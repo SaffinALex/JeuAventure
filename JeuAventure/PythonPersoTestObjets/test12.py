@@ -50,6 +50,7 @@ def placer_bloc(nbr,x,y):
         bloque_x.append(x)
         bloque_y.append(y)
 
+
         
     for ligne in lignes:
         for i in range (0,16):
@@ -84,7 +85,12 @@ def placer_obj(nbr,x,y):
     fichier = open(nom_bloc,'r')
     lignes  = fichier.readlines()
     
-        
+    if (nom_bloc != "objet0"):
+        bloque_x.append(x)
+        bloque_y.append(y)
+	print (x)
+	print (y)
+
     for ligne in lignes:
         for i in range (0,16):
             if ligne[i]=="1":
@@ -280,6 +286,7 @@ def vitesse(event):
         mon_perso[0]=8
     if touche=="Left":
         mon_perso[0]=-8
+   
 
 def stop(event):
     touche=event.keysym
@@ -341,7 +348,6 @@ mapy=1
 deplacement=0
 mon_perso=[0,0,96,96,[],"Perso1"]
 mon_ennemi=[0,0,64,64,[],"ennemi1"]
-mon_vase1=[0,0,320,320,[],"objet1"]
 bloque_y=[]
 bloque_x=[]
 
