@@ -16,8 +16,9 @@ def affiche_terrain():
 
     for ligne in lignes:
         for i in range (0,20):
-            placer_bloc(ligne[i],(i*32),j)
-
+            placer_bloc(0,(i*32),j)
+            if(ligne[i]!=0):
+                placer_bloc(ligne[i],(i*32),j)
         j+=32
     fichier.close()
 
@@ -33,7 +34,8 @@ def affiche_obj():
 
     for ligne in lignes:
         for i in range (0,20):
-            placer_obj(ligne[i],(i*32),j)
+            if ligne[i]!="0":
+                placer_obj(ligne[i],(i*32),j)
 
         j+=32
     fichier.close()
@@ -60,8 +62,6 @@ def placer_bloc(nbr,x,y):
                 canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="green",outline="")
             elif ligne[i]=="2":
                 canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="black",outline="")
-            elif ligne[i]=="0":
-                canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#219a21",outline="")
             elif ligne[i]=="3":
                 canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="blue",outline="")
             elif ligne[i]=="4":
@@ -91,8 +91,6 @@ def placer_obj(nbr,x,y):
     if (nom_bloc != "objet0"):
         bloque_x.append(x)
         bloque_y.append(y)
-	print (x)
-	print (y)
 
     for ligne in lignes:
         for i in range (0,16):
@@ -162,64 +160,29 @@ def efface_bloque():
         del bloque_y[len(bloque_y)-1]
 
 
-def bloquer_perso(val_x, val_y):
+def bloquer_entite(val_x, val_y,entite):
     global bloque_x
     global bloque_y
-    global mon_perso
-    
-    for i in range(0,len(bloque_x)-1):
+
+    for i in range(0,len(bloque_x)):
         
-        if(mon_perso[2]>=bloque_x[i] and mon_perso[2]<=bloque_x[i]+31):
-            if(mon_perso[3]>=bloque_y[i] and mon_perso[3]<=bloque_y[i]+31): #Coin Haut gauche
-               mon_perso[3]=val_y
-               mon_perso[2]=val_x
+        if(entite[2]>=bloque_x[i] and entite[2]<=bloque_x[i]+31):
+            if( entite[3]>=bloque_y[i] and  entite[3]<=bloque_y[i]+31): #Coin Haut gauche
+                entite[3]=val_y
+                entite[2]=val_x
                
-            elif(mon_perso[3]+31>=bloque_y[i] and mon_perso[3]+31<=bloque_y[i]+31): #Coin Bas gauche
-               mon_perso[3]=val_y
-               mon_perso[2]=val_x
+            elif( entite[3]+31>=bloque_y[i] and  entite[3]+31<=bloque_y[i]+31): #Coin Bas gauche
+                entite[3]=val_y
+                entite[2]=val_x
                 
-        if(mon_perso[2]+31>=bloque_x[i] and mon_perso[2]+32<=bloque_x[i]+31):
-            if(mon_perso[3]+31>=bloque_y[i] and mon_perso[3]+31<=bloque_y[i]+31): #Coin Haut Droite
-               mon_perso[3]=val_y
-               mon_perso[2]=val_x
-
-            elif(mon_perso[3]>=bloque_y[i] and mon_perso[3]<=bloque_y[i]+31): #Coin Bas Droite
-               mon_perso[3]=val_y
-               mon_perso[2]=val_x
-
-def bloquer_ennemi(val_x, val_y):
-    global bloque_x
-    global bloque_y
-    global mon_ennemi
-    global deplacement
-    
-    for i in range(0,len(bloque_x)-1):
-        
-        if(mon_ennemi[2]>=bloque_x[i] and mon_ennemi[2]<=bloque_x[i]+31):
-            if(mon_ennemi[3]>=bloque_y[i] and mon_ennemi[3]<=bloque_y[i]+31): #Coin Haut gauche
-                mon_ennemi[3]=val_y
-                mon_ennemi[2]=val_x
-                deplacement=0
-
-            elif(mon_ennemi[3]+31>=bloque_y[i] and mon_ennemi[3]+31<=bloque_y[i]+31): #Coin Bas gauche
-                mon_ennemi[3]=val_y
-                mon_ennemi[2]=val_x
-                deplacement=0
+        if( entite[2]+31>=bloque_x[i] and  entite[2]+32<=bloque_x[i]+31):
+            if( entite[3]+31>=bloque_y[i] and entite[3]+31<=bloque_y[i]+31): #Coin Haut Droite
+                entite[3]=val_y
+                entite[2]=val_x
+            elif( entite[3]>=bloque_y[i] and  entite[3]<=bloque_y[i]+31): #Coin Bas Droite
+                entite[3]=val_y
+                entite[2]=val_x
                 
-        if(mon_ennemi[2]+31>=bloque_x[i] and mon_ennemi[2]+32<=bloque_x[i]+31):
-            if(mon_ennemi[3]+31>=bloque_y[i] and mon_ennemi[3]+31<=bloque_y[i]+31): #Coin Haut Droite
-                mon_ennemi[3]=val_y
-                mon_ennemi[2]=val_x
-                deplacement=0
-                
-            elif(mon_ennemi[3]>=bloque_y[i] and mon_ennemi[3]<=bloque_y[i]+31): #Coin Bas Droite
-                mon_ennemi[3]=val_y
-                mon_ennemi[2]=val_x
-                deplacement=0
-
-
-
-    
 def frame():
 
     mouvement_perso()
@@ -235,7 +198,7 @@ def mouvement_perso():
     val_x=mon_perso[2]-mon_perso[0]
     val_y=mon_perso[3]-mon_perso[1]
     orientation(mon_perso)
-    bloquer_perso(val_x,val_y)
+    bloquer_entite(val_x,val_y,mon_perso)
     bouger_sprite(mon_perso[4],mon_perso[5],mon_perso[2],mon_perso[3])
 
 def orientation(entite) : 
@@ -302,7 +265,7 @@ def mouvement_ennemi():
 
     mon_ennemi[2]+=mon_ennemi[0]
     mon_ennemi[3]+=mon_ennemi[1]
-    bloquer_ennemi(mon_ennemi[2]-mon_ennemi[0],mon_ennemi[3]-mon_ennemi[1])
+    bloquer_entite(mon_ennemi[2]-mon_ennemi[0],mon_ennemi[3]-mon_ennemi[1],mon_ennemi)
     bouger_sprite(mon_ennemi[4],mon_ennemi[5],mon_ennemi[2],mon_ennemi[3])
     deplacement-=1
     
