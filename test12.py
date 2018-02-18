@@ -243,7 +243,7 @@ def orientation(entite) :
 	numero=(entite[5][numero-1])
 	
 	if entite[0]>0 :
-        entite[6]="Droite
+        entite[6]="Droite"
         numero+=1
         entite[5]=sprite+str(numero)
             
