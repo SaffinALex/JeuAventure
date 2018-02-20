@@ -7,27 +7,29 @@ from random import *
 def affiche_terrain():
     global mapx
     global mapy
-
+    
     canvas.delete("all")
-    nom="map"+str(mapx)+"-"+str(mapy)
+    affiche_surf()
+    nom="./map/map"+str(mapx)+"-"+str(mapy)
     fichier=open(nom,"r")
     lignes=fichier.readlines()
     j=0
 
     for ligne in lignes:
         for i in range (0,20):
-            placer_bloc(0,(i*32),j)
-            if(ligne[i]!=0):
-                placer_bloc(ligne[i],(i*32),j)
+            if(ligne[i]!="0"):
+                nom="./spriteDecor/bloc"+ligne[i]
+                placer(nom,(i*32),j,1)
         j+=32
     fichier.close()
+    affiche_ennemi()
+
 
 def affiche_obj():
     global mapx
     global mapy
-
-    #canvas.delete("all")
-    nom="mapobj"+str(mapx)+"-"+str(mapy)
+    
+    nom="./map/mapobj"+str(mapx)+"-"+str(mapy)
     fichier=open(nom,"r")
     lignes=fichier.readlines()
     j=0
@@ -35,93 +37,103 @@ def affiche_obj():
     for ligne in lignes:
         for i in range (0,20):
             if ligne[i]!="0":
-                placer_obj(ligne[i],(i*32),j)
+                nom="./spriteObjet/objet"+ligne[i]
+                placer(nom,(i*32),j,1)
 
         j+=32
     fichier.close()
 
-def placer_bloc(nbr,x,y):
+def affiche_surf():
+    global mapx
+    global mapy
+    
+    nom="./map/mapsurf"+str(mapx)+"-"+str(mapy)
+    fichier=open(nom,"r")
+    lignes=fichier.readlines()
+    j=0
+
+    for ligne in lignes:
+        for i in range (0,20):
+            nom="./spriteDecor/bloc"+ligne[i]
+            placer(nom,(i*32),j,0)
+
+        j+=32
+    fichier.close()
+
+def ajout_ennemi(nom,x,y):
+    global Ennemi
+    
+    fichier=open(nom+"-carac","r")
+    lignes=fichier.readlines()
+    liste=[0,0,x,y,[],nom,"Bas",0,int(lignes[0][8]),int(lignes[1][4]),int(lignes[2][8])]
+    Ennemi.append(liste)
+    mouvement_ennemi(Ennemi[len(Ennemi)-1])
+    fichier.close()
+    
+def affiche_ennemi():
+    Ennemi
+    nom="./map/mapennemi"+str(mapx)+"-"+str(mapy)
+    fichier=open(nom,"r")
+    lignes=fichier.readlines()
+    j=0
+
+    for ligne in lignes:
+        for i in range (0,20):
+            if(ligne[i]!="0"):
+                nom="./spriteEnnemi/ennemi"+ligne[i]
+                ajout_ennemi(nom,i*32,j)
+
+        j+=32
+    fichier.close()
+    
+
+def placer(nom,x,y,option):
     global bloque_x
     global bloque_y
     
     val_x=x
     val_y=y
-    nom_bloc="bloc"+str(nbr)
-    fichier = open(nom_bloc,'r')
+    fichier = open(nom,'r')
     lignes  = fichier.readlines()
     
-    if not(nom_bloc=="bloc0"):
-        bloque_x.append(x)
-        bloque_y.append(y)
-
-
-        
-    for ligne in lignes:
-        for i in range (0,16):
-            if ligne[i]=="1":
-                canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="green",outline="")
-            elif ligne[i]=="2":
-                canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="black",outline="")
-            elif ligne[i]=="3":
-                canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="blue",outline="")
-            elif ligne[i]=="4":
-                canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#808180",outline="")
-            elif ligne[i]=="5":
-                 canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#614919",outline="")
-            elif ligne[i]=="6":
-                 canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="red",outline="")
-                 
-            val_x+=2
-
-        val_y+=2
-        val_x=x
-        fichier.close()
-
-
-def placer_obj(nbr,x,y):
-    global bloque_x
-    global bloque_y
-    
-    val_x=x
-    val_y=y
-    nom_bloc="objet"+str(nbr)
-    fichier = open(nom_bloc,'r')
-    lignes  = fichier.readlines()
-    
-    if (nom_bloc != "objet0"):
+    if (option!=0):
         bloque_x.append(x)
         bloque_y.append(y)
 
     for ligne in lignes:
         for i in range (0,16):
             if ligne[i]=="1":
-                canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="green",outline="")
+                canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="green",outline="") #vert
             elif ligne[i]=="2":
-                canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="black",outline="")
+                canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="black",outline="") #noir
             elif ligne[i]=="3":
-                canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="blue",outline="")
+                canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="blue",outline="") #bleu
             elif ligne[i]=="4":
-                canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#808180",outline="")
+                canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#808180",outline="") #gris
             elif ligne[i]=="5":
-                 canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#614919",outline="")
+                 canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#614919",outline="") #marron
             elif ligne[i]=="6":
-                 canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="red",outline="")
+                 canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="red",outline="") #rouge 
             elif ligne[i]=="7":
-                 canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#d4a566",outline="")
+                 canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#d4a566",outline="") #beige
+            elif ligne[i]=="8":
+                 canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#96c14b",outline="") #vertClaire
             val_x+=2
 
         val_y+=2
         val_x=x
-        fichier.close()
+    fichier.close()
            
 def changeMap():
     global mon_perso
+    global Ennemi
     global mapx
     global mapy
 
     if (mon_perso[2]+32>640):
         mapx+=1
         mon_perso[2]=0
+        Ennemi=[]
         efface_bloque()
         affiche_terrain()
 	affiche_obj()
@@ -130,6 +142,7 @@ def changeMap():
     elif(mon_perso[2]<0):
         mapx-=1
         mon_perso[2]=640-32
+        Ennemi=[]
         efface_bloque()
         affiche_terrain()
 	affiche_obj()
@@ -138,6 +151,7 @@ def changeMap():
     elif(mon_perso[3]<0):
         mapy+=1
         mon_perso[3]=640-32
+        Ennemi=[]
         efface_bloque()
         affiche_terrain()
 	affiche_obj()        
@@ -146,6 +160,7 @@ def changeMap():
     elif(mon_perso[3]+32>640):
         mapy-=1
         mon_perso[3]=0
+        Ennemi=[]
         efface_bloque()
         affiche_terrain()
 	affiche_obj()        
@@ -179,24 +194,31 @@ def bloquer_entite(val_x, val_y,entite):
             if( entite[3]+31>=bloque_y[i] and entite[3]+31<=bloque_y[i]+31): #Coin Haut Droite
                 entite[3]=val_y
                 entite[2]=val_x
+                
             elif( entite[3]>=bloque_y[i] and  entite[3]<=bloque_y[i]+31): #Coin Bas Droite
                 entite[3]=val_y
                 entite[2]=val_x
                 
+        if(entite[3]>620 or entite[3]<-8 or entite[2]>620 or entite[2]<-8):
+            entite[3]=val_y
+            entite[2]=val_x
+                
 def frame():
-
+    global Ennemi
     mouvement_perso()
     changeMap()
-    mouvement_ennemi()
-    canvas.after(70,frame)
+    for i in range(0,len(Ennemi)):
+        mouvement_ennemi(Ennemi[i])
+        
+    canvas.after(10,frame)
 
 def mouvement_perso():
     global mon_perso
-    
+           
+    val_x=mon_perso[2]
+    val_y=mon_perso[3] 
     mon_perso[2]+=mon_perso[0]
     mon_perso[3]+=mon_perso[1]
-    val_x=mon_perso[2]-mon_perso[0]
-    val_y=mon_perso[3]-mon_perso[1]
     orientation(mon_perso)
     bloquer_entite(val_x,val_y,mon_perso)
     bouger_sprite(mon_perso[4],mon_perso[5],mon_perso[2],mon_perso[3])
@@ -243,32 +265,29 @@ def orientation(entite) :
 
 
     	
-def mouvement_ennemi():
-    global deplacement
-    global mon_ennemi
+def mouvement_ennemi(mon_ennemi):
 
-    if(deplacement<=0):
+    if(mon_ennemi[7]<=0):
         chiffre=randint(0,4)
         mon_ennemi[0]=0
         mon_ennemi[1]=0
         
         if(chiffre==0):
-            mon_ennemi[0]+=4
+            mon_ennemi[0]+=mon_ennemi[8]
             
         elif(chiffre==1):
-            mon_ennemi[0]-=4
+            mon_ennemi[0]-=mon_ennemi[8]
         elif(chiffre==2):
-            mon_ennemi[1]+=4
+            mon_ennemi[1]+=mon_ennemi[8]
         elif(chiffre==3):
-            mon_ennemi[1]-=4
-        deplacement=10
+            mon_ennemi[1]-=mon_ennemi[8]
+        mon_ennemi[7]=10
 
     mon_ennemi[2]+=mon_ennemi[0]
     mon_ennemi[3]+=mon_ennemi[1]
     bloquer_entite(mon_ennemi[2]-mon_ennemi[0],mon_ennemi[3]-mon_ennemi[1],mon_ennemi)
     bouger_sprite(mon_ennemi[4],mon_ennemi[5],mon_ennemi[2],mon_ennemi[3])
-    deplacement-=1
-    
+    mon_ennemi[7]-=1
 
 def vitesse(event):
     global mon_perso
@@ -344,8 +363,8 @@ canvas = Canvas(fenetre, width=640, height=639, background="#219a21")
 mapx=1
 mapy=1
 deplacement=0
-mon_perso=[0,0,96,96,[],"PersoB1","Bas"]
-mon_ennemi=[0,0,64,64,[],"ennemi1","Bas"]
+mon_perso=[0,0,96,96,[],"./spritePerso/PersoB1","Bas"]
+Ennemi=[]
 bloque_y=[]
 bloque_x=[]
 
