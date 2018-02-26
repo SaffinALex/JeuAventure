@@ -65,7 +65,7 @@ def ajout_ennemi(nom,x,y):
     
     fichier=open(nom+"-carac","r")
     lignes=fichier.readlines()
-    liste=[0,0,x,y,[],nom,"Bas",0,int(lignes[0][8]),int(lignes[1][4]),int(lignes[2][8])]
+    liste=[0,0,x,y,[],nom+"B1","Bas",0,int(lignes[0][8]),int(lignes[1][4]),int(lignes[2][8])]
     Ennemi.append(liste)
     mouvement_ennemi(Ennemi[len(Ennemi)-1])
     fichier.close()
@@ -210,7 +210,7 @@ def frame():
     for i in range(0,len(Ennemi)):
         mouvement_ennemi(Ennemi[i])
         
-    canvas.after(10,frame)
+    canvas.after(50,frame)
 
 def mouvement_perso():
     global mon_perso
@@ -274,17 +274,21 @@ def mouvement_ennemi(mon_ennemi):
         
         if(chiffre==0):
             mon_ennemi[0]+=mon_ennemi[8]
-            
+            mon_ennemi[6]="Droite"
         elif(chiffre==1):
             mon_ennemi[0]-=mon_ennemi[8]
+            mon_ennemi[6]="Gauche"
         elif(chiffre==2):
             mon_ennemi[1]+=mon_ennemi[8]
+            mon_ennemi[6]="Bas"
         elif(chiffre==3):
             mon_ennemi[1]-=mon_ennemi[8]
+            mon_ennemi[6]="Haut"
         mon_ennemi[7]=10
 
     mon_ennemi[2]+=mon_ennemi[0]
     mon_ennemi[3]+=mon_ennemi[1]
+    orientation(mon_ennemi)
     bloquer_entite(mon_ennemi[2]-mon_ennemi[0],mon_ennemi[3]-mon_ennemi[1],mon_ennemi)
     bouger_sprite(mon_ennemi[4],mon_ennemi[5],mon_ennemi[2],mon_ennemi[3])
     mon_ennemi[7]-=1
@@ -322,7 +326,7 @@ def bouger_sprite(sprite_pos,nom,x,y):
     lignes  = fichier.readlines()
 
     for ligne in lignes:
-        for i in range (0,16):
+        for i in range (0,16):                
             if ligne[i]=="1":
                 pos=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="green",outline="")
             elif ligne[i]=="2":
@@ -338,6 +342,8 @@ def bouger_sprite(sprite_pos,nom,x,y):
             elif ligne[i]=="7":
                  pos=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#d4a566",outline="")
             elif ligne[i]=="8":
+                 pos= canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#96c14b",outline="") #vertClaire
+            elif ligne[i]=="9":
                  pos=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="white",outline="")
                  
             if ligne[i]!="0":
