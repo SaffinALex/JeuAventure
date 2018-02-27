@@ -118,6 +118,8 @@ def placer(nom,x,y,option):
                  canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#d4a566",outline="") #beige
             elif ligne[i]=="8":
                  canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#96c14b",outline="") #vertClaire
+            elif ligne[i]=="9":
+                 canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="white",outline="") #Blanc
             val_x+=2
 
         val_y+=2
@@ -205,13 +207,46 @@ def bloquer_entite(val_x, val_y,entite):
                 
 def frame():
     global Ennemi
+    global mon_perso
+
+    #print mon_perso[0]
+    evenement()
     mouvement_perso()
     changeMap()
     for i in range(0,len(Ennemi)):
         mouvement_ennemi(Ennemi[i])
         
+    if(len(Ennemi)>0):
+        toucher(mon_perso)
+        
     canvas.after(50,frame)
 
+def toucher(entite):
+
+    global Ennemi
+    effaces=[]
+
+    for i in range(len(Ennemi)):
+
+        if(entite[2]>=Ennemi[i][2] and entite[2]<=Ennemi[i][2]+31):
+            if( entite[3]>=Ennemi[i][3] and  entite[3]<=Ennemi[i][3]+31): #Coin Haut gauche
+                effaces.append(i)
+        
+            elif( entite[3]+31>=Ennemi[i][3] and  entite[3]+31<Ennemi[i][3]+31): #Coin Bas gauche
+                effaces.append(i)
+                
+        if( entite[2]+31>=Ennemi[i][2] and  entite[2]+32<=Ennemi[i][2]+31):
+            if( entite[3]+31>=Ennemi[i][3] and entite[3]+31<=Ennemi[i][3]+31): #Coin Haut Droite
+                effaces.append(i)
+                
+            elif( entite[3]>=Ennemi[i][3] and  entite[3]<=Ennemi[i][3]+31): #Coin Bas Droite
+                effaces.append(i)
+                
+    for i in range(len(effaces)):
+        efface(Ennemi[effaces[i]][4])
+        del Ennemi[effaces[i]]
+            
+                    
 def mouvement_perso():
     global mon_perso
            
@@ -315,6 +350,43 @@ def stop(event):
 
     if(touche=="Right" or touche=="Left"):
         mon_perso[0]=0
+
+def evenement():
+    global mapx
+    global mapy
+    global coffre1
+    global ferme1
+    global Ennemi
+
+    if(mapx==1 and mapy==1):
+        if(coffre1==False):
+            if(not(len(Ennemi)>0)):
+                
+                #fichier=open("./map/mapobj1-1","r")
+                #lignes=fichier.readlines()
+                #newligne=""
+
+                #for i in range(len(lignes[1])):
+                 #   if(i==5):
+                 #       newligne+="2"
+                  #  else:
+                   #     newligne+=lignes[1][i]
+               # lignes[1]=newligne
+
+                #fichier.close()
+                
+                #fichier=open("./map/mapobj1-1","w")
+                #fichier.close()
+                
+                #fichier=open("./map/mapobj1-1","a")
+               # for i in range(0,16):
+                #    fichier.write(lignes[i]) 
+                    
+                coffre1=True
+                placer("./spriteObjet/objet2",160,32,1)
+                #fichier.close()
+                
+
         
         
 
@@ -373,6 +445,7 @@ mon_perso=[0,0,96,96,[],"./spritePerso/PersoB1","Bas"]
 Ennemi=[]
 bloque_y=[]
 bloque_x=[]
+coffre1=False
 
 
 affiche_terrain()
