@@ -187,7 +187,7 @@ def bloquer_entite(val_x, val_y,entite):
     for i in range(0,len(bloque_x)):
         
         if(entite[2]>=bloque_x[i] and entite[2]<=bloque_x[i]+31):
-            if( entite[3]>=bloque_y[i] and  entite[3]<=bloque_y[i]+31): #Coin Haut gauche
+            if( entite[3]+16>=bloque_y[i] and  entite[3]+16<=bloque_y[i]+31): #Coin Haut gauche
                 entite[3]=val_y
                 entite[2]=val_x
                
@@ -196,11 +196,11 @@ def bloquer_entite(val_x, val_y,entite):
                 entite[2]=val_x
                 
         if( entite[2]+31>=bloque_x[i] and  entite[2]+32<=bloque_x[i]+31):
-            if( entite[3]+31>=bloque_y[i] and entite[3]+31<=bloque_y[i]+31): #Coin Haut Droite
+            if( entite[3]+31>=bloque_y[i] and entite[3]+31<=bloque_y[i]+31): #Coin Bas Droite
                 entite[3]=val_y
                 entite[2]=val_x
                 
-            elif( entite[3]>=bloque_y[i] and  entite[3]<=bloque_y[i]+31): #Coin Bas Droite
+            elif( entite[3]+16>=bloque_y[i] and  entite[3]+16<=bloque_y[i]+31): #Coin Haut Droite
                 entite[3]=val_y
                 entite[2]=val_x
                 
