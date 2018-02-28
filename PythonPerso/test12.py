@@ -120,6 +120,9 @@ def placer(nom,x,y,option):
                  canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#96c14b",outline="") #vertClaire
             elif ligne[i]=="9":
                  canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="white",outline="") #Blanc
+            elif ligne[i]=="A":
+                canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#242323",outline="") #NoirClaire(Ombre)
+                
             val_x+=2
 
         val_y+=2
