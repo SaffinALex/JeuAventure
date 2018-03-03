@@ -22,7 +22,8 @@ def affiche_terrain():
                 placer(nom,(i*32),j,1)
         j+=32
     fichier.close()
-    affiche_ennemi()
+    if(attendre == False):
+    	affiche_ennemi()
 
 
 def affiche_obj():
@@ -211,18 +212,19 @@ def bloquer_entite(val_x, val_y,entite):
 def frame():
     global Ennemi
     global mon_perso
+    global attendre
 
-    #print mon_perso[0]
-    evenement()
-    mouvement_perso()
-    changeMap()
-    for i in range(0,len(Ennemi)):
-        mouvement_ennemi(Ennemi[i])
+    if(attendre == False):
+    	#print mon_perso[0]
+    	evenement()
+    	mouvement_perso()
+    	changeMap()
+    	for i in range(0,len(Ennemi)):
+    	    mouvement_ennemi(Ennemi[i])
         
-    if(len(Ennemi)>0):
-        toucher(mon_perso)
-        
-    canvas.after(50,frame)
+    	if(len(Ennemi)>0):
+    	    toucher(mon_perso)
+    	canvas.after(50,frame)
 
 def toucher(entite):
 
@@ -345,6 +347,46 @@ def vitesse(event):
     if touche=="Left":
         mon_perso[0]=-8
    
+def creation_menu(x,y):
+	
+	canvas.create_text(200, 200, text = "Reprendre")
+	canvas.create_text(x, y, text = "<")
+	canvas.create_text(200, 300, text = "Menu Principal")
+
+
+
+def menu(event):
+    global attendre
+    global choix_menu
+	
+    touche=event.keysym
+    if(touche=="Escape"):
+	if(attendre != True):
+        	attendre = True
+		canvas.delete("all")
+		choix_menu = 0
+		creation_menu(300,200)
+
+    if(touche=="Down"):
+	if(attendre == True):
+		if(choix_menu == 0):
+			canvas.delete("all")
+			creation_menu(300,300)
+			choix_menu = 1
+		elif(choix_menu == 1):
+			canvas.delete("all")
+			creation_menu(300,200)
+			choix_menu = 0
+	elif(attendre == False):
+		vitesse(event)
+
+    if(touche=="Return"):
+	if(choix_menu == 0):
+		affiche_terrain()
+        	attendre = False
+		frame()
+
+
 
 def stop(event):
     touche=event.keysym
@@ -389,7 +431,7 @@ def evenement():
                 placer("./spriteObjet/objet2",160,32,1)
                 #fichier.close()
                 
-
+	
         
         
 
@@ -399,7 +441,7 @@ def bouger_sprite(sprite_pos,nom,x,y):
     val_y=y
     fichier = open(nom,'r')
     lignes  = fichier.readlines()
-
+	
     for ligne in lignes:
         for i in range (0,16):                
             if ligne[i]=="1":
@@ -444,11 +486,13 @@ canvas = Canvas(fenetre, width=640, height=639, background="#219a21")
 mapx=1
 mapy=1
 deplacement=0
+choix_menu = 0
 mon_perso=[0,0,96,96,[],"./spritePerso/PersoB1","Bas"]
 Ennemi=[]
 bloque_y=[]
 bloque_x=[]
 coffre1=False
+attendre = False
 
 
 affiche_terrain()
@@ -456,10 +500,15 @@ affiche_obj()
 frame()
 
 canvas.pack()
+canvas.event_add('<<menu_esc>>', '<KeyPress-Escape>')
+canvas.event_add('<<menu_ret>>', '<KeyPress-Return>')
+canvas.event_add('<<menu_dwn>>', '<KeyPress-Down>')
 canvas.focus_set()
 canvas.bind("<Key>", vitesse)
 canvas.bind("<KeyRelease>", stop)
-
+canvas.bind("<<menu_esc>>",menu)
+canvas.bind("<<menu_ret>>",menu)
+canvas.bind("<<menu_dwn>>",menu)
         
 fenetre.mainloop()
-    
+
