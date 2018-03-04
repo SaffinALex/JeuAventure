@@ -346,6 +346,80 @@ def vitesse(event):
         mon_perso[0]=8
     if touche=="Left":
         mon_perso[0]=-8
+
+def accueil():
+	canvas.delete("all")
+	canvas.create_text(400, 300, text = "Appuyer sur Espace pour Continuer")
+
+def menu_principal(event):
+	global choix_menu_principal
+	global attendre_principal
+
+	touche=event.keysym
+	if(touche == "space"):
+		attendre_principal = True
+		canvas.delete("all")
+		choix_menu_principal = 0
+		creation_menu_principal(300,200)
+		
+	if(touche=="Down"):
+		if(attendre_principal == True):
+			if(choix_menu_principal == 0):
+				canvas.delete("all")
+				choix_menu_principal = 1
+				creation_menu_principal(300,300)
+				
+				
+			elif(choix_menu_principal == 1):
+				canvas.delete("all")
+				choix_menu_principal = 2
+				creation_menu_principal(300,400)
+				
+			elif(choix_menu_principal == 2):
+				canvas.delete("all")
+				choix_menu_principal = 0
+				creation_menu_principal(300,200)
+				
+		elif(attendre_principal == False):
+			menu(event)
+	if(touche=="Up"):
+		if(attendre_principal == True):
+			if(choix_menu_principal == 0):
+				canvas.delete("all")
+				choix_menu_principal = 2
+				creation_menu_principal(300,400)
+				
+				
+			elif(choix_menu_principal == 1):
+				canvas.delete("all")
+				choix_menu_principal = 0
+				creation_menu_principal(300,200)
+				
+			elif(choix_menu_principal == 2):
+				canvas.delete("all")
+				choix_menu_principal = 1
+				creation_menu_principal(300,300)
+				
+		elif(attendre_principal == False):
+			menu(event)
+
+	if(touche=="Return"):
+		if(attendre_principal == True):
+			if(choix_menu_principal == 0):
+				attendre_principal = False
+				affiche_terrain()
+				affiche_obj()
+				frame()				
+		elif(attendre_principal == False):
+			menu(event)		
+				
+
+def creation_menu_principal(x,y):
+	
+	canvas.create_text(200, 200, text = "Nouvelle Partie")
+	canvas.create_text(x, y, text = "<")
+	canvas.create_text(200, 300, text = "Charger Partie")
+	canvas.create_text(200, 400, text = "Options")
    
 def creation_menu(x,y):
 	
@@ -362,10 +436,11 @@ def menu(event):
     touche=event.keysym
     if(touche=="Escape"):
 	if(attendre != True):
-        	attendre = True
-		canvas.delete("all")
-		choix_menu = 0
-		creation_menu(300,200)
+		if(attendre_principal == False):
+	        	attendre = True
+			canvas.delete("all")
+			choix_menu = 0
+			creation_menu(300,200)
 
     if(touche=="Down"):
 	if(attendre == True):
@@ -379,12 +454,27 @@ def menu(event):
 			choix_menu = 0
 	elif(attendre == False):
 		vitesse(event)
+    if(touche=="Up"):
+	if(attendre == True):
+		if(choix_menu == 0):
+			canvas.delete("all")
+			creation_menu(300,300)
+			choix_menu = 1
+		elif(choix_menu == 1):
+			canvas.delete("all")
+			creation_menu(300,200)
+			choix_menu = 0
+	elif(attendre == False):
+		vitesse(event)
 
     if(touche=="Return"):
-	if(choix_menu == 0):
-		affiche_terrain()
-        	attendre = False
-		frame()
+	if(attendre == True):
+		if(choix_menu == 0):
+			affiche_terrain()
+        		attendre = False
+			frame()
+		elif(choix_menu == 1):
+			accueil()
 
 
 
@@ -487,28 +577,34 @@ mapx=1
 mapy=1
 deplacement=0
 choix_menu = 0
+choix_menu_principal = 3
 mon_perso=[0,0,96,96,[],"./spritePerso/PersoB1","Bas"]
 Ennemi=[]
 bloque_y=[]
 bloque_x=[]
 coffre1=False
 attendre = False
+attendre_principal = False
 
-
-affiche_terrain()
-affiche_obj()
-frame()
+accueil()
+#affiche_terrain()
+#affiche_obj()
+#frame()
 
 canvas.pack()
 canvas.event_add('<<menu_esc>>', '<KeyPress-Escape>')
 canvas.event_add('<<menu_ret>>', '<KeyPress-Return>')
+canvas.event_add('<<menu_up>>', '<KeyPress-Up>')
 canvas.event_add('<<menu_dwn>>', '<KeyPress-Down>')
+canvas.event_add('<<menu_spac>>', '<KeyPress-space>')
 canvas.focus_set()
 canvas.bind("<Key>", vitesse)
 canvas.bind("<KeyRelease>", stop)
 canvas.bind("<<menu_esc>>",menu)
-canvas.bind("<<menu_ret>>",menu)
-canvas.bind("<<menu_dwn>>",menu)
+canvas.bind("<<menu_ret>>",menu_principal)
+canvas.bind("<<menu_up>>",menu_principal)
+canvas.bind("<<menu_dwn>>",menu_principal)
+canvas.bind("<<menu_spac>>",menu_principal)
         
 fenetre.mainloop()
 
