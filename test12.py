@@ -15,13 +15,14 @@ def affiche_terrain():
     lignes=fichier.readlines()
     j=0
 
-    for ligne in lignes:
+    for cpt in range(0,20):
         for i in range (0,20):
-            if(ligne[i]!="0"):
-                nom="./spriteDecor/bloc"+ligne[i]
-                placer(nom,(i*32),j,1)
+            nom="./spriteSurface/bloc"+lignes[cpt][i]
+            placer(nom,(i*32),j,0)
         j+=32
     fichier.close()
+    affiche_surf()
+    affiche_obj()
     affiche_ennemi()
 
 
@@ -29,15 +30,15 @@ def affiche_obj():
     global mapx
     global mapy
     
-    nom="./map/mapobj"+str(mapx)+"-"+str(mapy)
+    nom="./map/map"+str(mapx)+"-"+str(mapy)
     fichier=open(nom,"r")
     lignes=fichier.readlines()
     j=0
 
-    for ligne in lignes:
+    for cpt in range(60,80):
         for i in range (0,20):
-            if ligne[i]!="0":
-                nom="./spriteObjet/objet"+ligne[i]
+            if lignes[cpt][i]!="0":
+                nom="./spriteObjet/objet"+lignes[cpt][i]
                 placer(nom,(i*32),j,1)
 
         j+=32
@@ -47,15 +48,16 @@ def affiche_surf():
     global mapx
     global mapy
     
-    nom="./map/mapsurf"+str(mapx)+"-"+str(mapy)
+    nom="./map/map"+str(mapx)+"-"+str(mapy)
     fichier=open(nom,"r")
     lignes=fichier.readlines()
     j=0
 
-    for ligne in lignes:
+    for cpt in range(20,40):
         for i in range (0,20):
-            nom="./spriteDecor/bloc"+ligne[i]
-            placer(nom,(i*32),j,0)
+            if lignes[cpt][i]!="0":
+                nom="./spriteDecor/bloc"+lignes[cpt][i]
+                placer(nom,(i*32),j,1)
 
         j+=32
     fichier.close()
@@ -72,15 +74,15 @@ def ajout_ennemi(nom,x,y):
     
 def affiche_ennemi():
     Ennemi
-    nom="./map/mapennemi"+str(mapx)+"-"+str(mapy)
+    nom="./map/map"+str(mapx)+"-"+str(mapy)
     fichier=open(nom,"r")
     lignes=fichier.readlines()
     j=0
 
-    for ligne in lignes:
+    for cpt in range(40,60):
         for i in range (0,20):
-            if(ligne[i]!="0"):
-                nom="./spriteEnnemi/ennemi"+ligne[i]
+            if lignes[cpt][i]!="0":
+                nom="./spriteEnnemi/ennemi"+lignes[cpt][i]
                 ajout_ennemi(nom,i*32,j)
 
         j+=32
@@ -103,7 +105,7 @@ def placer(nom,x,y,option):
     for ligne in lignes:
         for i in range (0,16):
             if ligne[i]=="1":
-                canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="green",outline="") #vert
+                canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#0a650a",outline="") #vert
             elif ligne[i]=="2":
                 canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="black",outline="") #noir
             elif ligne[i]=="3":
@@ -117,11 +119,16 @@ def placer(nom,x,y,option):
             elif ligne[i]=="7":
                  canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#d4a566",outline="") #beige
             elif ligne[i]=="8":
-                 canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#96c14b",outline="") #vertClaire
+                 canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#0dac07",outline="") #vertClaire
             elif ligne[i]=="9":
                  canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="white",outline="") #Blanc
             elif ligne[i]=="A":
-                canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#242323",outline="") #NoirClaire(Ombre)
+                canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#6d5331",outline="") #MarronClaire
+            elif ligne[i]=="B":
+                canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#383837",outline="") #NOIRCLAIRE(OMBRE)
+            elif ligne[i]=="C":
+                canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#e3e570",outline="") #JAUNECLAIRE
+
                 
             val_x+=2
 
@@ -141,7 +148,6 @@ def changeMap():
         Ennemi=[]
         efface_bloque()
         affiche_terrain()
-	affiche_obj()
         mouvement_perso()
         
     elif(mon_perso[2]<0):
@@ -158,8 +164,7 @@ def changeMap():
         mon_perso[3]=640-32
         Ennemi=[]
         efface_bloque()
-        affiche_terrain()
-	affiche_obj()        
+        affiche_terrain()       
 	mouvement_perso()
         
     elif(mon_perso[3]+32>640):
@@ -167,8 +172,7 @@ def changeMap():
         mon_perso[3]=0
         Ennemi=[]
         efface_bloque()
-        affiche_terrain()
-	affiche_obj()        
+        affiche_terrain()       
 	mouvement_perso()
 
 def efface_bloque():
@@ -184,8 +188,7 @@ def bloquer_entite(val_x, val_y,entite):
     global bloque_x
     global bloque_y
 
-    for i in range(0,len(bloque_x)):
-        
+    for i in range(len(bloque_x)):
         if(entite[2]>=bloque_x[i] and entite[2]<=bloque_x[i]+31):
             if( entite[3]+16>=bloque_y[i] and  entite[3]+16<=bloque_y[i]+31): #Coin Haut gauche
                 entite[3]=val_y
@@ -199,30 +202,32 @@ def bloquer_entite(val_x, val_y,entite):
             if( entite[3]+31>=bloque_y[i] and entite[3]+31<=bloque_y[i]+31): #Coin Bas Droite
                 entite[3]=val_y
                 entite[2]=val_x
-                
+            
             elif( entite[3]+16>=bloque_y[i] and  entite[3]+16<=bloque_y[i]+31): #Coin Haut Droite
                 entite[3]=val_y
                 entite[2]=val_x
                 
-        if(entite[3]>620 or entite[3]<-8 or entite[2]>620 or entite[2]<-8):
-            entite[3]=val_y
-            entite[2]=val_x
+    if(entite[3]>620 or entite[3]<-8 or entite[2]>620 or entite[2]<-8):
+        entite[3]=val_y
+        entite[2]=val_x
                 
 def frame():
     global Ennemi
     global mon_perso
+    global attendre
 
+    if(not attendre):
     #print mon_perso[0]
-    evenement()
-    mouvement_perso()
-    changeMap()
-    for i in range(0,len(Ennemi)):
-        mouvement_ennemi(Ennemi[i])
+        evenement()
+        mouvement_perso()
+        changeMap()
+        for i in range(0,len(Ennemi)):
+            mouvement_ennemi(Ennemi[i])
         
-    if(len(Ennemi)>0):
-        toucher(mon_perso)
+        if(len(Ennemi)>0):
+            toucher(mon_perso)
         
-    canvas.after(50,frame)
+        canvas.after(30,frame)
 
 def toucher(entite):
 
@@ -344,7 +349,135 @@ def vitesse(event):
         mon_perso[0]=8
     if touche=="Left":
         mon_perso[0]=-8
+        
+def accueil():
+	canvas.delete("all")
+	canvas.create_text(400, 300, text = "Appuyer sur Espace pour Continuer")
+
+def menu_principal(event):
+	global choix_menu_principal
+	global attendre_principal
+
+	touche=event.keysym
+	if(touche == "space"):
+		attendre_principal = True
+		canvas.delete("all")
+		choix_menu_principal = 0
+		creation_menu_principal(300,200)
+		
+	if(touche=="Down"):
+		if(attendre_principal == True):
+			if(choix_menu_principal == 0):
+				canvas.delete("all")
+				choix_menu_principal = 1
+				creation_menu_principal(300,300)
+				
+				
+			elif(choix_menu_principal == 1):
+				canvas.delete("all")
+				choix_menu_principal = 2
+				creation_menu_principal(300,400)
+				
+			elif(choix_menu_principal == 2):
+				canvas.delete("all")
+				choix_menu_principal = 0
+				creation_menu_principal(300,200)
+				
+		elif(attendre_principal == False):
+			menu(event)
+	if(touche=="Up"):
+		if(attendre_principal == True):
+			if(choix_menu_principal == 0):
+				canvas.delete("all")
+				choix_menu_principal = 2
+				creation_menu_principal(300,400)
+				
+				
+			elif(choix_menu_principal == 1):
+				canvas.delete("all")
+				choix_menu_principal = 0
+				creation_menu_principal(300,200)
+				
+			elif(choix_menu_principal == 2):
+				canvas.delete("all")
+				choix_menu_principal = 1
+				creation_menu_principal(300,300)
+				
+		elif(attendre_principal == False):
+			menu(event)
+
+	if(touche=="Return"):
+		if(attendre_principal == True):
+			if(choix_menu_principal == 0):
+				attendre_principal = False
+				affiche_terrain()
+				affiche_obj()
+				frame()				
+		elif(attendre_principal == False):
+			menu(event)		
+def creation_menu_principal(x,y):
+	
+	canvas.create_text(200, 200, text = "Nouvelle Partie")
+	canvas.create_text(x, y, text = "<")
+	canvas.create_text(200, 300, text = "Charger Partie")
+	canvas.create_text(200, 400, text = "Options")
    
+def creation_menu(x,y):
+	
+	canvas.create_text(200, 200, text = "Reprendre")
+	canvas.create_text(x, y, text = "<")
+	canvas.create_text(200, 300, text = "Menu Principal")
+
+
+
+def menu(event):
+    global attendre
+    global choix_menu
+	
+    touche=event.keysym
+    if(touche=="Escape"):
+	if(attendre != True):
+		if(attendre_principal == False):
+	        	attendre = True
+			canvas.delete("all")
+			choix_menu = 0
+			creation_menu(300,200)
+
+    if(touche=="Down"):
+	if(attendre == True):
+		if(choix_menu == 0):
+			canvas.delete("all")
+			creation_menu(300,300)
+			choix_menu = 1
+		elif(choix_menu == 1):
+			canvas.delete("all")
+			creation_menu(300,200)
+			choix_menu = 0
+	elif(attendre == False):
+		vitesse(event)
+    if(touche=="Up"):
+	if(attendre == True):
+		if(choix_menu == 0):
+			canvas.delete("all")
+			creation_menu(300,300)
+			choix_menu = 1
+		elif(choix_menu == 1):
+			canvas.delete("all")
+			creation_menu(300,200)
+			choix_menu = 0
+	elif(attendre == False):
+		vitesse(event)
+
+    if(touche=="Return"):
+	if(attendre == True):
+		if(choix_menu == 0):
+			affiche_terrain()
+        		attendre = False
+			frame()
+		elif(choix_menu == 1):
+			accueil()
+
+				
 
 def stop(event):
     touche=event.keysym
@@ -437,28 +570,38 @@ def efface(liste):
         del liste[len(liste)-1]
 
 
-        
 fenetre = Tk()
 
 canvas = Canvas(fenetre, width=640, height=639, background="#219a21")
 mapx=1
 mapy=1
 deplacement=0
-mon_perso=[0,0,96,96,[],"./spritePerso/PersoB1","Bas"]
+mon_perso=[0,0,96,384,[],"./spritePerso/PersoB1","Bas"]
 Ennemi=[]
 bloque_y=[]
 bloque_x=[]
 coffre1=False
+attendre = False
+attendre_principal = False
 
-
-affiche_terrain()
-affiche_obj()
-frame()
+accueil()
+#affiche_terrain()
+#frame()
 
 canvas.pack()
+canvas.event_add('<<menu_esc>>', '<KeyPress-Escape>')
+canvas.event_add('<<menu_ret>>', '<KeyPress-Return>')
+canvas.event_add('<<menu_up>>', '<KeyPress-Up>')
+canvas.event_add('<<menu_dwn>>', '<KeyPress-Down>')
+canvas.event_add('<<menu_spac>>', '<KeyPress-space>')
 canvas.focus_set()
 canvas.bind("<Key>", vitesse)
 canvas.bind("<KeyRelease>", stop)
+canvas.bind("<<menu_esc>>",menu)
+canvas.bind("<<menu_ret>>",menu_principal)
+canvas.bind("<<menu_up>>",menu_principal)
+canvas.bind("<<menu_dwn>>",menu_principal)
+canvas.bind("<<menu_spac>>",menu_principal)
 
         
 fenetre.mainloop()
