@@ -23,7 +23,8 @@ def affiche_terrain():
     fichier.close()
     affiche_surf()
     affiche_obj()
-    affiche_ennemi()
+    if(attendre == False):
+	affiche_ennemi()
 
 
 def affiche_obj():
@@ -351,27 +352,32 @@ def vitesse(event):
         mon_perso[0]=-8
         
 def accueil():
+	global premier_passage
 	canvas.delete("all")
 	canvas.create_text(400, 300, text = "Appuyer sur Espace pour Continuer")
+	premier_passage = True
 
 def menu_principal(event):
 	global choix_menu_principal
 	global attendre_principal
+	global attendre
+	global premier_passage
 
 	touche=event.keysym
 	if(touche == "space"):
-		attendre_principal = True
-		canvas.delete("all")
-		choix_menu_principal = 0
-		creation_menu_principal(300,200)
+		if(premier_passage == True):
+			attendre_principal = True
+			canvas.delete("all")
+			choix_menu_principal = 0
+			premier_passage = False
+			creation_menu_principal(300,200)
 		
 	if(touche=="Down"):
 		if(attendre_principal == True):
 			if(choix_menu_principal == 0):
 				canvas.delete("all")
 				choix_menu_principal = 1
-				creation_menu_principal(300,300)
-				
+				creation_menu_principal(300,300)	
 				
 			elif(choix_menu_principal == 1):
 				canvas.delete("all")
@@ -391,7 +397,6 @@ def menu_principal(event):
 				canvas.delete("all")
 				choix_menu_principal = 2
 				creation_menu_principal(300,400)
-				
 				
 			elif(choix_menu_principal == 1):
 				canvas.delete("all")
@@ -475,6 +480,7 @@ def menu(event):
         		attendre = False
 			frame()
 		elif(choix_menu == 1):
+			attendre = False
 			accueil()
 
 				
@@ -583,6 +589,7 @@ bloque_x=[]
 coffre1=False
 attendre = False
 attendre_principal = False
+premier_passage = False
 
 accueil()
 #affiche_terrain()
