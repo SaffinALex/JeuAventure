@@ -3,6 +3,7 @@
 
 from Tkinter import *
 from random import *
+from PIL import Image, ImageFont, ImageDraw, ImageTk 
         
 def affiche_terrain():
     global mapx
@@ -39,12 +40,8 @@ def affiche_obj():
     for cpt in range(60,80):
         for i in range (0,20):
             if lignes[cpt][i]!="0":
-                if lignes[cpt][i]=="5" or lignes[cpt][i]=="6" or lignes[cpt][i]=="7" or lignes[cpt][i]=="8" :
-                    nom="./spriteObjet/objet"+"2"
-                    placer(nom,(i*32),j,1)
-                else:
-                    nom="./spriteObjet/objet"+lignes[cpt][i]
-                    placer(nom,(i*32),j,1)
+                nom="./spriteObjet/objet"+lignes[cpt][i]
+                placer(nom,(i*32),j,1)
 
         j+=32
     fichier.close()
@@ -133,8 +130,6 @@ def placer(nom,x,y,option):
                 canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#383837",outline="") #NOIRCLAIRE(OMBRE)
             elif ligne[i]=="C":
                 canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#e3e570",outline="") #JAUNECLAIRE
-            elif ligne[i]=="D": #BleuGlace 
-                canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#b2d5f6",outline="")
 
                 
             val_x+=2
@@ -359,8 +354,17 @@ def vitesse(event):
         
 def accueil():
 	global premier_passage
+	global dicimg
+
 	canvas.delete("all")
-	canvas.create_text(400, 300, text = "Appuyer sur Espace pour Continuer")
+	
+	im=Image.open("accueil.ppm") 
+   	photo = ImageTk.PhotoImage(im) 
+    	dicimg['img1'] = photo
+    	item = canvas.create_image(320,220,image =photo) 
+
+
+	canvas.create_text(300, 300, text = "Appuyer sur Espace pour Continuer")
 	premier_passage = True
 
 def menu_principal(event):
@@ -368,6 +372,14 @@ def menu_principal(event):
 	global attendre_principal
 	global attendre
 	global premier_passage
+	global mapx
+	global mapy
+	global deplacement
+	global mon_perso
+	global Ennemi
+	global bloque_y
+	global bloque_x
+	global coffre1
 
 	touche=event.keysym
 	if(touche == "space"):
@@ -421,6 +433,14 @@ def menu_principal(event):
 		if(attendre_principal == True):
 			if(choix_menu_principal == 0):
 				attendre_principal = False
+				mapx=1
+				mapy=1
+				deplacement=0
+				mon_perso=[0,0,96,384,[],"./spritePerso/PersoB1","Bas"]
+				Ennemi=[]
+				bloque_y=[]
+				bloque_x=[]
+				coffre1=False
 				affiche_terrain()
 				affiche_obj()
 				frame()				
@@ -596,6 +616,8 @@ coffre1=False
 attendre = False
 attendre_principal = False
 premier_passage = False
+dicimg = {}
+
 
 accueil()
 #affiche_terrain()
