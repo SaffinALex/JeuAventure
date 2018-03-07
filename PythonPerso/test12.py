@@ -38,8 +38,12 @@ def affiche_obj():
     for cpt in range(60,80):
         for i in range (0,20):
             if lignes[cpt][i]!="0":
-                nom="./spriteObjet/objet"+lignes[cpt][i]
-                placer(nom,(i*32),j,1)
+                if lignes[cpt][i]=="5" or lignes[cpt][i]=="6" or lignes[cpt][i]=="7" or lignes[cpt][i]=="8" :
+                    nom="./spriteObjet/objet"+"2"
+                    placer(nom,(i*32),j,1)
+                else:
+                    nom="./spriteObjet/objet"+lignes[cpt][i]
+                    placer(nom,(i*32),j,1)
 
         j+=32
     fichier.close()
@@ -128,6 +132,8 @@ def placer(nom,x,y,option):
                 canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#383837",outline="") #NOIRCLAIRE(OMBRE)
             elif ligne[i]=="C":
                 canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#e3e570",outline="") #JAUNECLAIRE
+            elif ligne[i]=="D": #BleuGlace 
+                canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#b2d5f6",outline="")
 
                 
             val_x+=2

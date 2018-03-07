@@ -37,6 +37,8 @@ def placer(nom,x,y,canvas):
                 fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#383837",outline="") #NOIRCLAIRE(OMBRE)
             elif ligne[i]=="C":
                 fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#e3e570",outline="") #JAUNECLAIRE
+            elif ligne[i]=="D": #BleuGlace 
+                fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#b2d5f6",outline="")
 
             if ligne[i]!="0":    
                 ma_map[x/32+y/32*20].append(fig)
