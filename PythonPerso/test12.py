@@ -30,6 +30,7 @@ def affiche_terrain():
 def affiche_obj():
     global mapx
     global mapy
+    global listeitem
     
     nom="./map/map"+str(mapx)+"-"+str(mapy)
     fichier=open(nom,"r")
@@ -39,6 +40,8 @@ def affiche_obj():
     for cpt in range(60,80):
         for i in range (0,20):
             if lignes[cpt][i]!="0":
+                listeitem.append([lignes[cpt][i],i*32,j,0,0])
+                
                 if lignes[cpt][i]=="5" or lignes[cpt][i]=="6" or lignes[cpt][i]=="7" or lignes[cpt][i]=="8" :
                     nom="./spriteObjet/objet"+"2"
                     placer(nom,(i*32),j,1)
@@ -154,6 +157,7 @@ def changeMap():
         mon_perso[2]=0
         Ennemi=[]
         efface_bloque()
+        efface_listeitem()
         affiche_terrain()
         mouvement_perso()
         
@@ -162,6 +166,7 @@ def changeMap():
         mon_perso[2]=640-32
         Ennemi=[]
         efface_bloque()
+        efface_listeitem()
         affiche_terrain()
 	affiche_obj()
         mouvement_perso()
@@ -171,6 +176,7 @@ def changeMap():
         mon_perso[3]=640-32
         Ennemi=[]
         efface_bloque()
+        efface_listeitem()
         affiche_terrain()       
 	mouvement_perso()
         
@@ -179,6 +185,7 @@ def changeMap():
         mon_perso[3]=0
         Ennemi=[]
         efface_bloque()
+        efface_listeitem()
         affiche_terrain()       
 	mouvement_perso()
 
@@ -221,6 +228,7 @@ def bloquer_entite(val_x, val_y,entite):
 def frame():
     global Ennemi
     global mon_perso
+    global listeitem
     global attendre
 
     if(not attendre):
@@ -233,6 +241,10 @@ def frame():
         
         if(len(Ennemi)>0):
             toucher(mon_perso)
+            
+        for i in range(0,len(listeitem)):
+            if(listeitem[i][3]>0):
+                compt(listeitem[i])
         
         canvas.after(30,frame)
 
@@ -356,6 +368,9 @@ def vitesse(event):
         mon_perso[0]=8
     if touche=="Left":
         mon_perso[0]=-8
+        
+    if(touche=="a"):
+        interagir()
         
 def accueil():
 	global premier_passage
@@ -489,6 +504,7 @@ def menu(event):
 			attendre = False
 			accueil()
 
+
 				
 
 def stop(event):
@@ -581,6 +597,64 @@ def efface(liste):
         canvas.delete(liste[len(liste)-1])
         del liste[len(liste)-1]
 
+def compt(liste):
+    if liste[0]=="5" or liste[0]=="6" or liste[0]=="7" or liste[0]=="8":
+        liste[3]-=1
+        if liste[3]==0:
+            placer("./spriteObjet/objet4",liste[1],liste[2],0)
+            
+def efface_listeitem():
+    global listeitem
+    while len(listeitem)>0:
+        del listeitem[len(listeitem)-1]
+
+def interaction(liste):
+    global inventaire
+    if liste[0]=="5" or liste[0]=="6" or liste[0]=="7" or liste[0]=="8":
+        liste[3]=10
+        liste[4]=1
+        placer("./spriteObjet/objet"+liste[0],liste[1],liste[2],0)
+        if liste[0]=="5":
+            inventaire[0]+=1
+            print inventaire[0]
+        elif liste[0]=="6":
+            inventaire[0]+=5
+            print inventaire[0]
+        elif liste[0]=="7":
+            inventaire[1]+=1
+            
+    if liste[0]=="C" and inventaire[1]>0:
+        inventaire[1]-=1
+        print inventaire[1]
+        
+def interagir():
+    global listeitem
+    global mon_perso
+    
+    taille=len(listeitem)
+    posx=mon_perso[2]+16
+    posy=mon_perso[3]+16
+
+    for i in range(0,taille):
+        if listeitem[i][4]!=1:
+            if mon_perso[6]=="Bas":
+                if mon_perso[3]+33>=listeitem[i][2] and mon_perso[3]+33<=listeitem[i][2]+32 and posx>listeitem[i][1] and posx<listeitem[i][1]+32:
+                    interaction(listeitem[i])
+
+                
+            elif mon_perso[6]=="Haut":
+                if mon_perso[3]+16>=listeitem[i][2]and mon_perso[3]+16<=listeitem[i][2]+32 and posx>listeitem[i][1] and posx<listeitem[i][1]+32:
+                    interaction(listeitem[i])
+
+            elif mon_perso[6]=="Gauche":
+                if mon_perso[2]-1>=listeitem[i][1] and mon_perso[2]-1<=listeitem[i][1]+32 and posy>=listeitem[i][2] and posy<listeitem[i][2]+32:
+                    interaction(listeitem[i])
+
+            elif mon_perso[6]=="Droite":
+                if mon_perso[2]+33>=listeitem[i][1] and mon_perso[2]+33<=listeitem[i][1]+32 and posy>listeitem[i][2] and posy<listeitem[i][2]+32:
+                    interaction(listeitem[i])
+
+    
 
 fenetre = Tk()
 
@@ -596,10 +670,13 @@ coffre1=False
 attendre = False
 attendre_principal = False
 premier_passage = False
+listeitem=[]
+listecassable=[]
+inventaire=[0,0]
+#accueil()
+affiche_terrain()
+frame()
 
-accueil()
-#affiche_terrain()
-#frame()
 
 canvas.pack()
 canvas.event_add('<<menu_esc>>', '<KeyPress-Escape>')
