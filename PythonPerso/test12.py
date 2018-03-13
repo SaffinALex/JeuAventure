@@ -31,6 +31,8 @@ def affiche_obj():
     global mapx
     global mapy
     global listeitem
+    global listechangement
+    ouvert=False
     
     nom="./map/map"+str(mapx)+"-"+str(mapy)
     fichier=open(nom,"r")
@@ -40,14 +42,31 @@ def affiche_obj():
     for cpt in range(60,80):
         for i in range (0,20):
             if lignes[cpt][i]!="0":
-                listeitem.append([lignes[cpt][i],i*32,j,0,0])
-                
+                ouvert=False
                 if lignes[cpt][i]=="5" or lignes[cpt][i]=="6" or lignes[cpt][i]=="7" or lignes[cpt][i]=="8" :
-                    nom="./spriteObjet/objet"+"2"
-                    placer(nom,(i*32),j,1)
+                    
+                    if(len(listechangement) != 0):
+                        for k in range (0,len(listechangement)):
+                            if mapx==listechangement[k][2] and mapy==listechangement[k][3] and listechangement[k][0]==i*32 and listechangement[k][1]==j:
+                                nom="./spriteObjet/objet"+"4"
+                                placer(nom,(i*32),j,1)
+                                ouvert=True
+
+                        if(not(ouvert)):
+                            nom="./spriteObjet/objet"+"2"
+                            placer(nom,(i*32),j,1)
+                            listeitem.append([lignes[cpt][i],i*32,j,0,0])
+
+                    else:
+                        nom="./spriteObjet/objet"+"2"
+                        placer(nom,(i*32),j,1)
+                        listeitem.append([lignes[cpt][i],i*32,j,0,0])
                 else:
                     nom="./spriteObjet/objet"+lignes[cpt][i]
                     placer(nom,(i*32),j,1)
+                    listeitem.append([lignes[cpt][i],i*32,j,0,0])
+            
+
 
         j+=32
     fichier.close()
@@ -371,7 +390,8 @@ def vitesse(event):
         
     if(touche=="a"):
         interagir()
-        
+
+
 def accueil():
 	global premier_passage
 	canvas.delete("all")
@@ -608,20 +628,30 @@ def efface_listeitem():
     while len(listeitem)>0:
         del listeitem[len(listeitem)-1]
 
+def efface_item():
+    print "l"
+
 def interaction(liste):
     global inventaire
+    global listechangement
+    global mapx
+    global mapy
+    
     if liste[0]=="5" or liste[0]=="6" or liste[0]=="7" or liste[0]=="8":
-        liste[3]=10
-        liste[4]=1
-        placer("./spriteObjet/objet"+liste[0],liste[1],liste[2],0)
-        if liste[0]=="5":
-            inventaire[0]+=1
-            print inventaire[0]
-        elif liste[0]=="6":
-            inventaire[0]+=5
-            print inventaire[0]
-        elif liste[0]=="7":
-            inventaire[1]+=1
+        if liste[4]!=1:
+            liste[3]=10
+            liste[4]=1
+            listechangement.append([liste[1],liste[2],mapx,mapy])
+            placer("./spriteObjet/objet"+liste[0],liste[1],liste[2],0)
+            if liste[0]=="5":
+                inventaire[0]+=1
+                print inventaire[0]
+            elif liste[0]=="6":
+                inventaire[0]+=5
+                print inventaire[0]
+            elif liste[0]=="7":
+                inventaire[1]+=1
+
             
     if liste[0]=="C" and inventaire[1]>0:
         inventaire[1]-=1
@@ -636,23 +666,28 @@ def interagir():
     posy=mon_perso[3]+16
 
     for i in range(0,taille):
-        if listeitem[i][4]!=1:
-            if mon_perso[6]=="Bas":
-                if mon_perso[3]+33>=listeitem[i][2] and mon_perso[3]+33<=listeitem[i][2]+32 and posx>listeitem[i][1] and posx<listeitem[i][1]+32:
-                    interaction(listeitem[i])
-
+        
+        if mon_perso[6]=="Bas":
+            if mon_perso[3]+33>=listeitem[i][2] and mon_perso[3]+33<=listeitem[i][2]+32 and posx>listeitem[i][1] and posx<listeitem[i][1]+32:
+                interaction(listeitem[i])
+                break
                 
-            elif mon_perso[6]=="Haut":
-                if mon_perso[3]+16>=listeitem[i][2]and mon_perso[3]+16<=listeitem[i][2]+32 and posx>listeitem[i][1] and posx<listeitem[i][1]+32:
-                    interaction(listeitem[i])
+        elif mon_perso[6]=="Haut":
+            if mon_perso[3]+16>=listeitem[i][2]and mon_perso[3]+16<=listeitem[i][2]+32 and posx>listeitem[i][1] and posx<listeitem[i][1]+32:
+                interaction(listeitem[i])
+                break
 
-            elif mon_perso[6]=="Gauche":
-                if mon_perso[2]-1>=listeitem[i][1] and mon_perso[2]-1<=listeitem[i][1]+32 and posy>=listeitem[i][2] and posy<listeitem[i][2]+32:
-                    interaction(listeitem[i])
 
-            elif mon_perso[6]=="Droite":
-                if mon_perso[2]+33>=listeitem[i][1] and mon_perso[2]+33<=listeitem[i][1]+32 and posy>listeitem[i][2] and posy<listeitem[i][2]+32:
-                    interaction(listeitem[i])
+        elif mon_perso[6]=="Gauche":
+            if mon_perso[2]-1>=listeitem[i][1] and mon_perso[2]-1<=listeitem[i][1]+32 and posy>=listeitem[i][2] and posy<listeitem[i][2]+32:
+                interaction(listeitem[i])
+                break
+
+        elif mon_perso[6]=="Droite":
+            if mon_perso[2]+33>=listeitem[i][1] and mon_perso[2]+33<=listeitem[i][1]+32 and posy>listeitem[i][2] and posy<listeitem[i][2]+32:
+                interaction(listeitem[i])
+                break
+
 
     
 
@@ -672,6 +707,7 @@ attendre_principal = False
 premier_passage = False
 listeitem=[]
 listecassable=[]
+listechangement=[]
 inventaire=[0,0]
 #accueil()
 affiche_terrain()
