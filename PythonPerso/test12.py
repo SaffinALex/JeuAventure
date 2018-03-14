@@ -33,6 +33,7 @@ def affiche_obj():
     global listeitem
     global listechangement
     ouvert=False
+    porte_ouverte=False
     
     nom="./map/map"+str(mapx)+"-"+str(mapy)
     fichier=open(nom,"r")
@@ -43,30 +44,39 @@ def affiche_obj():
         for i in range (0,20):
             if lignes[cpt][i]!="0":
                 ouvert=False
-                if lignes[cpt][i]=="5" or lignes[cpt][i]=="6" or lignes[cpt][i]=="7" or lignes[cpt][i]=="8" :
-                    
+                if lignes[cpt][i]=="5" or lignes[cpt][i]=="6" or lignes[cpt][i]=="7" or lignes[cpt][i]=="8":              
                     if(len(listechangement) != 0):
                         for k in range (0,len(listechangement)):
                             if mapx==listechangement[k][2] and mapy==listechangement[k][3] and listechangement[k][0]==i*32 and listechangement[k][1]==j:
                                 nom="./spriteObjet/objet"+"4"
-                                placer(nom,(i*32),j,1)
+                                placer(nom,(i*32),j,2)
                                 ouvert=True
 
                         if(not(ouvert)):
                             nom="./spriteObjet/objet"+"2"
+                            listeitem.append([lignes[cpt][i],i*32,j,0,0,[]])
                             placer(nom,(i*32),j,1)
-                            listeitem.append([lignes[cpt][i],i*32,j,0,0])
+
 
                     else:
                         nom="./spriteObjet/objet"+"2"
-                        placer(nom,(i*32),j,1)
-                        listeitem.append([lignes[cpt][i],i*32,j,0,0])
+                        listeitem.append([lignes[cpt][i],i*32,j,0,0,[]])
+                        placer(nom,(i*32),j,2)
+                elif lignes[cpt][i]=="C":
+                    porte_ouverte=False
+                    for k in range (0,len(listechangement)):
+                        if mapx==listechangement[k][2] and mapy==listechangement[k][3] and listechangement[k][0]==i*32 and listechangement[k][1]==j and listechangement[k][4]=="C":
+                            porte_ouverte=True
+                            
+                    if(not(porte_ouverte)):            
+                        listeitem.append([lignes[cpt][i],i*32,j,0,0,[]])
+                        nom="./spriteObjet/objet"+lignes[cpt][i]
+                        placer(nom,(i*32),j,2)                        
+                            
                 else:
+                    listeitem.append([lignes[cpt][i],i*32,j,0,0,[]])
                     nom="./spriteObjet/objet"+lignes[cpt][i]
-                    placer(nom,(i*32),j,1)
-                    listeitem.append([lignes[cpt][i],i*32,j,0,0])
-            
-
+                    placer(nom,(i*32),j,2)       
 
         j+=32
     fichier.close()
@@ -116,47 +126,55 @@ def affiche_ennemi():
     fichier.close()
     
 
-def placer(nom,x,y,option):
+def placer(nom,x,y,option): #0=Transparent, 1=bloquer, 2=item
     global bloque_x
     global bloque_y
+    global bloquer
+    global listeitem
     
     val_x=x
     val_y=y
     fichier = open(nom,'r')
     lignes  = fichier.readlines()
+    fig=0
     
     if (option!=0):
         bloque_x.append(x)
         bloque_y.append(y)
+        bloquer[x/32+y/32*20].append(x)
+        bloquer[x/32+y/32*20].append(y)
 
     for ligne in lignes:
         for i in range (0,16):
             if ligne[i]=="1":
-                canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#0a650a",outline="") #vert
+                fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#0a650a",outline="") #vert
             elif ligne[i]=="2":
-                canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="black",outline="") #noir
+                fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="black",outline="") #noir
             elif ligne[i]=="3":
-                canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="blue",outline="") #bleu
+                fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="blue",outline="") #bleu
             elif ligne[i]=="4":
-                canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#808180",outline="") #gris
+                fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#808180",outline="") #gris
             elif ligne[i]=="5":
-                 canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#614919",outline="") #marron
+                 fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#614919",outline="") #marron
             elif ligne[i]=="6":
-                 canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="red",outline="") #rouge 
+                 fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="red",outline="") #rouge 
             elif ligne[i]=="7":
-                 canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#d4a566",outline="") #beige
+                 fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#d4a566",outline="") #beige
             elif ligne[i]=="8":
-                 canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#0dac07",outline="") #vertClaire
+                 fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#0dac07",outline="") #vertClaire
             elif ligne[i]=="9":
-                 canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="white",outline="") #Blanc
+                 fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="white",outline="") #Blanc
             elif ligne[i]=="A":
-                canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#6d5331",outline="") #MarronClaire
+                fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#6d5331",outline="") #MarronClaire
             elif ligne[i]=="B":
-                canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#383837",outline="") #NOIRCLAIRE(OMBRE)
+                fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#383837",outline="") #NOIRCLAIRE(OMBRE)
             elif ligne[i]=="C":
-                canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#e3e570",outline="") #JAUNECLAIRE
+                fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#e3e570",outline="") #JAUNECLAIRE
             elif ligne[i]=="D": #BleuGlace 
-                canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#b2d5f6",outline="")
+               fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#b2d5f6",outline="")
+
+            if(option==2 and ligne[i]!=0 and len(listeitem)!=0):
+                listeitem[len(listeitem)-1][5].append(fig)
 
                 
             val_x+=2
@@ -221,24 +239,29 @@ def bloquer_entite(val_x, val_y,entite):
     global bloque_x
     global bloque_y
 
+
     for i in range(len(bloque_x)):
         if(entite[2]>=bloque_x[i] and entite[2]<=bloque_x[i]+31):
             if( entite[3]+16>=bloque_y[i] and  entite[3]+16<=bloque_y[i]+31): #Coin Haut gauche
                 entite[3]=val_y
                 entite[2]=val_x
+                break
                
             elif( entite[3]+31>=bloque_y[i] and  entite[3]+31<=bloque_y[i]+31): #Coin Bas gauche
                 entite[3]=val_y
                 entite[2]=val_x
+                break
                 
         if( entite[2]+31>=bloque_x[i] and  entite[2]+32<=bloque_x[i]+31):
             if( entite[3]+31>=bloque_y[i] and entite[3]+31<=bloque_y[i]+31): #Coin Bas Droite
                 entite[3]=val_y
                 entite[2]=val_x
+                break
             
             elif( entite[3]+16>=bloque_y[i] and  entite[3]+16<=bloque_y[i]+31): #Coin Haut Droite
                 entite[3]=val_y
                 entite[2]=val_x
+                break
                 
     if(entite[3]>620 or entite[3]<-8 or entite[2]>620 or entite[2]<-8):
         entite[3]=val_y
@@ -381,16 +404,22 @@ def vitesse(event):
     
     if touche=="Up":
         mon_perso[1]=-8
+
     if touche=="Down":
-        mon_perso[1]=8            
+        mon_perso[1]=8
+
     if touche=="Right":
         mon_perso[0]=8
+
     if touche=="Left":
         mon_perso[0]=-8
+
         
     if(touche=="a"):
         interagir()
 
+def placer_sol(x,y):
+    canvas.create_rectangle(x,y,x+32,y+32,fill="#219a21",outline="") #vert
 
 def accueil():
 	global premier_passage
@@ -530,6 +559,7 @@ def menu(event):
 def stop(event):
     touche=event.keysym
     if(touche=="Up" or touche=="Down"):
+        
         mon_perso[1]=0
 
     if(touche=="Right" or touche=="Left"):
@@ -628,20 +658,25 @@ def efface_listeitem():
     while len(listeitem)>0:
         del listeitem[len(listeitem)-1]
 
-def efface_item():
-    print "l"
+def efface_item(liste):
+    for i in range(0,len(liste[5])):
+        canvas.delete(liste[5][0])
+        del liste[5][0]
 
 def interaction(liste):
     global inventaire
     global listechangement
     global mapx
     global mapy
+    global bloque_x
+    global bloque_y
+    numero_eff=[]
     
     if liste[0]=="5" or liste[0]=="6" or liste[0]=="7" or liste[0]=="8":
         if liste[4]!=1:
             liste[3]=10
             liste[4]=1
-            listechangement.append([liste[1],liste[2],mapx,mapy])
+            listechangement.append([liste[1],liste[2],mapx,mapy,liste[0]])
             placer("./spriteObjet/objet"+liste[0],liste[1],liste[2],0)
             if liste[0]=="5":
                 inventaire[0]+=1
@@ -653,9 +688,26 @@ def interaction(liste):
                 inventaire[1]+=1
 
             
-    if liste[0]=="C" and inventaire[1]>0:
+    if liste[0]=="C" and inventaire[1]>0 and liste[4]!=1:
+        
         inventaire[1]-=1
         print inventaire[1]
+        listechangement.append([liste[1],liste[2],mapx,mapy,liste[0]])
+        
+        for i in range(0,len(bloque_x)):
+            if(bloque_x[i]==liste[1] and bloque_y[i]==liste[2]):
+                numero_eff.append(i)
+                liste[4]=1
+                efface_item(liste)
+                placer_sol(liste[1],liste[2])
+
+                
+        if len(numero_eff)!=0:
+            for j in range(0, len(numero_eff)):
+                del bloque_x[numero_eff[len(numero_eff)-1]]
+                del bloque_y[numero_eff[len(numero_eff)-1]]
+                del numero_eff[len(numero_eff)-1]
+    
         
 def interagir():
     global listeitem
@@ -701,6 +753,12 @@ mon_perso=[0,0,96,384,[],"./spritePerso/PersoB1","Bas"]
 Ennemi=[]
 bloque_y=[]
 bloque_x=[]
+
+bloquer=[]
+for i in range(0,20*20):
+    bloquer.append([])
+
+
 coffre1=False
 attendre = False
 attendre_principal = False

@@ -3,6 +3,8 @@
 
 from Tkinter import *
 from random import *
+import os
+
 def placer(nom,x,y,canvas):
 
     global ma_map
@@ -46,6 +48,8 @@ def placer(nom,x,y,canvas):
             val_x+=2
         val_y+=2
         val_x=x
+    print ma_map[x/32+y/32*20]
+    print"-------------"
     fichier.close()
 
 def bougerCurseur1():
@@ -166,12 +170,13 @@ def placer_map():
     global nom
     global mode
     global nommap
+    global ma_map
 
     cpt=0
     nom2=nom+Bloc[selection]
-    fichier=open(nommap+".cp","r")
+    fichier=open("./map/"+nommap+".cp","r")
     lignes=fichier.readlines()
-    fichier2=open(nommap+".cp","w")
+    fichier2=open("./map/"+nommap+".cp","w")
             
     for ligne in lignes:
         for i in range(0,20):
@@ -192,10 +197,10 @@ def placer_map():
                 
     fichier2.close()
     fichier.close()
-    fichier=open(nommap+".cp","r")
+    fichier=open("./map/"+nommap+".cp","r")
     lignes=fichier.readlines()
     
-
+    ma_map[curseur1[2]/32+curseur1[3]/32*20]=[]
     num=lignes[curseur1[3]/32][curseur1[2]/32]
     placer("./spriteSurface/bloc"+num,curseur1[2],curseur1[3],canvas2)
     num=lignes[curseur1[3]/32+20][curseur1[2]/32]
@@ -215,14 +220,19 @@ def effacer():
     global nommap
 
     if(commence==True):
+        print ma_map[(curseur1[2]/32)+curseur1[3]/32*20]
+        print"-------------"
+
         for i in range(0,len(ma_map[(curseur1[2]/32)+curseur1[3]/32*20])):
             canvas2.delete(ma_map[curseur1[2]/32+curseur1[3]/32*20][i])
+            
+        ma_map[(curseur1[2]/32)+curseur1[3]/32*20]=[]
                 
         cpt=0
         nom2=nom+Bloc[selection]
-        fichier=open(nommap+".cp","r")
+        fichier=open("./map/"+nommap+".cp","r")
         lignes=fichier.readlines()
-        fichier2=open(nommap+".cp","w")
+        fichier2=open("./map/"+nommap+".cp","w")
 
         for ligne in lignes:
             for i in range(0,20):
@@ -263,21 +273,19 @@ def stop(event):
 
     
 
-    
-def nouveau():
-    global copie
-    entree = Entry(fenetre, width=30)
-    copie.append(entree)
-    entree.pack()
-    bouton=Button(fenetre, text="Valider", command=validernom)
-    copie.append(bouton)
-    bouton.pack()
+
 
 def initialisecanvas():
     global canvas
     global canvas2
     global posx
     global posy
+    global ma_map
+
+    ma_map=[]
+    for i in range(0,20*20):
+        ma_map.append([])
+        
     posx=0
     posy=0
     canvas2 =Canvas(fenetre, width=640, height=640, background="#219a21")
@@ -309,11 +317,13 @@ def test():
     fenetre.after(100,test)
     
 def affiche_terrain(nom):
+    global ma_map
     fichier=open(nom,"r")
     lignes=fichier.readlines()
     j=0
     h=0
     cpt=0
+    
 
     for ligne in lignes:
         if cpt>=20:
@@ -322,9 +332,11 @@ def affiche_terrain(nom):
             j=0
             print ligne
         for i in range (0,20):
+            ma_map[i+j/32*20]=[]
             if(ligne[i]!="0"):
                 if h==0:
                     nom="./spriteSurface/bloc"
+
                 elif h==1:
                     nom="./spriteDecor/bloc"
                 elif h==3:
@@ -345,35 +357,61 @@ def validernom2():
     global nommap
     global curseur1
     global curseur2
+    global pasouvert
 
-    
-    if commence:
-        canvas.destroy()
-        canvas2.destroy()
 
-    curseur1[2]=0
-    curseur1[3]=0
-    curseur2[2]=0
-    curseur2[3]=0
-    
-    initialisecanvas()
-    
     nommap= copie[0].get()
-    fichier=open(nommap+".cp","w")
-    fichier2=open(nommap,"r")
-    lignes=fichier2.readlines()
-    for ligne in lignes:
-        fichier.write(ligne)
-        
-    fichier.close()
-    fichier2.close()
     
-    copie[1].destroy()
-    copie[0].destroy()
-    del copie[1]
-    del copie[0]
-    commence=True
-    affiche_terrain(nommap)
+    if(os.path.isfile("./map/"+nommap)):
+        if commence:
+            canvas.destroy()
+            canvas2.destroy()
+        
+        curseur1[2]=0
+        curseur1[3]=0
+        curseur2[2]=0
+        curseur2[3]=0
+        
+        initialisecanvas()
+    
+        fichier=open("./map/"+nommap+".cp","w")
+        fichier2=open("./map/"+nommap,"r")
+        lignes=fichier2.readlines()
+        for ligne in lignes:
+            fichier.write(ligne)
+        
+        fichier.close()
+        fichier2.close()
+        
+        copie[1].destroy()
+        copie[0].destroy()
+        del copie[1]
+        del copie[0]
+        commence=True
+        affiche_terrain("./map/"+nommap)
+        pasouvert=True
+        
+    else:
+        print "Fichier inexistant"
+
+    
+def nouveau():
+    global copie
+    global pasouvert
+
+    if not(pasouvert):
+        copie[1].destroy()
+        copie[0].destroy()
+        del copie[1]
+        del copie[0]
+        
+    pasouvert=False
+    entree = Entry(fenetre, width=30)
+    copie.append(entree)
+    entree.pack()
+    bouton=Button(fenetre, text="Valider", command=validernom)
+    copie.append(bouton)
+    bouton.pack()
 
 def validernom():
     global copie
@@ -382,37 +420,53 @@ def validernom():
     global nommap
     global curseur1
     global curseur2
+    global pasouvert
 
-    curseur1[2]=0
-    curseur1[3]=0
-    curseur2[2]=0
-    curseur2[3]=0
-    
-    if commence:
-        canvas.destroy()
-        canvas2.destroy()
-        
-    initialisecanvas()
-    
     nommap= copie[0].get()
-    fichier=open(nommap+".cp","w")
-    ligne="00000000000000000000"
-    for i in range(0,79):
-        fichier.write(ligne+"\n")
-    fichier.write(ligne)
-    fichier.close()
+    print "./map/"+nommap
     
-    copie[1].destroy()
-    copie[0].destroy()
-    del copie[1]
-    del copie[0]
-    commence=True
+    if(os.path.isfile("./map/"+nommap)):
+        print "Existe deja"
+
+    else:
+        curseur1[2]=0
+        curseur1[3]=0
+        curseur2[2]=0
+        curseur2[3]=0
+        
+        if commence:
+            canvas.destroy()
+            canvas2.destroy()
+        
+        initialisecanvas()
+        fichier=open("./map/"+nommap+".cp","w")
+        ligne="00000000000000000000"
+        for i in range(0,79):
+            fichier.write(ligne+"\n")
+        fichier.write(ligne)
+        fichier.close()
+    
+        copie[1].destroy()
+        copie[0].destroy()
+        del copie[1]
+        del copie[0]
+        commence=True
+        pasouvert=True
 
     
     
 def editer():
     global copie
     global mode
+    global pasouvert
+
+    if not(pasouvert):
+        copie[1].destroy()
+        copie[0].destroy()
+        del copie[1]
+        del copie[0]
+        
+    pasouvert=False
     mode=1
     entree = Entry(fenetre, width=30)
     copie.append(entree)
@@ -438,8 +492,8 @@ def souris(event):
             
 def sauvegarder():
     global nommap
-    fichier=open(nommap+".cp","r")
-    fichier2=open(nommap,"w")
+    fichier=open("./map/"+nommap+".cp","r")
+    fichier2=open("./map/"+nommap,"w")
     lignes=fichier.readlines()
     for ligne in lignes:
         fichier2.write(ligne)
@@ -480,6 +534,7 @@ posx=0
 posy=0
 selection=0
 Bloc="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabc"
+pasouvert=True
 
 
 test()
