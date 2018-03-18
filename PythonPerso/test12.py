@@ -104,7 +104,7 @@ def ajout_ennemi(nom,x,y):
     
     fichier=open(nom+"-carac","r")
     lignes=fichier.readlines()
-    liste=[0,0,x,y,[],nom+"B1","Bas",0,int(lignes[0][8]),int(lignes[1][4]),int(lignes[2][8])] #vitesse, vie, dommage.
+    liste=[0,0,x,y,[],nom+"B1","Bas",0,int(lignes[0][8]),int(lignes[1][4]),int(lignes[2][8]),0] #vitesse, vie, dommage.
     Ennemi.append(liste)
     mouvement_ennemi(Ennemi[len(Ennemi)-1])
     fichier.close()
@@ -379,10 +379,16 @@ def frame():
     global attendre
     global joueur_touche
 
+    efface=[]
     if(not attendre):
     #print mon_perso[0]
         evenement()
         changeMap()
+
+        for i in range(0,len(Ennemi)):
+            if Ennemi[i][9]<=0:
+                efface.append(i)
+        mort(efface)
         
         if mon_perso[9][1]:
             if mon_perso[9][0]==0:
@@ -397,8 +403,7 @@ def frame():
         for i in range(0,len(Ennemi)):
             mouvement_ennemi(Ennemi[i])
         
-        if(len(Ennemi)>0):
-                
+        if(len(Ennemi)>0):             
             if mon_perso[9][1]:
                 toucher(mon_perso)
             
@@ -407,6 +412,13 @@ def frame():
                 compt(listeitem[i])
         
         canvas.after(30,frame)
+        
+def mort(effaces):
+    global Ennemi
+    for i in range(0,len(effaces)):
+        efface(Ennemi[effaces[len(effaces)-1]][4])
+        del Ennemi[effaces[len(effaces)-1]]
+        del effaces[len(effaces)-1]
 
 def joueur_toucher():
     global mon_perso
@@ -488,10 +500,22 @@ def toucher(entite):
                 effaces.append(i)
                 
     if(len(effaces)>0):     
-        for i in range(len(effaces)):
-            efface(Ennemi[effaces[i]][4])
         for i in range(0, len(effaces)):
-            del Ennemi[effaces[len(effaces)-1]]
+            if Ennemi[effaces[len(effaces)-1]][11]<=0:
+                Ennemi[effaces[len(effaces)-1]][9]-=1
+                Ennemi[effaces[len(effaces)-1]][11]=5
+            if(entite[6]=="Bas"):
+                Ennemi[effaces[len(effaces)-1]][1]=8
+                Ennemi[effaces[len(effaces)-1]][0]=0
+            elif(entite[6]=="Haut"):
+                Ennemi[effaces[len(effaces)-1]][1]=-8
+                Ennemi[effaces[len(effaces)-1]][0]=0
+            elif(entite[6]=="Droite"):
+                Ennemi[effaces[len(effaces)-1]][0]=8
+                Ennemi[effaces[len(effaces)-1]][1]=0
+            elif(entite[6]=="Gauche"):
+                Ennemi[effaces[len(effaces)-1]][0]=-8
+                Ennemi[effaces[len(effaces)-1]][1]=0
             del effaces[len(effaces)-1]
 
             
@@ -572,10 +596,15 @@ def mouvement_ennemi(mon_ennemi):
 
     mon_ennemi[2]+=mon_ennemi[0]
     mon_ennemi[3]+=mon_ennemi[1]
-    orientation(mon_ennemi)
-    bloquer_entite(mon_ennemi[2]-mon_ennemi[0],mon_ennemi[3]-mon_ennemi[1],mon_ennemi)
+    if mon_ennemi[11]>0:
+        mon_ennemi[11]-=1
+        if mon_ennemi[11]==0:
+            mon_ennemi[7]=0
+    else:
+        mon_ennemi[7]-=1
+        orientation(mon_ennemi)
     bouger_sprite(mon_ennemi[4],mon_ennemi[5],mon_ennemi[2],mon_ennemi[3])
-    mon_ennemi[7]-=1
+    bloquer_entite(mon_ennemi[2]-mon_ennemi[0],mon_ennemi[3]-mon_ennemi[1],mon_ennemi)
 
 def vitesse(event):
     global mon_perso
