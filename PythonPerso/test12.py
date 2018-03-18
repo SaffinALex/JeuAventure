@@ -266,6 +266,112 @@ def bloquer_entite(val_x, val_y,entite):
     if(entite[3]>620 or entite[3]<-8 or entite[2]>620 or entite[2]<-8):
         entite[3]=val_y
         entite[2]=val_x
+
+def aff_attaque():
+    global mon_perso
+    global sprite_att
+
+    decale=False
+    x=mon_perso[2]
+    y=mon_perso[3]
+    fichier = open("./Attaque/epee",'r')
+    print "aff_attaque"
+    lignes  = fichier.readlines()
+    efface(sprite_att)
+    if mon_perso[7]==0:
+        mon_perso[9][1]=False
+    
+    else:
+        efface(mon_perso[4])
+
+        if mon_perso[6]=="Bas":
+            
+            num=0*96+96-mon_perso[7]*32
+            for i in range (0,32):
+                ligne=lignes[i+num]
+                for j in range(0,16):
+                    placer_attaque(ligne[j],x,y)
+                    x+=2
+                x-=32
+                y+=2
+                
+        elif mon_perso[6]=="Haut":
+            num=1*96+96-mon_perso[7]*32
+            for i in range (0,32):
+                ligne=lignes[i+num]
+                for j in range(0,16):
+                    placer_attaque(ligne[j],x,y)
+                    x+=2
+                x-=32
+                if(y>mon_perso[3]+31):
+                    y-=64
+                    
+                y+=2
+                
+        elif mon_perso[6]=="Droite":
+            num=2*96+96-mon_perso[7]*32
+            for i in range (0,32):
+                ligne=lignes[i+num]
+                for j in range(0,16):
+                    placer_attaque(ligne[j],x,y)
+                    x+=2
+                x-=32
+                if(y>mon_perso[3]+31):
+                    y-=32
+                    x+=32
+                    
+                y+=2
+        elif mon_perso[6]=="Gauche":
+            num=3*96+96-mon_perso[7]*32
+            for i in range (0,32):
+                ligne=lignes[i+num]
+                for j in range(0,16):
+                    placer_attaque(ligne[j],x,y)
+                    x+=2
+                x-=32
+                if(y>mon_perso[3]+31):
+                    y-=32
+                    x-=32
+                    
+                y+=2
+
+
+        mon_perso[7]-=1
+    
+
+def placer_attaque(num,val_x,val_y):
+    global sprite_att
+    
+    if num=="1":
+        fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#0a650a",outline="") #vert
+    elif num=="2":
+        fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="black",outline="") #noir
+    elif num=="3":
+        fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="blue",outline="") #bleu
+    elif num=="4":
+        fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#808180",outline="") #gris
+    elif num=="5":
+        fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#614919",outline="") #marron
+    elif num=="6":
+        fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="red",outline="") #rouge 
+    elif num=="7":
+        fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#d4a566",outline="") #beige
+    elif num=="8":
+        fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#0dac07",outline="") #vertClaire
+    elif num=="9":
+        fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="white",outline="") #Blanc
+    elif num=="A":
+        fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#6d5331",outline="") #MarronClaire
+    elif num=="B":
+        fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#383837",outline="") #NOIRCLAIRE(OMBRE)
+    elif num=="C":
+        fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#e3e570",outline="") #JAUNECLAIRE
+    elif num=="D": #BleuGlace 
+        fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#b2d5f6",outline="")
+
+    if num!="0":
+        sprite_att.append(fig)
+    
                 
 def frame():
     global Ennemi
@@ -276,13 +382,24 @@ def frame():
     if(not attendre):
     #print mon_perso[0]
         evenement()
-        mouvement_perso()
         changeMap()
-        for i in range(0,len(Ennemi)):
-            mouvement_ennemi(Ennemi[i])
+        
+        if mon_perso[9][1]:
+            if mon_perso[9][0]==0:
+                aff_attaque()
+                mon_perso[9][0]=3
+            else:
+                mon_perso[9][0]-=1
+                
+        if(not mon_perso[9][1]):
+            mouvement_perso()
+            
+       # for i in range(0,len(Ennemi)):
+          #  mouvement_ennemi(Ennemi[i])
         
         if(len(Ennemi)>0):
-            toucher(mon_perso)
+            if mon_perso[9][1]:
+                toucher(mon_perso)
             
         for i in range(0,len(listeitem)):
             if(listeitem[i][3]>0):
@@ -295,25 +412,56 @@ def toucher(entite):
     global Ennemi
     effaces=[]
 
-    for i in range(len(Ennemi)):
 
-        if(entite[2]>=Ennemi[i][2] and entite[2]<=Ennemi[i][2]+31):
-            if( entite[3]>=Ennemi[i][3] and  entite[3]<=Ennemi[i][3]+31): #Coin Haut gauche
-                effaces.append(i)
+    if entite[6]=="Haut" or entite[6]=="Bas":
+        if entite[6]=="Haut":
+            posx=entite[2]
+            posy=entite[3]
         
-            elif( entite[3]+31>=Ennemi[i][3] and  entite[3]+31<Ennemi[i][3]+31): #Coin Bas gauche
+        if entite[6]=="Bas":
+            posx=entite[2]
+            posy=entite[3]+16
+            
+        for i in range(0,len(Ennemi)):
+            if Ennemi[i][2]>=posx and Ennemi[i][2]<posx+31 and Ennemi[i][3]+31>=posy and Ennemi[i][3]+31<posy+31:
                 effaces.append(i)
                 
-        if( entite[2]+31>=Ennemi[i][2] and  entite[2]+32<=Ennemi[i][2]+31):
-            if( entite[3]+31>=Ennemi[i][3] and entite[3]+31<=Ennemi[i][3]+31): #Coin Haut Droite
+            elif Ennemi[i][2]+31>=posx and Ennemi[i][2]+31<posx+31 and Ennemi[i][3]+31>=posy and Ennemi[i][3]+31<posy+31:
                 effaces.append(i)
                 
-            elif( entite[3]>=Ennemi[i][3] and  entite[3]<=Ennemi[i][3]+31): #Coin Bas Droite
+            elif Ennemi[i][2]>=posx and Ennemi[i][2]<posx+31 and Ennemi[i][3]>=posy and Ennemi[i][3]<posy+31:
                 effaces.append(i)
                 
-    for i in range(len(effaces)):
-        efface(Ennemi[effaces[i]][4])
-        del Ennemi[effaces[i]]
+            elif Ennemi[i][2]+31>=posx and Ennemi[i][2]+31<posx+31 and Ennemi[i][3]>=posy and Ennemi[i][3]<posy+31:
+                effaces.append(i)
+                
+    if entite[6]=="Droite" or entite[6]=="Gauche":
+        if entite[6]=="Gauche":
+            posx=entite[2]-16
+            posy=entite[3]
+            
+        if entite[6]=="Droite":
+            posx=entite[2]+16
+            posy=entite[3]
+
+            
+        for i in range(0,len(Ennemi)):
+            if Ennemi[i][2]>=posx and Ennemi[i][2]<posx+31 and Ennemi[i][3]+31>=posy and Ennemi[i][3]+31<posy+31:
+                effaces.append(i)
+                
+            elif Ennemi[i][2]+31>=posx and Ennemi[i][2]+31<posx+31 and Ennemi[i][3]+31>=posy and Ennemi[i][3]+31<posy+31:
+                effaces.append(i)
+                
+            elif Ennemi[i][2]>=posx and Ennemi[i][2]<posx+31 and Ennemi[i][3]>=posy and Ennemi[i][3]<posy+31:
+                effaces.append(i)
+                
+            elif Ennemi[i][2]+31>=posx and Ennemi[i][2]+31<posx+31 and Ennemi[i][3]>=posy and Ennemi[i][3]<posy+31:
+                effaces.append(i)
+                
+    if(len(effaces)>0):     
+        for i in range(len(effaces)):
+            efface(Ennemi[effaces[i]][4])
+
             
                     
 def mouvement_perso():
@@ -417,6 +565,17 @@ def vitesse(event):
         
     if(touche=="a"):
         interagir()
+
+    if(touche=="b"):
+        attaque()
+
+def attaque():
+    global mon_perso
+    if not mon_perso[9][1]:
+        mon_perso[9][1]=True
+        mon_perso[9][0]=0
+        mon_perso[7]=3
+
 
 def placer_sol(x,y):
     canvas.create_rectangle(x,y,x+32,y+32,fill="#219a21",outline="") #vert
@@ -614,7 +773,7 @@ def bouger_sprite(sprite_pos,nom,x,y):
     for ligne in lignes:
         for i in range (0,16):                
             if ligne[i]=="1":
-                pos=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="green",outline="")
+                pos=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#0a650a",outline="")
             elif ligne[i]=="2":
                 pos=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="black",outline="")
             elif ligne[i]=="3":
@@ -749,16 +908,16 @@ canvas = Canvas(fenetre, width=640, height=639, background="#219a21")
 mapx=1
 mapy=1
 deplacement=0
-mon_perso=[0,0,96,384,[],"./spritePerso/PersoB1","Bas"]
+mon_perso=[0,0,96,384,[],"./spritePerso/PersoB1","Bas",0,0,[0,False]] # vitesse x,y ,pos x,y ,perso,sprite,orientation,cptAttaque,cptOriente,CouldownAttaque
 Ennemi=[]
 bloque_y=[]
 bloque_x=[]
-
+cpt=0
 bloquer=[]
 for i in range(0,20*20):
     bloquer.append([])
 
-
+sprite_att=[]
 coffre1=False
 attendre = False
 attendre_principal = False
