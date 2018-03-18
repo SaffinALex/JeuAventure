@@ -104,7 +104,7 @@ def ajout_ennemi(nom,x,y):
     
     fichier=open(nom+"-carac","r")
     lignes=fichier.readlines()
-    liste=[0,0,x,y,[],nom+"B1","Bas",0,int(lignes[0][8]),int(lignes[1][4]),int(lignes[2][8])]
+    liste=[0,0,x,y,[],nom+"B1","Bas",0,int(lignes[0][8]),int(lignes[1][4]),int(lignes[2][8])] #vitesse, vie, dommage.
     Ennemi.append(liste)
     mouvement_ennemi(Ennemi[len(Ennemi)-1])
     fichier.close()
@@ -275,7 +275,6 @@ def aff_attaque():
     x=mon_perso[2]
     y=mon_perso[3]
     fichier = open("./Attaque/epee",'r')
-    print "aff_attaque"
     lignes  = fichier.readlines()
     efface(sprite_att)
     if mon_perso[7]==0:
@@ -378,6 +377,7 @@ def frame():
     global mon_perso
     global listeitem
     global attendre
+    global joueur_touche
 
     if(not attendre):
     #print mon_perso[0]
@@ -387,17 +387,18 @@ def frame():
         if mon_perso[9][1]:
             if mon_perso[9][0]==0:
                 aff_attaque()
-                mon_perso[9][0]=3
+                mon_perso[9][0]=1
             else:
                 mon_perso[9][0]-=1
                 
         if(not mon_perso[9][1]):
             mouvement_perso()
             
-       # for i in range(0,len(Ennemi)):
-          #  mouvement_ennemi(Ennemi[i])
+        for i in range(0,len(Ennemi)):
+            mouvement_ennemi(Ennemi[i])
         
         if(len(Ennemi)>0):
+                
             if mon_perso[9][1]:
                 toucher(mon_perso)
             
@@ -407,6 +408,34 @@ def frame():
         
         canvas.after(30,frame)
 
+def joueur_toucher():
+    global mon_perso
+    global Ennemi
+    global joueur_touche 
+    joueur_touche=False
+    posx=mon_perso[2]
+    posy=mon_perso[3]+16
+
+    for i in range(0,len(Ennemi)):
+        if posx>=Ennemi[i][2] and posx<Ennemi[i][2]+31 and posy+31>=Ennemi[i][3] and posy+31<Ennemi[i][3]+31:
+            joueur_touche=True
+        elif posx+31>=Ennemi[i][2] and posx+31<Ennemi[i][2]+31 and posy+31>=Ennemi[i][3] and posy+31<Ennemi[i][3]+31:
+            joueur_touche=True
+        elif posx>=Ennemi[i][2] and posx<Ennemi[i][2]+31 and posy>=Ennemi[i][3] and posy<Ennemi[i][3]+31:
+            joueur_touche=True
+        elif posx+31>=Ennemi[i][2] and posx+31<Ennemi[i][2]+31 and posy>=Ennemi[i][3] and posy<Ennemi[i][3]+31:
+            joueur_touche=True
+            
+    if joueur_touche:
+        if mon_perso[6]=="Bas":
+            mon_perso[1]=-8
+        if mon_perso[6]=="Haut":
+            mon_perso[1]=8
+        if mon_perso[6]=="Droite":
+            mon_perso[0]=8
+        if mon_perso[6]=="Gauche":
+            mon_perso[0]=-8
+            
 def toucher(entite):
 
     global Ennemi
@@ -461,6 +490,9 @@ def toucher(entite):
     if(len(effaces)>0):     
         for i in range(len(effaces)):
             efface(Ennemi[effaces[i]][4])
+        for i in range(0, len(effaces)):
+            del Ennemi[effaces[len(effaces)-1]]
+            del effaces[len(effaces)-1]
 
             
                     
@@ -923,6 +955,7 @@ attendre = False
 attendre_principal = False
 premier_passage = False
 listeitem=[]
+joueur_touche=False
 listecassable=[]
 listechangement=[]
 inventaire=[0,0]
