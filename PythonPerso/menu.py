@@ -40,7 +40,9 @@ def placer(nom,x,y,canvas):
             elif ligne[i]=="C":
                 fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#e3e570",outline="") #JAUNECLAIRE
             elif ligne[i]=="D": #BleuGlace 
-                fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#b2d5f6",outline="")
+               fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#b2d5f6",outline="")
+            elif ligne[i]=="E":
+               fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#261f2f",outline="") #BleuFoncée/Gris
 
             if ligne[i]!="0":    
                 ma_map[x/32+y/32*20].append(fig)
@@ -533,7 +535,7 @@ curseur2=[0,0,0,0,[]]
 posx=0
 posy=0
 selection=0
-Bloc="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabc"
+Bloc="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghi"
 pasouvert=True
 
 

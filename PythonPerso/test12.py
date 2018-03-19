@@ -172,6 +172,10 @@ def placer(nom,x,y,option): #0=Transparent, 1=bloquer, 2=item
                 fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#e3e570",outline="") #JAUNECLAIRE
             elif ligne[i]=="D": #BleuGlace 
                fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#b2d5f6",outline="")
+            elif ligne[i]=="E":
+               fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#261f2f",outline="") #BleuFoncée/Gris
+
+               
 
             if(option==2 and ligne[i]!=0 and len(listeitem)!=0):
                 listeitem[len(listeitem)-1][5].append(fig)
@@ -791,34 +795,14 @@ def evenement():
     global coffre1
     global ferme1
     global Ennemi
+    global listeitem
 
     if(mapx==1 and mapy==1):
         if(coffre1==False):
-            if(not(len(Ennemi)>0)):
-                
-                #fichier=open("./map/mapobj1-1","r")
-                #lignes=fichier.readlines()
-                #newligne=""
-
-                #for i in range(len(lignes[1])):
-                 #   if(i==5):
-                 #       newligne+="2"
-                  #  else:
-                   #     newligne+=lignes[1][i]
-               # lignes[1]=newligne
-
-                #fichier.close()
-                
-                #fichier=open("./map/mapobj1-1","w")
-                #fichier.close()
-                
-                #fichier=open("./map/mapobj1-1","a")
-               # for i in range(0,16):
-                #    fichier.write(lignes[i]) 
-                    
+            if(not(len(Ennemi)>0)):                 
                 coffre1=True
-                placer("./spriteObjet/objet2",160,32,1)
-                #fichier.close()
+                listeitem.append(["7",160,192,0,0,[]])
+                placer("./spriteObjet/objet2",160,192,2)
                 
 
         
@@ -965,11 +949,11 @@ def interagir():
 
 fenetre = Tk()
 
-canvas = Canvas(fenetre, width=640, height=639, background="#219a21")
+canvas = Canvas(fenetre, width=640, height=639, background="black")
 mapx=1
 mapy=1
 deplacement=0
-mon_perso=[0,0,96,384,[],"./spritePerso/PersoB1","Bas",0,0,[0,False]] # vitesse x,y ,pos x,y ,perso,sprite,orientation,cptAttaque,cptOriente,CouldownAttaque
+mon_perso=[0,0,320,80,[],"./spritePerso/PersoB1","Bas",0,0,[0,False]] # vitesse x,y ,pos x,y ,perso,sprite,orientation,cptAttaque,cptOriente,CouldownAttaque
 Ennemi=[]
 bloque_y=[]
 bloque_x=[]
