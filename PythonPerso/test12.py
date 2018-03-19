@@ -67,6 +67,7 @@ def affiche_obj():
                     for k in range (0,len(listechangement)):
                         if mapx==listechangement[k][2] and mapy==listechangement[k][3] and listechangement[k][0]==i*32 and listechangement[k][1]==j and listechangement[k][4]=="C":
                             porte_ouverte=True
+                            listeitem.append([lignes[cpt][i],i*32,j,0,1,[]])
                             
                     if(not(porte_ouverte)):            
                         listeitem.append([lignes[cpt][i],i*32,j,0,0,[]])
