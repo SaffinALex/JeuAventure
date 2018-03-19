@@ -613,6 +613,9 @@ def mouvement_ennemi(mon_ennemi):
 
 def vitesse(event):
     global mon_perso
+    global rectangle
+    global idmessage
+    global attendre
 
     touche=event.keysym
     
@@ -630,8 +633,13 @@ def vitesse(event):
 
         
     if(touche=="a"):
-        interagir()
-
+	if(attendre == True):
+		attendre = False
+		canvas.delete(rectangle)
+		canvas.delete(idmessage)
+		frame()
+	else:
+		interagir()
     if(touche=="b"):
         attaque()
 
@@ -646,140 +654,6 @@ def attaque():
 def placer_sol(x,y):
     canvas.create_rectangle(x,y,x+32,y+32,fill="#219a21",outline="") #vert
 
-def accueil():
-	global premier_passage
-	canvas.delete("all")
-	canvas.create_text(400, 300, text = "Appuyer sur Espace pour Continuer")
-	premier_passage = True
-
-def menu_principal(event):
-	global choix_menu_principal
-	global attendre_principal
-	global attendre
-	global premier_passage
-
-	touche=event.keysym
-	if(touche == "space"):
-		if(premier_passage == True):
-			attendre_principal = True
-			canvas.delete("all")
-			choix_menu_principal = 0
-			premier_passage = False
-			creation_menu_principal(300,200)
-		
-	if(touche=="Down"):
-		if(attendre_principal == True):
-			if(choix_menu_principal == 0):
-				canvas.delete("all")
-				choix_menu_principal = 1
-				creation_menu_principal(300,300)	
-				
-			elif(choix_menu_principal == 1):
-				canvas.delete("all")
-				choix_menu_principal = 2
-				creation_menu_principal(300,400)
-				
-			elif(choix_menu_principal == 2):
-				canvas.delete("all")
-				choix_menu_principal = 0
-				creation_menu_principal(300,200)
-				
-		elif(attendre_principal == False):
-			menu(event)
-	if(touche=="Up"):
-		if(attendre_principal == True):
-			if(choix_menu_principal == 0):
-				canvas.delete("all")
-				choix_menu_principal = 2
-				creation_menu_principal(300,400)
-				
-			elif(choix_menu_principal == 1):
-				canvas.delete("all")
-				choix_menu_principal = 0
-				creation_menu_principal(300,200)
-				
-			elif(choix_menu_principal == 2):
-				canvas.delete("all")
-				choix_menu_principal = 1
-				creation_menu_principal(300,300)
-				
-		elif(attendre_principal == False):
-			menu(event)
-
-	if(touche=="Return"):
-		if(attendre_principal == True):
-			if(choix_menu_principal == 0):
-				attendre_principal = False
-				affiche_terrain()
-				affiche_obj()
-				frame()				
-		elif(attendre_principal == False):
-			menu(event)		
-def creation_menu_principal(x,y):
-	
-	canvas.create_text(200, 200, text = "Nouvelle Partie")
-	canvas.create_text(x, y, text = "<")
-	canvas.create_text(200, 300, text = "Charger Partie")
-	canvas.create_text(200, 400, text = "Options")
-   
-def creation_menu(x,y):
-	
-	canvas.create_text(200, 200, text = "Reprendre")
-	canvas.create_text(x, y, text = "<")
-	canvas.create_text(200, 300, text = "Menu Principal")
-
-
-
-def menu(event):
-    global attendre
-    global choix_menu
-	
-    touche=event.keysym
-    if(touche=="Escape"):
-	if(attendre != True):
-		if(attendre_principal == False):
-	        	attendre = True
-			canvas.delete("all")
-			choix_menu = 0
-			creation_menu(300,200)
-
-    if(touche=="Down"):
-	if(attendre == True):
-		if(choix_menu == 0):
-			canvas.delete("all")
-			creation_menu(300,300)
-			choix_menu = 1
-		elif(choix_menu == 1):
-			canvas.delete("all")
-			creation_menu(300,200)
-			choix_menu = 0
-	elif(attendre == False):
-		vitesse(event)
-    if(touche=="Up"):
-	if(attendre == True):
-		if(choix_menu == 0):
-			canvas.delete("all")
-			creation_menu(300,300)
-			choix_menu = 1
-		elif(choix_menu == 1):
-			canvas.delete("all")
-			creation_menu(300,200)
-			choix_menu = 0
-	elif(attendre == False):
-		vitesse(event)
-
-    if(touche=="Return"):
-	if(attendre == True):
-		if(choix_menu == 0):
-			affiche_terrain()
-        		attendre = False
-			frame()
-		elif(choix_menu == 1):
-			attendre = False
-			accueil()
-
-
-				
 
 def stop(event):
     touche=event.keysym
@@ -876,6 +750,9 @@ def interaction(liste):
     global bloque_x
     global bloque_y
     numero_eff=[]
+    global idmessage
+    global rectangle
+    global attendre
     
     if liste[0]=="5" or liste[0]=="6" or liste[0]=="7" or liste[0]=="8":
         if liste[4]!=1:
@@ -912,7 +789,15 @@ def interaction(liste):
                 del bloque_x[numero_eff[len(numero_eff)-1]]
                 del bloque_y[numero_eff[len(numero_eff)-1]]
                 del numero_eff[len(numero_eff)-1]
-    
+                
+    if liste[0]=="A":
+	fichier = str(mapx)+str(mapy)+str(liste[1])+str(liste[2])
+	chemin = "messages/sign/"+fichier
+	mon_fichier = open(chemin, "r")
+	message = mon_fichier.read()	
+	attendre = True
+	rectangle = canvas.create_rectangle(100, 550, 550, 625, width=5, fill='white')
+	idmessage = canvas.create_text(320, 590, text = message)
         
 def interagir():
     global listeitem
@@ -963,6 +848,9 @@ bloquer=[]
 for i in range(0,20*20):
     bloquer.append([])
 
+rectangle = 1
+idmessage = 0
+
 sprite_att=[]
 coffre1=False
 attendre = False
@@ -979,20 +867,9 @@ frame()
 
 
 canvas.pack()
-canvas.event_add('<<menu_esc>>', '<KeyPress-Escape>')
-canvas.event_add('<<menu_ret>>', '<KeyPress-Return>')
-canvas.event_add('<<menu_up>>', '<KeyPress-Up>')
-canvas.event_add('<<menu_dwn>>', '<KeyPress-Down>')
-canvas.event_add('<<menu_spac>>', '<KeyPress-space>')
 canvas.focus_set()
 canvas.bind("<Key>", vitesse)
 canvas.bind("<KeyRelease>", stop)
-canvas.bind("<<menu_esc>>",menu)
-canvas.bind("<<menu_ret>>",menu_principal)
-canvas.bind("<<menu_up>>",menu_principal)
-canvas.bind("<<menu_dwn>>",menu_principal)
-canvas.bind("<<menu_spac>>",menu_principal)
-
         
 fenetre.mainloop()
     
