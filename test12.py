@@ -68,6 +68,7 @@ def affiche_obj():
                     for k in range (0,len(listechangement)):
                         if mapx==listechangement[k][2] and mapy==listechangement[k][3] and listechangement[k][0]==i*32 and listechangement[k][1]==j and listechangement[k][4]=="C":
                             porte_ouverte=True
+                            listeitem.append([lignes[cpt][i],i*32,j,0,1,[]])
                             
                     if(not(porte_ouverte)):            
                         listeitem.append([lignes[cpt][i],i*32,j,0,0,[]])
@@ -105,7 +106,7 @@ def ajout_ennemi(nom,x,y):
     
     fichier=open(nom+"-carac","r")
     lignes=fichier.readlines()
-    liste=[0,0,x,y,[],nom+"B1","Bas",0,int(lignes[0][8]),int(lignes[1][4]),int(lignes[2][8])]
+    liste=[0,0,x,y,[],nom+"B1","Bas",0,int(lignes[0][8]),int(lignes[1][4]),int(lignes[2][8]),0] #vitesse, vie, dommage.
     Ennemi.append(liste)
     mouvement_ennemi(Ennemi[len(Ennemi)-1])
     fichier.close()
@@ -173,6 +174,10 @@ def placer(nom,x,y,option): #0=Transparent, 1=bloquer, 2=item
                 fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#e3e570",outline="") #JAUNECLAIRE
             elif ligne[i]=="D": #BleuGlace 
                fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#b2d5f6",outline="")
+            elif ligne[i]=="E":
+               fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#261f2f",outline="") #BleuFoncée/Gris
+
+               
 
             if(option==2 and ligne[i]!=0 and len(listeitem)!=0):
                 listeitem[len(listeitem)-1][5].append(fig)
@@ -267,54 +272,258 @@ def bloquer_entite(val_x, val_y,entite):
     if(entite[3]>620 or entite[3]<-8 or entite[2]>620 or entite[2]<-8):
         entite[3]=val_y
         entite[2]=val_x
+
+def aff_attaque():
+    global mon_perso
+    global sprite_att
+
+    decale=False
+    x=mon_perso[2]
+    y=mon_perso[3]
+    fichier = open("./Attaque/epee",'r')
+    lignes  = fichier.readlines()
+    efface(sprite_att)
+    if mon_perso[7]==0:
+        mon_perso[9][1]=False
+    
+    else:
+        efface(mon_perso[4])
+
+        if mon_perso[6]=="Bas":
+            
+            num=0*96+96-mon_perso[7]*32
+            for i in range (0,32):
+                ligne=lignes[i+num]
+                for j in range(0,16):
+                    placer_attaque(ligne[j],x,y)
+                    x+=2
+                x-=32
+                y+=2
+                
+        elif mon_perso[6]=="Haut":
+            num=1*96+96-mon_perso[7]*32
+            for i in range (0,32):
+                ligne=lignes[i+num]
+                for j in range(0,16):
+                    placer_attaque(ligne[j],x,y)
+                    x+=2
+                x-=32
+                if(y>mon_perso[3]+31):
+                    y-=64
+                    
+                y+=2
+                
+        elif mon_perso[6]=="Droite":
+            num=2*96+96-mon_perso[7]*32
+            for i in range (0,32):
+                ligne=lignes[i+num]
+                for j in range(0,16):
+                    placer_attaque(ligne[j],x,y)
+                    x+=2
+                x-=32
+                if(y>mon_perso[3]+31):
+                    y-=32
+                    x+=32
+                    
+                y+=2
+        elif mon_perso[6]=="Gauche":
+            num=3*96+96-mon_perso[7]*32
+            for i in range (0,32):
+                ligne=lignes[i+num]
+                for j in range(0,16):
+                    placer_attaque(ligne[j],x,y)
+                    x+=2
+                x-=32
+                if(y>mon_perso[3]+31):
+                    y-=32
+                    x-=32
+                    
+                y+=2
+
+
+        mon_perso[7]-=1
+    
+
+def placer_attaque(num,val_x,val_y):
+    global sprite_att
+    
+    if num=="1":
+        fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#0a650a",outline="") #vert
+    elif num=="2":
+        fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="black",outline="") #noir
+    elif num=="3":
+        fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="blue",outline="") #bleu
+    elif num=="4":
+        fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#808180",outline="") #gris
+    elif num=="5":
+        fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#614919",outline="") #marron
+    elif num=="6":
+        fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="red",outline="") #rouge 
+    elif num=="7":
+        fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#d4a566",outline="") #beige
+    elif num=="8":
+        fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#0dac07",outline="") #vertClaire
+    elif num=="9":
+        fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="white",outline="") #Blanc
+    elif num=="A":
+        fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#6d5331",outline="") #MarronClaire
+    elif num=="B":
+        fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#383837",outline="") #NOIRCLAIRE(OMBRE)
+    elif num=="C":
+        fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#e3e570",outline="") #JAUNECLAIRE
+    elif num=="D": #BleuGlace 
+        fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#b2d5f6",outline="")
+
+    if num!="0":
+        sprite_att.append(fig)
+    
                 
 def frame():
     global Ennemi
     global mon_perso
     global listeitem
     global attendre
+    global joueur_touche
 
+    efface=[]
     if(not attendre):
     #print mon_perso[0]
         evenement()
-        mouvement_perso()
         changeMap()
+
+        for i in range(0,len(Ennemi)):
+            if Ennemi[i][9]<=0:
+                efface.append(i)
+        mort(efface)
+        
+        if mon_perso[9][1]:
+            if mon_perso[9][0]==0:
+                aff_attaque()
+                mon_perso[9][0]=1
+            else:
+                mon_perso[9][0]-=1
+                
+        if(not mon_perso[9][1]):
+            mouvement_perso()
+            
         for i in range(0,len(Ennemi)):
             mouvement_ennemi(Ennemi[i])
         
-        if(len(Ennemi)>0):
-            toucher(mon_perso)
+        if(len(Ennemi)>0):             
+            if mon_perso[9][1]:
+                toucher(mon_perso)
             
         for i in range(0,len(listeitem)):
             if(listeitem[i][3]>0):
                 compt(listeitem[i])
         
         canvas.after(30,frame)
+        
+def mort(effaces):
+    global Ennemi
+    for i in range(0,len(effaces)):
+        efface(Ennemi[effaces[len(effaces)-1]][4])
+        del Ennemi[effaces[len(effaces)-1]]
+        del effaces[len(effaces)-1]
 
+def joueur_toucher():
+    global mon_perso
+    global Ennemi
+    global joueur_touche 
+    joueur_touche=False
+    posx=mon_perso[2]
+    posy=mon_perso[3]+16
+
+    for i in range(0,len(Ennemi)):
+        if posx>=Ennemi[i][2] and posx<Ennemi[i][2]+31 and posy+31>=Ennemi[i][3] and posy+31<Ennemi[i][3]+31:
+            joueur_touche=True
+        elif posx+31>=Ennemi[i][2] and posx+31<Ennemi[i][2]+31 and posy+31>=Ennemi[i][3] and posy+31<Ennemi[i][3]+31:
+            joueur_touche=True
+        elif posx>=Ennemi[i][2] and posx<Ennemi[i][2]+31 and posy>=Ennemi[i][3] and posy<Ennemi[i][3]+31:
+            joueur_touche=True
+        elif posx+31>=Ennemi[i][2] and posx+31<Ennemi[i][2]+31 and posy>=Ennemi[i][3] and posy<Ennemi[i][3]+31:
+            joueur_touche=True
+            
+    if joueur_touche:
+        if mon_perso[6]=="Bas":
+            mon_perso[1]=-8
+        if mon_perso[6]=="Haut":
+            mon_perso[1]=8
+        if mon_perso[6]=="Droite":
+            mon_perso[0]=8
+        if mon_perso[6]=="Gauche":
+            mon_perso[0]=-8
+            
 def toucher(entite):
 
     global Ennemi
     effaces=[]
 
-    for i in range(len(Ennemi)):
 
-        if(entite[2]>=Ennemi[i][2] and entite[2]<=Ennemi[i][2]+31):
-            if( entite[3]>=Ennemi[i][3] and  entite[3]<=Ennemi[i][3]+31): #Coin Haut gauche
-                effaces.append(i)
+    if entite[6]=="Haut" or entite[6]=="Bas":
+        if entite[6]=="Haut":
+            posx=entite[2]
+            posy=entite[3]
         
-            elif( entite[3]+31>=Ennemi[i][3] and  entite[3]+31<Ennemi[i][3]+31): #Coin Bas gauche
+        if entite[6]=="Bas":
+            posx=entite[2]
+            posy=entite[3]+16
+            
+        for i in range(0,len(Ennemi)):
+            if Ennemi[i][2]>=posx and Ennemi[i][2]<posx+31 and Ennemi[i][3]+31>=posy and Ennemi[i][3]+31<posy+31:
                 effaces.append(i)
                 
-        if( entite[2]+31>=Ennemi[i][2] and  entite[2]+32<=Ennemi[i][2]+31):
-            if( entite[3]+31>=Ennemi[i][3] and entite[3]+31<=Ennemi[i][3]+31): #Coin Haut Droite
+            elif Ennemi[i][2]+31>=posx and Ennemi[i][2]+31<posx+31 and Ennemi[i][3]+31>=posy and Ennemi[i][3]+31<posy+31:
                 effaces.append(i)
                 
-            elif( entite[3]>=Ennemi[i][3] and  entite[3]<=Ennemi[i][3]+31): #Coin Bas Droite
+            elif Ennemi[i][2]>=posx and Ennemi[i][2]<posx+31 and Ennemi[i][3]>=posy and Ennemi[i][3]<posy+31:
                 effaces.append(i)
                 
-    for i in range(len(effaces)):
-        efface(Ennemi[effaces[i]][4])
-        del Ennemi[effaces[i]]
+            elif Ennemi[i][2]+31>=posx and Ennemi[i][2]+31<posx+31 and Ennemi[i][3]>=posy and Ennemi[i][3]<posy+31:
+                effaces.append(i)
+                
+    if entite[6]=="Droite" or entite[6]=="Gauche":
+        if entite[6]=="Gauche":
+            posx=entite[2]-16
+            posy=entite[3]
+            
+        if entite[6]=="Droite":
+            posx=entite[2]+16
+            posy=entite[3]
+
+            
+        for i in range(0,len(Ennemi)):
+            if Ennemi[i][2]>=posx and Ennemi[i][2]<posx+31 and Ennemi[i][3]+31>=posy and Ennemi[i][3]+31<posy+31:
+                effaces.append(i)
+                
+            elif Ennemi[i][2]+31>=posx and Ennemi[i][2]+31<posx+31 and Ennemi[i][3]+31>=posy and Ennemi[i][3]+31<posy+31:
+                effaces.append(i)
+                
+            elif Ennemi[i][2]>=posx and Ennemi[i][2]<posx+31 and Ennemi[i][3]>=posy and Ennemi[i][3]<posy+31:
+                effaces.append(i)
+                
+            elif Ennemi[i][2]+31>=posx and Ennemi[i][2]+31<posx+31 and Ennemi[i][3]>=posy and Ennemi[i][3]<posy+31:
+                effaces.append(i)
+                
+    if(len(effaces)>0):     
+        for i in range(0, len(effaces)):
+            if Ennemi[effaces[len(effaces)-1]][11]<=0:
+                Ennemi[effaces[len(effaces)-1]][9]-=1
+                Ennemi[effaces[len(effaces)-1]][11]=5
+            if(entite[6]=="Bas"):
+                Ennemi[effaces[len(effaces)-1]][1]=8
+                Ennemi[effaces[len(effaces)-1]][0]=0
+            elif(entite[6]=="Haut"):
+                Ennemi[effaces[len(effaces)-1]][1]=-8
+                Ennemi[effaces[len(effaces)-1]][0]=0
+            elif(entite[6]=="Droite"):
+                Ennemi[effaces[len(effaces)-1]][0]=8
+                Ennemi[effaces[len(effaces)-1]][1]=0
+            elif(entite[6]=="Gauche"):
+                Ennemi[effaces[len(effaces)-1]][0]=-8
+                Ennemi[effaces[len(effaces)-1]][1]=0
+            del effaces[len(effaces)-1]
+
             
                     
 def mouvement_perso():
@@ -393,17 +602,23 @@ def mouvement_ennemi(mon_ennemi):
 
     mon_ennemi[2]+=mon_ennemi[0]
     mon_ennemi[3]+=mon_ennemi[1]
-    orientation(mon_ennemi)
-    bloquer_entite(mon_ennemi[2]-mon_ennemi[0],mon_ennemi[3]-mon_ennemi[1],mon_ennemi)
+    if mon_ennemi[11]>0:
+        mon_ennemi[11]-=1
+        if mon_ennemi[11]==0:
+            mon_ennemi[7]=0
+    else:
+        mon_ennemi[7]-=1
+        orientation(mon_ennemi)
     bouger_sprite(mon_ennemi[4],mon_ennemi[5],mon_ennemi[2],mon_ennemi[3])
-    mon_ennemi[7]-=1
+    bloquer_entite(mon_ennemi[2]-mon_ennemi[0],mon_ennemi[3]-mon_ennemi[1],mon_ennemi)
 
 def vitesse(event):
     global mon_perso
-    global attendre  
-    global idmessage
     global rectangle
- 
+    global idmessage
+    global attendre
+    global dialogue
+
     touche=event.keysym
     
     if touche=="Up":
@@ -421,151 +636,33 @@ def vitesse(event):
         
     if(touche=="a"):
 	if(attendre == True):
-		attendre = False
-		canvas.delete(rectangle)
-		canvas.delete(idmessage)
-		frame()
+		if(suite == False):
+			dialogue = 0
+			attendre = False
+			canvas.delete(rectangle)
+			canvas.delete(idmessage)
+			frame()
+		else:
+			canvas.delete(rectangle)
+			canvas.delete(idmessage)
+			interagir()
+		
 	else:
 		interagir()
-        
+    if(touche=="b"):
+        attaque()
+
+def attaque():
+    global mon_perso
+    if not mon_perso[9][1]:
+        mon_perso[9][1]=True
+        mon_perso[9][0]=0
+        mon_perso[7]=3
+
 
 def placer_sol(x,y):
     canvas.create_rectangle(x,y,x+32,y+32,fill="#219a21",outline="") #vert
 
-def accueil():
-	global premier_passage
-	canvas.delete("all")
-	canvas.create_text(400, 300, text = "Appuyer sur Espace pour Continuer")
-	premier_passage = True
-
-def menu_principal(event):
-	global choix_menu_principal
-	global attendre_principal
-	global attendre
-	global premier_passage
-
-	touche=event.keysym
-	if(touche == "space"):
-		if(premier_passage == True):
-			attendre_principal = True
-			canvas.delete("all")
-			choix_menu_principal = 0
-			premier_passage = False
-			creation_menu_principal(300,200)
-		
-	if(touche=="Down"):
-		if(attendre_principal == True):
-			if(choix_menu_principal == 0):
-				canvas.delete("all")
-				choix_menu_principal = 1
-				creation_menu_principal(300,300)	
-				
-			elif(choix_menu_principal == 1):
-				canvas.delete("all")
-				choix_menu_principal = 2
-				creation_menu_principal(300,400)
-				
-			elif(choix_menu_principal == 2):
-				canvas.delete("all")
-				choix_menu_principal = 0
-				creation_menu_principal(300,200)
-				
-		elif(attendre_principal == False):
-			menu(event)
-	if(touche=="Up"):
-		if(attendre_principal == True):
-			if(choix_menu_principal == 0):
-				canvas.delete("all")
-				choix_menu_principal = 2
-				creation_menu_principal(300,400)
-				
-			elif(choix_menu_principal == 1):
-				canvas.delete("all")
-				choix_menu_principal = 0
-				creation_menu_principal(300,200)
-				
-			elif(choix_menu_principal == 2):
-				canvas.delete("all")
-				choix_menu_principal = 1
-				creation_menu_principal(300,300)
-				
-		elif(attendre_principal == False):
-			menu(event)
-
-	if(touche=="Return"):
-		if(attendre_principal == True):
-			if(choix_menu_principal == 0):
-				attendre_principal = False
-				affiche_terrain()
-				affiche_obj()
-				frame()				
-		elif(attendre_principal == False):
-			menu(event)		
-def creation_menu_principal(x,y):
-	
-	canvas.create_text(200, 200, text = "Nouvelle Partie")
-	canvas.create_text(x, y, text = "<")
-	canvas.create_text(200, 300, text = "Charger Partie")
-	canvas.create_text(200, 400, text = "Options")
-   
-def creation_menu(x,y):
-	
-	canvas.create_text(200, 200, text = "Reprendre")
-	canvas.create_text(x, y, text = "<")
-	canvas.create_text(200, 300, text = "Menu Principal")
-
-
-
-def menu(event):
-    global attendre
-    global choix_menu
-	
-    touche=event.keysym
-    if(touche=="Escape"):
-	if(attendre != True):
-		if(attendre_principal == False):
-	        	attendre = True
-			canvas.delete("all")
-			choix_menu = 0
-			creation_menu(300,200)
-
-    if(touche=="Down"):
-	if(attendre == True):
-		if(choix_menu == 0):
-			canvas.delete("all")
-			creation_menu(300,300)
-			choix_menu = 1
-		elif(choix_menu == 1):
-			canvas.delete("all")
-			creation_menu(300,200)
-			choix_menu = 0
-	elif(attendre == False):
-		vitesse(event)
-    if(touche=="Up"):
-	if(attendre == True):
-		if(choix_menu == 0):
-			canvas.delete("all")
-			creation_menu(300,300)
-			choix_menu = 1
-		elif(choix_menu == 1):
-			canvas.delete("all")
-			creation_menu(300,200)
-			choix_menu = 0
-	elif(attendre == False):
-		vitesse(event)
-
-    if(touche=="Return"):
-	if(attendre == True):
-		if(choix_menu == 0):
-			affiche_terrain()
-        		attendre = False
-			frame()
-		elif(choix_menu == 1):
-			attendre = False
-			accueil()
-
-
-				
 
 def stop(event):
     touche=event.keysym
@@ -582,34 +679,14 @@ def evenement():
     global coffre1
     global ferme1
     global Ennemi
+    global listeitem
 
     if(mapx==1 and mapy==1):
         if(coffre1==False):
-            if(not(len(Ennemi)>0)):
-                
-                #fichier=open("./map/mapobj1-1","r")
-                #lignes=fichier.readlines()
-                #newligne=""
-
-                #for i in range(len(lignes[1])):
-                 #   if(i==5):
-                 #       newligne+="2"
-                  #  else:
-                   #     newligne+=lignes[1][i]
-               # lignes[1]=newligne
-
-                #fichier.close()
-                
-                #fichier=open("./map/mapobj1-1","w")
-                #fichier.close()
-                
-                #fichier=open("./map/mapobj1-1","a")
-               # for i in range(0,16):
-                #    fichier.write(lignes[i]) 
-                    
+            if(not(len(Ennemi)>0)):                 
                 coffre1=True
-                placer("./spriteObjet/objet2",160,32,1)
-                #fichier.close()
+                listeitem.append(["7",160,192,0,0,[]])
+                placer("./spriteObjet/objet2",160,192,2)
                 
 
         
@@ -625,7 +702,7 @@ def bouger_sprite(sprite_pos,nom,x,y):
     for ligne in lignes:
         for i in range (0,16):                
             if ligne[i]=="1":
-                pos=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="green",outline="")
+                pos=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#0a650a",outline="")
             elif ligne[i]=="2":
                 pos=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="black",outline="")
             elif ligne[i]=="3":
@@ -682,9 +759,12 @@ def interaction(liste):
     global bloque_x
     global bloque_y
     numero_eff=[]
-    global attendre
     global idmessage
     global rectangle
+    global attendre
+    global dialogue
+    global chemin
+    global suite
     
     if liste[0]=="5" or liste[0]=="6" or liste[0]=="7" or liste[0]=="8":
         if liste[4]!=1:
@@ -722,6 +802,7 @@ def interaction(liste):
                 del bloque_y[numero_eff[len(numero_eff)-1]]
                 del numero_eff[len(numero_eff)-1]
     
+    #les panneaux            
     if liste[0]=="A":
 	fichier = str(mapx)+str(mapy)+str(liste[1])+str(liste[2])
 	chemin = "messages/sign/"+fichier
@@ -730,6 +811,25 @@ def interaction(liste):
 	attendre = True
 	rectangle = canvas.create_rectangle(100, 550, 550, 625, width=5, fill='white')
 	idmessage = canvas.create_text(320, 590, text = message)
+
+    #les pnj
+    if liste[0]=="D":
+	fichier = str(mapx)+str(mapy)+str(liste[1])+str(liste[2])+str(dialogue)
+	chemin = "messages/pnj/"+fichier
+	mon_fichier = open(chemin, "r")
+	message = mon_fichier.read()	
+	attendre = True
+	rectangle = canvas.create_rectangle(100, 550, 550, 625, width=5, fill='white')
+	idmessage = canvas.create_text(320, 590, text = message)
+	dialogue = dialogue+1
+	
+	fichier = str(mapx)+str(mapy)+str(liste[1])+str(liste[2])+str(dialogue)
+	chemin = "messages/pnj/"+fichier
+	if(os.path.exists(chemin) == True):
+		suite = True
+	else:
+		suite = False
+
 
 
         
@@ -769,50 +869,45 @@ def interagir():
 
 fenetre = Tk()
 
-canvas = Canvas(fenetre, width=640, height=639, background="#219a21")
+canvas = Canvas(fenetre, width=640, height=639, background="black")
 mapx=1
 mapy=1
 deplacement=0
-mon_perso=[0,0,96,384,[],"./spritePerso/PersoB1","Bas"]
+mon_perso=[0,0,320,80,[],"./spritePerso/PersoB1","Bas",0,0,[0,False]] # vitesse x,y ,pos x,y ,perso,sprite,orientation,cptAttaque,cptOriente,CouldownAttaque
 Ennemi=[]
 bloque_y=[]
 bloque_x=[]
-rectangle = 1
-idmessage = 0
-
+cpt=0
 bloquer=[]
+dialogue = 0
+chemin = ""
+
 for i in range(0,20*20):
     bloquer.append([])
 
+rectangle = 1
+idmessage = 0
 
+sprite_att=[]
 coffre1=False
 attendre = False
 attendre_principal = False
 premier_passage = False
 listeitem=[]
+joueur_touche=False
 listecassable=[]
 listechangement=[]
 inventaire=[0,0]
+suite = False
 #accueil()
 affiche_terrain()
 frame()
 
 
 canvas.pack()
-canvas.event_add('<<menu_esc>>', '<KeyPress-Escape>')
-canvas.event_add('<<menu_ret>>', '<KeyPress-Return>')
-canvas.event_add('<<menu_up>>', '<KeyPress-Up>')
-canvas.event_add('<<menu_dwn>>', '<KeyPress-Down>')
-canvas.event_add('<<menu_spac>>', '<KeyPress-space>')
 canvas.focus_set()
 canvas.bind("<Key>", vitesse)
 canvas.bind("<KeyRelease>", stop)
-canvas.bind("<<menu_esc>>",menu)
-canvas.bind("<<menu_ret>>",menu_principal)
-canvas.bind("<<menu_up>>",menu_principal)
-canvas.bind("<<menu_dwn>>",menu_principal)
-canvas.bind("<<menu_spac>>",menu_principal)
-
         
 fenetre.mainloop()
     
