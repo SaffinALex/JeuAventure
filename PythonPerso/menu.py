@@ -50,8 +50,6 @@ def placer(nom,x,y,canvas):
             val_x+=2
         val_y+=2
         val_x=x
-    print ma_map[x/32+y/32*20]
-    print"-------------"
     fichier.close()
 
 def bougerCurseur1():
@@ -222,11 +220,8 @@ def effacer():
     global nommap
 
     if(commence==True):
-        print ma_map[(curseur1[2]/32)+curseur1[3]/32*20]
-        print"-------------"
 
-        for i in range(0,len(ma_map[(curseur1[2]/32)+curseur1[3]/32*20])):
-            canvas2.delete(ma_map[curseur1[2]/32+curseur1[3]/32*20][i])
+        canvas2.create_rectangle(curseur1[2],curseur1[3],curseur1[2]+32,curseur1[3]+32,outline="",fill="green")
             
         ma_map[(curseur1[2]/32)+curseur1[3]/32*20]=[]
                 
@@ -535,7 +530,7 @@ curseur2=[0,0,0,0,[]]
 posx=0
 posy=0
 selection=0
-Bloc="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghi"
+Bloc="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijkl"
 pasouvert=True
 
 

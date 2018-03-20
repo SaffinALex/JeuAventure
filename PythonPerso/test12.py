@@ -62,10 +62,10 @@ def affiche_obj():
                         nom="./spriteObjet/objet"+"2"
                         listeitem.append([lignes[cpt][i],i*32,j,0,0,[]])
                         placer(nom,(i*32),j,2)
-                elif lignes[cpt][i]=="C":
+                elif lignes[cpt][i]=="C" or lignes[cpt][i]=="F" or lignes[cpt][i]=="G" :
                     porte_ouverte=False
                     for k in range (0,len(listechangement)):
-                        if mapx==listechangement[k][2] and mapy==listechangement[k][3] and listechangement[k][0]==i*32 and listechangement[k][1]==j and listechangement[k][4]=="C":
+                        if mapx==listechangement[k][2] and mapy==listechangement[k][3] and listechangement[k][0]==i*32 and listechangement[k][1]==j and (listechangement[k][4]=="C" or listechangement[k][4]=="F" or listechangement[k][4]=="G"):
                             porte_ouverte=True
                             listeitem.append([lignes[cpt][i],i*32,j,0,1,[]])
                             
@@ -770,7 +770,7 @@ def interaction(liste):
                 inventaire[1]+=1
 
             
-    if liste[0]=="C" and inventaire[1]>0 and liste[4]!=1:
+    if (liste[0]=="C" or liste[0]=="G" or liste[0]=="F") and inventaire[1]>0 and liste[4]!=1:
         
         inventaire[1]-=1
         print inventaire[1]
@@ -781,7 +781,6 @@ def interaction(liste):
                 numero_eff.append(i)
                 liste[4]=1
                 efface_item(liste)
-                placer_sol(liste[1],liste[2])
 
                 
         if len(numero_eff)!=0:
