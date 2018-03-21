@@ -202,10 +202,13 @@ def placer_map():
     
     ma_map[curseur1[2]/32+curseur1[3]/32*20]=[]
     num=lignes[curseur1[3]/32][curseur1[2]/32]
-    placer("./spriteSurface/bloc"+num,curseur1[2],curseur1[3],canvas2)
-    num=lignes[curseur1[3]/32+20][curseur1[2]/32]
     if num!="0":
-        placer("./spriteDecor/bloc"+num,curseur1[2],curseur1[3],canvas2)
+        placer("./spriteSurface/bloc"+num,curseur1[2],curseur1[3],canvas2)
+    else:
+        canvas2.create_rectangle(curseur1[2],curseur1[3],curseur1[2]+32,curseur1[3]+32,outline="",fill="#0dac07")
+        
+    num=lignes[curseur1[3]/32+20][curseur1[2]/32]
+    placer("./spriteDecor/bloc"+num,curseur1[2],curseur1[3],canvas2)
     num=lignes[curseur1[3]/32+40][curseur1[2]/32]
     placer("./spriteEnnemi/Ennemi"+num,curseur1[2],curseur1[3],canvas2)
     num=lignes[curseur1[3]/32+60][curseur1[2]/32]
@@ -221,7 +224,7 @@ def effacer():
 
     if(commence==True):
 
-        canvas2.create_rectangle(curseur1[2],curseur1[3],curseur1[2]+32,curseur1[3]+32,outline="",fill="green")
+        canvas2.create_rectangle(curseur1[2],curseur1[3],curseur1[2]+32,curseur1[3]+32,outline="",fill="#0dac07")
             
         ma_map[(curseur1[2]/32)+curseur1[3]/32*20]=[]
                 
@@ -530,7 +533,7 @@ curseur2=[0,0,0,0,[]]
 posx=0
 posy=0
 selection=0
-Bloc="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijkl"
+Bloc="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopq"
 pasouvert=True
 
 
