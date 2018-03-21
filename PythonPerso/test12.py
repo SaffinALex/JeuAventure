@@ -429,7 +429,10 @@ def affiche_fleche():
 			mon_fleche[0] -= 8
 			num += 96
         	mon_fleche[3] = "Gauche"
-	bouger_fleche(mon_fleche[4],orientation,mon_fleche[0],mon_fleche[1],num)	
+	bouger_fleche(mon_fleche[4],orientation,mon_fleche[0],mon_fleche[1],num)
+
+	print mon_fleche[1]
+	print mon_fleche[0]	
 #def mouvement_fleche():
 #	sprite_pos = []
 #	orientation = mon_perso[6]
@@ -490,7 +493,11 @@ def mouvement_fleche():
 			elif Ennemi[i][2]+31>=posx and Ennemi[i][2]+31<posx+31 and Ennemi[i][3]>=posy and Ennemi[i][3]<posy+31:
 				effaces.append(i)
 				mon_fleche[2] = False
-		
+
+	if mon_fleche[0] >= 640 or mon_fleche[0] <= 0 or mon_fleche[1] <= 0 or mon_fleche[1] >= 640:
+		efface(mon_fleche[4])
+		mon_fleche[2]= False
+		print "ok"
 
 	if(len(effaces)>0):     
 		for i in range(len(effaces)):
