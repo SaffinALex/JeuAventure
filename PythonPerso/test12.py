@@ -337,8 +337,203 @@ def aff_attaque():
 
 
         mon_perso[7]-=1
-    
 
+def aff_tireur():
+	global mon_perso
+	global sprite_att
+
+	mon_fleche[2]=True
+	mon_fleche[5]=mon_perso[6]
+	touche_qqch=False
+	decale=False
+	x=mon_perso[2]
+	y=mon_perso[3]
+	mon_fleche[0] = mon_perso[2]
+	mon_fleche[1] = mon_perso[3]
+	fichier = open("./Attaque/arc/arc_secure",'r')
+	print "aff_tirer"
+	lignes  = fichier.readlines()
+	efface(sprite_att)
+	if mon_perso[7]==0:
+		mon_perso[9][1]=False
+	else:
+		efface(mon_perso[4])
+		if mon_perso[6]=="Bas":
+			num=0
+			for i in range (0,16):
+				ligne=lignes[i+num]
+				for j in range(0,16):
+					placer_attaque(ligne[j],x,y)
+					x+=2
+				x-=32
+				y+=2
+		elif mon_perso[6]=="Haut":
+            		num=32
+            		for i in range (0,16):
+                		ligne=lignes[i+num]
+                		for j in range(0,16):
+                    			placer_attaque(ligne[j],x,y)
+                    			x+=2
+                		x-=32
+                		if(y>mon_perso[3]+31):
+                    			y-=64
+                		y+=2
+		elif mon_perso[6]=="Droite":
+		    	num=64
+		    	for i in range (0,16):
+		        	ligne=lignes[i+num]
+				for j in range(0,16):
+				    placer_attaque(ligne[j],x,y)
+				    x+=2
+				x-=32
+				if(y>mon_perso[3]+31):
+				    y-=32
+				    x+=32
+                    
+                		y+=2
+		elif mon_perso[6]=="Gauche":
+		    	num=96
+		    	for i in range (0,16):
+		        	ligne=lignes[i+num]
+		        	for j in range(0,16):
+		            		placer_attaque(ligne[j],x,y)
+		            		x+=2
+		        	x-=32
+		        	if(y>mon_perso[3]+31):
+		            		y-=32
+		            		x-=32    
+		        	y+=2
+		mon_perso[7]-=1
+
+def affiche_fleche():
+	orientation = mon_fleche[5]
+	fichier=open("./Attaque/arc/arc_secure")
+	lignes = fichier.readlines()
+	num = 17
+    	if (orientation == "Bas") :
+		if (mon_perso[3] <= 608) :
+			mon_fleche[1] += 8	
+        	mon_fleche[3] = "Bas"
+	elif orientation == "Haut" :
+		if mon_perso[3] >= 32 :
+			mon_fleche[1] -= 8
+			num += 32
+        	mon_fleche[3] = "Haut" 
+	elif orientation == "Droite" :
+		if mon_perso[2] <= 608 :		
+			mon_fleche[0] += 8
+			num += 64
+        	mon_fleche[3] = "Droite"
+	elif orientation == "Gauche" :
+		if mon_perso[2] >= 32 :
+			mon_fleche[0] -= 8
+			num += 96
+        	mon_fleche[3] = "Gauche"
+	bouger_fleche(mon_fleche[4],orientation,mon_fleche[0],mon_fleche[1],num)	
+#def mouvement_fleche():
+#	sprite_pos = []
+#	orientation = mon_perso[6]
+#	bouger_fleche(sprite_pos,orientation,mon_fleche[0],mon_fleche[1],num)
+	
+def mouvement_fleche():
+	effaces=[]
+	affiche_fleche()
+	if mon_fleche[3]=="Haut" or mon_fleche[3]=="Bas":
+		if mon_fleche[3]=="Haut":
+			posx=mon_fleche[0]
+			posy=mon_fleche[1]
+        
+		if mon_fleche[3]=="Bas":
+			posx=mon_fleche[0]
+			posy=mon_fleche[1]+16
+            
+		for i in range(0,len(Ennemi)):
+			if Ennemi[i][2]>=posx and Ennemi[i][2]<posx+31 and Ennemi[i][3]+31>=posy and Ennemi[i][3]+31<posy+31:
+				effaces.append(i)
+				mon_fleche[2] = False
+                
+			elif Ennemi[i][2]+31>=posx and Ennemi[i][2]+31<posx+31 and Ennemi[i][3]+31>=posy and Ennemi[i][3]+31<posy+31:
+				effaces.append(i)
+				mon_fleche[2] = False
+                
+			elif Ennemi[i][2]>=posx and Ennemi[i][2]<posx+31 and Ennemi[i][3]>=posy and Ennemi[i][3]<posy+31:
+				effaces.append(i)
+				mon_fleche[2] = False
+                
+			elif Ennemi[i][2]+31>=posx and Ennemi[i][2]+31<posx+31 and Ennemi[i][3]>=posy and Ennemi[i][3]<posy+31:
+				effaces.append(i)
+				mon_fleche[2] = False
+
+	if mon_fleche[3]=="Droite" or mon_fleche[3]=="Gauche":
+		if mon_fleche[3]=="Gauche":
+			posx=mon_fleche[0]-16
+			posy=mon_fleche[1]
+            
+		if mon_fleche[3]=="Droite":
+			posx=mon_fleche[0]+16
+			posy=mon_fleche[1]
+
+            
+		for i in range(0,len(Ennemi)):
+			if Ennemi[i][2]>=posx and Ennemi[i][2]<posx+31 and Ennemi[i][3]+31>=posy and Ennemi[i][3]+31<posy+31:
+				effaces.append(i)
+				mon_fleche[2] = False
+                
+			elif Ennemi[i][2]+31>=posx and Ennemi[i][2]+31<posx+31 and Ennemi[i][3]+31>=posy and Ennemi[i][3]+31<posy+31:
+				effaces.append(i)
+				mon_fleche[2] = False
+                
+			elif Ennemi[i][2]>=posx and Ennemi[i][2]<posx+31 and Ennemi[i][3]>=posy and Ennemi[i][3]<posy+31:
+				effaces.append(i)
+				mon_fleche[2] = False
+                
+			elif Ennemi[i][2]+31>=posx and Ennemi[i][2]+31<posx+31 and Ennemi[i][3]>=posy and Ennemi[i][3]<posy+31:
+				effaces.append(i)
+				mon_fleche[2] = False
+		
+
+	if(len(effaces)>0):     
+		for i in range(len(effaces)):
+			efface(Ennemi[effaces[i]][4])
+			efface(mon_fleche[4])
+
+def bouger_fleche(sprite_pos,orientation, x, y, num):
+	efface(sprite_pos)
+	
+	val_x=x
+	val_y=y
+	fichier=open("./Attaque/arc/arc_secure")
+	lignes = fichier.readlines()
+	for i in range (0,16):
+		ligne = lignes[i+num]
+		for j in range (0,16):
+			if ligne[j]=="1":
+				pos=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#0a650a",outline="")
+			elif ligne[j]=="2":
+				pos=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="black",outline="")
+			elif ligne[j]=="3":
+				pos=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="blue",outline="")
+			elif ligne[j]=="4":
+				pos=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#808180",outline="")
+			elif ligne[j]=="5":
+				pos=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#614919",outline="")
+			elif ligne[j]=="6":
+				pos=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="red",outline="")
+			elif ligne[j]=="7":
+				pos=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#d4a566",outline="")
+			elif ligne[j]=="8":
+				pos= canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#96c14b",outline="") #vertClaire
+			elif ligne[j]=="9":
+				pos=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="white",outline="")
+
+			if ligne[j]!="0":
+				sprite_pos.append(pos)
+			val_x +=2
+
+		val_y+=2
+		val_x=x
+		fichier.close()
+			
 def placer_attaque(num,val_x,val_y):
     global sprite_att
     
@@ -386,13 +581,20 @@ def frame():
         
         if mon_perso[9][1]:
             if mon_perso[9][0]==0:
-                aff_attaque()
-                mon_perso[9][0]=3
+                if mon_perso[9][2]=="b":
+					aff_attaque()
+                elif mon_perso[9][2]=="c" and mon_fleche[2]==False:
+					aff_tireur()
+                mon_perso[9][0]=1
             else:
                 mon_perso[9][0]-=1
-                
+
         if(not mon_perso[9][1]):
-            mouvement_perso()
+			mouvement_perso()
+
+
+        if (mon_fleche[2] == True):
+            mouvement_fleche()
             
        # for i in range(0,len(Ennemi)):
           #  mouvement_ennemi(Ennemi[i])
@@ -568,13 +770,25 @@ def vitesse(event):
 
     if(touche=="b"):
         attaque()
+	
+    if(touche=="c"): 
+	tirer()
 
 def attaque():
     global mon_perso
     if not mon_perso[9][1]:
+	mon_perso[9][2]="b"
         mon_perso[9][1]=True
         mon_perso[9][0]=0
         mon_perso[7]=3
+
+def tirer():
+    global mon_perso
+    if not mon_perso[9][1]: #on cd ?
+	mon_perso[9][2]="c"
+        mon_perso[9][1]=True #cd = true
+	mon_perso[9][0]=0 #cd time
+	mon_perso[7]=0
 
 
 def placer_sol(x,y):
@@ -908,7 +1122,8 @@ canvas = Canvas(fenetre, width=640, height=639, background="#219a21")
 mapx=1
 mapy=1
 deplacement=0
-mon_perso=[0,0,96,384,[],"./spritePerso/PersoB1","Bas",0,0,[0,False]] # vitesse x,y ,pos x,y ,perso,sprite,orientation,cptAttaque,cptOriente,CouldownAttaque
+mon_perso=[0,0,96,384,[],"./spritePerso/PersoB1","Bas",0,0,[0,False,"null"]] # vitesse x,y ,pos x,y ,perso,sprite,orientation,cptAttaque,cptOriente,CouldownAttaque
+mon_fleche=[mon_perso[2],mon_perso[3],False,"Bas",[],orientation]#position x, y, flèche_sur_écran?, orientation du fleche
 Ennemi=[]
 bloque_y=[]
 bloque_x=[]
