@@ -4,99 +4,105 @@
 from Tkinter import *
 from random import *
         
-def affiche_terrain():
-    global mapx
-    global mapy
-    
+def affiche_terrain(nom):
+    global nommap
+
     canvas.delete("all")
-    affiche_surf()
-    nom="./map/map"+str(mapx)+"-"+str(mapy)
+    nommap=nom
     fichier=open(nom,"r")
     lignes=fichier.readlines()
     j=0
+    i=0
 
     for cpt in range(0,20):
-        for i in range (0,20):
-            nom="./spriteSurface/bloc"+lignes[cpt][i]
-            placer(nom,(i*32),j,0)
+        i=0
+        while i<40:
+            nom="./spriteSurface/bloc"+lignes[cpt][i]+lignes[cpt][i+1]
+            placer(nom,(i*16),j,0)
+            i+=2
         j+=32
     fichier.close()
-    affiche_surf()
-    affiche_obj()
+    affiche_surf(nommap)
+    affiche_obj(nommap)
     if(attendre == False):
-	affiche_ennemi()
+	affiche_ennemi(nommap)
 
 
-def affiche_obj():
-    global mapx
-    global mapy
+def affiche_obj(nom):
+
     global listeitem
     global listechangement
     ouvert=False
     porte_ouverte=False
     
-    nom="./map/map"+str(mapx)+"-"+str(mapy)
     fichier=open(nom,"r")
     lignes=fichier.readlines()
     j=0
+    i=0
+    nom_bis=nom
 
     for cpt in range(60,80):
-        for i in range (0,20):
-            if lignes[cpt][i]!="0":
+        i=0
+        while i<40:
+            num=lignes[cpt][i]+lignes[cpt][i+1]
+            if num !="00":
                 ouvert=False
-                if lignes[cpt][i]=="5" or lignes[cpt][i]=="6" or lignes[cpt][i]=="7" or lignes[cpt][i]=="8":              
+                if num=="05" or num=="06" or num=="07" or num=="08":              
                     if(len(listechangement) != 0):
                         for k in range (0,len(listechangement)):
-                            if mapx==listechangement[k][2] and mapy==listechangement[k][3] and listechangement[k][0]==i*32 and listechangement[k][1]==j:
-                                nom="./spriteObjet/objet"+"4"
-                                placer(nom,(i*32),j,2)
+                            if nom_bis==listechangement[k][2]  and listechangement[k][0]==i*16 and listechangement[k][1]==j:
+                                nom="./spriteObjet/objet"+"04"
+                                placer(nom,(i*16),j,2)
                                 ouvert=True
 
                         if(not(ouvert)):
-                            nom="./spriteObjet/objet"+"2"
-                            listeitem.append([lignes[cpt][i],i*32,j,0,0,[]])
-                            placer(nom,(i*32),j,1)
+                            nom="./spriteObjet/objet"+"02"
+                            listeitem.append([num,i*16,j,0,0,[]])
+                            placer(nom,(i*16),j,1)
 
 
                     else:
-                        nom="./spriteObjet/objet"+"2"
-                        listeitem.append([lignes[cpt][i],i*32,j,0,0,[]])
-                        placer(nom,(i*32),j,2)
-                elif lignes[cpt][i]=="C" or lignes[cpt][i]=="F" or lignes[cpt][i]=="G" :
+                        nom="./spriteObjet/objet"+"02"
+                        listeitem.append([num,i*16,j,0,0,[]])
+                        placer(nom,(i*16),j,2)
+                elif num=="12" or num=="15" or num=="16" :
                     porte_ouverte=False
                     for k in range (0,len(listechangement)):
-                        if mapx==listechangement[k][2] and mapy==listechangement[k][3] and listechangement[k][0]==i*32 and listechangement[k][1]==j and (listechangement[k][4]=="C" or listechangement[k][4]=="F" or listechangement[k][4]=="G"):
+                        if nom_bis==listechangement[k][2] and listechangement[k][0]==i*16 and listechangement[k][1]==j and (listechangement[k][4]=="12" or listechangement[k][4]=="15" or listechangement[k][4]=="16"):
                             porte_ouverte=True
-                            listeitem.append([lignes[cpt][i],i*32,j,0,1,[]])
+                            listeitem.append([num,i*16,j,0,1,[]])
                             
                     if(not(porte_ouverte)):            
-                        listeitem.append([lignes[cpt][i],i*32,j,0,0,[]])
-                        nom="./spriteObjet/objet"+lignes[cpt][i]
-                        placer(nom,(i*32),j,2)                        
+                        listeitem.append([num,i*16,j,0,0,[]])
+                        nom="./spriteObjet/objet"+num
+                        placer(nom,(i*16),j,2)                        
                             
                 else:
-                    listeitem.append([lignes[cpt][i],i*32,j,0,0,[]])
-                    nom="./spriteObjet/objet"+lignes[cpt][i]
-                    placer(nom,(i*32),j,2)       
+                    listeitem.append([num,i*16,j,0,0,[]])
+                    nom="./spriteObjet/objet"+num
+                    placer(nom,(i*16),j,2)
+            i+=2
 
         j+=32
     fichier.close()
 
-def affiche_surf():
+def affiche_surf(nom):
     global mapx
     global mapy
     
-    nom="./map/map"+str(mapx)+"-"+str(mapy)
     fichier=open(nom,"r")
     lignes=fichier.readlines()
     j=0
+    i=0
 
     for cpt in range(20,40):
-        for i in range (0,20):
-            if lignes[cpt][i]!="0":
-                nom="./spriteDecor/bloc"+lignes[cpt][i]
-                placer(nom,(i*32),j,1)
-
+        i=0
+        while i<40:
+            num=lignes[cpt][i]+lignes[cpt][i+1]
+            if num!="00":
+                nom="./spriteDecor/bloc"+num
+                placer(nom,(i*16),j,1)
+            i+=2
         j+=32
     fichier.close()
 
@@ -110,18 +116,20 @@ def ajout_ennemi(nom,x,y):
     mouvement_ennemi(Ennemi[len(Ennemi)-1])
     fichier.close()
     
-def affiche_ennemi():
-    Ennemi
-    nom="./map/map"+str(mapx)+"-"+str(mapy)
+def affiche_ennemi(nom):
     fichier=open(nom,"r")
     lignes=fichier.readlines()
     j=0
+    i=0
 
     for cpt in range(40,60):
-        for i in range (0,20):
-            if lignes[cpt][i]!="0":
-                nom="./spriteEnnemi/ennemi"+lignes[cpt][i]+"/ennemi"+lignes[cpt][i]
-                ajout_ennemi(nom,i*32,j)
+        i=0
+        while i<40:
+            num=lignes[cpt][i]+lignes[cpt][i+1]
+            if num!="00":
+                nom="./spriteEnnemi/ennemi"+num+"/ennemi"+num
+                ajout_ennemi(nom,i*16,j)
+            i+=2
 
         j+=32
     fichier.close()
@@ -193,6 +201,7 @@ def changeMap():
     global Ennemi
     global mapx
     global mapy
+    global nommap
 
     if (mon_perso[2]+32>640):
         mapx+=1
@@ -201,7 +210,8 @@ def changeMap():
         mon_perso[10]=[0,0,0,0,[],""]
         efface_bloque()
         efface_listeitem()
-        affiche_terrain()
+        nommap="./map/map"+str(mapx+1)+str(mapy)
+        affiche_terrain(nommap)
         mouvement_perso()
         
     elif(mon_perso[2]<0):
@@ -211,8 +221,8 @@ def changeMap():
         mon_perso[10]=[0,0,0,0,[],""]
         efface_bloque()
         efface_listeitem()
-        affiche_terrain()
-	affiche_obj()
+        nommap="./map/map"+str(mapx-1)+str(mapy)
+        affiche_terrain(nommap)
         mouvement_perso()
         
     elif(mon_perso[3]<0):
@@ -222,7 +232,8 @@ def changeMap():
         mon_perso[10]=[0,0,0,0,[],""]
         efface_bloque()
         efface_listeitem()
-        affiche_terrain()       
+        nommap="./map/map"+str(mapx)+str(mapy-1)
+        affiche_terrain(nommap)
 	mouvement_perso()
         
     elif(mon_perso[3]+32>640):
@@ -232,7 +243,8 @@ def changeMap():
         mon_perso[10]=[0,0,0,0,[],""]
         efface_bloque()
         efface_listeitem()
-        affiche_terrain()       
+        nommap="./map/map"+str(mapx)+str(mapy+1)
+        affiche_terrain(nommap)    
 	mouvement_perso()
 
 def efface_bloque():
@@ -379,7 +391,6 @@ def aff_arc():
                 
         elif mon_perso[6]=="Haut":
             num=16
-            print "haut"
             for i in range (0,16):
                 ligne=lignes[i+num]
                 for j in range(0,16):
@@ -517,6 +528,7 @@ def frame():
 
         evenement()
         changeMap()
+        joueur_toucher()
 
         for i in range(0,len(Ennemi)):
             if Ennemi[i][9]<=0:
@@ -546,7 +558,7 @@ def frame():
             mouvement_ennemi(Ennemi[i])
         
         if(len(Ennemi)>0):             
-            if mon_perso[9][1] and (mon_perso[10][1]==0 or mon_perso[10][0]==0):
+            if mon_perso[9][1] and (mon_perso[10][1]==0 and mon_perso[10][0]==0):
                 toucher(mon_perso)
             elif mon_perso[10][0]!=0 or mon_perso[10][1]!=0:
                 toucher_fleche(mon_perso[10])
@@ -600,30 +612,59 @@ def mort(effaces):
 def joueur_toucher():
     global mon_perso
     global Ennemi
-    global joueur_touche 
-    joueur_touche=False
+    touche=False
     posx=mon_perso[2]
-    posy=mon_perso[3]+16
-
+    posy=mon_perso[3]
     for i in range(0,len(Ennemi)):
-        if posx>=Ennemi[i][2] and posx<Ennemi[i][2]+31 and posy+31>=Ennemi[i][3] and posy+31<Ennemi[i][3]+31:
-            joueur_touche=True
-        elif posx+31>=Ennemi[i][2] and posx+31<Ennemi[i][2]+31 and posy+31>=Ennemi[i][3] and posy+31<Ennemi[i][3]+31:
-            joueur_touche=True
-        elif posx>=Ennemi[i][2] and posx<Ennemi[i][2]+31 and posy>=Ennemi[i][3] and posy<Ennemi[i][3]+31:
-            joueur_touche=True
-        elif posx+31>=Ennemi[i][2] and posx+31<Ennemi[i][2]+31 and posy>=Ennemi[i][3] and posy<Ennemi[i][3]+31:
-            joueur_touche=True
+        if(Ennemi[i][6]=="Haut"):
+            posx2=Ennemi[i][2]
+            posy2=Ennemi[i][3]+16
+        else:
+            posx2=Ennemi[i][2]
+            posy2=Ennemi[i][3]
             
-    if joueur_touche:
-        if mon_perso[6]=="Bas":
-            mon_perso[1]=-8
-        if mon_perso[6]=="Haut":
-            mon_perso[1]=8
-        if mon_perso[6]=="Droite":
-            mon_perso[0]=8
-        if mon_perso[6]=="Gauche":
-            mon_perso[0]=-8
+        if posx2>=posx and posx2<posx+31 and posy2+31>=posy and posy2+16<posy+31:
+            touche=True
+            ennemi=Ennemi[i]
+            break
+        elif posx2+31>=posx and posx2+31<posx+31 and posy2+16>=posy and posy2+16<posy+31:
+            touche=True
+            ennemi=Ennemi[i]
+            break       
+        elif posx2>=posx and posx2<posx+31 and posy2>=posy and posy2<posy+31:
+            touche=True
+            ennemi=Ennemi[i]
+            break   
+        elif posx2+31>=posx and posx2+31<posx+31 and posy2>=posy and posy2<posy+31:
+            touche=True
+            ennemi=Ennemi[i]
+            break       
+                
+    if(touche):
+            sprite=""
+            E=mon_perso
+	    for j in range (0,len(mon_perso[5])-2) :
+		sprite+=mon_perso[5][j]
+                
+            if E[11]<=0:
+                E[11]=5
+                
+            if(E[6]=="Bas"):
+                E[1]=-8
+                E[0]=0
+                E[5]=sprite+"B4"            
+            elif(E[6]=="Haut"):
+                E[1]=8
+                E[0]=0
+                E[5]=sprite+"H4"
+            elif(E[6]=="Droite"):
+                E[0]=-8
+                E[1]=0
+                E[5]=sprite+"D4"
+            elif(E[6]=="Gauche"):
+                E[0]=8
+                E[1]=0
+                E[5]=sprite+"G4"
 
 def toucher_fleche(fleche):
     global Ennemi
@@ -646,22 +687,31 @@ def toucher_fleche(fleche):
         mon_perso[10]=[0,0,0,0,[],"Bas"]
         efface(fleche[4])
         for i in range(0, len(effaces)):
-            if Ennemi[effaces[len(effaces)-1]][11]<=0:
-                Ennemi[effaces[len(effaces)-1]][9]-=1
-                Ennemi[effaces[len(effaces)-1]][11]=5
+            E=Ennemi[effaces[len(effaces)-1]]
+            sprite=""
+	    for j in range (0,len(E[5])-2) :
+		sprite+=E[5][j]
+            if E[11]<=0:
+                E[9]-=1
+                E[11]=5
             if(fleche[5]=="Bas"):
-                Ennemi[effaces[len(effaces)-1]][1]=8
-                Ennemi[effaces[len(effaces)-1]][0]=0
+                E[1]=8
+                E[0]=0
+                E[5]=sprite+"B4"  
             elif(fleche[5]=="Haut"):
-                Ennemi[effaces[len(effaces)-1]][1]=-8
-                Ennemi[effaces[len(effaces)-1]][0]=0
+                E[1]=-8
+                E[0]=0
+                E[5]=sprite+"H4"
             elif(fleche[5]=="Droite"):
-                Ennemi[effaces[len(effaces)-1]][0]=8
-                Ennemi[effaces[len(effaces)-1]][1]=0
+                E[0]=8
+                E[1]=0
+                E[5]=sprite+"D4"
             elif(fleche[5]=="Gauche"):
-                Ennemi[effaces[len(effaces)-1]][0]=-8
-                Ennemi[effaces[len(effaces)-1]][1]=0
+                E[0]=-8
+                E[1]=0
+                E[5]=sprite+"G4"
             del effaces[len(effaces)-1]
+
         
 def toucher(entite):
 
@@ -713,23 +763,32 @@ def toucher(entite):
             elif Ennemi[i][2]+31>=posx and Ennemi[i][2]+31<posx+31 and Ennemi[i][3]>=posy and Ennemi[i][3]<posy+31:
                 effaces.append(i)
                 
-    if(len(effaces)>0):     
+    if(len(effaces)>0):
         for i in range(0, len(effaces)):
-            if Ennemi[effaces[len(effaces)-1]][11]<=0:
-                Ennemi[effaces[len(effaces)-1]][9]-=1
-                Ennemi[effaces[len(effaces)-1]][11]=5
+            E=Ennemi[effaces[len(effaces)-1]]
+            sprite=""
+	    for j in range (0,len(E[5])-2) :
+		sprite+=E[5][j]
+            if E[11]<=0:
+                E[9]-=1
+                E[11]=5
+                
             if(entite[6]=="Bas"):
-                Ennemi[effaces[len(effaces)-1]][1]=8
-                Ennemi[effaces[len(effaces)-1]][0]=0
+                E[1]=8
+                E[0]=0
+                E[5]=sprite+"B4"            
             elif(entite[6]=="Haut"):
-                Ennemi[effaces[len(effaces)-1]][1]=-8
-                Ennemi[effaces[len(effaces)-1]][0]=0
+                E[1]=-8
+                E[0]=0
+                E[5]=sprite+"H4"
             elif(entite[6]=="Droite"):
-                Ennemi[effaces[len(effaces)-1]][0]=8
-                Ennemi[effaces[len(effaces)-1]][1]=0
+                E[0]=8
+                E[1]=0
+                E[5]=sprite+"D4"
             elif(entite[6]=="Gauche"):
-                Ennemi[effaces[len(effaces)-1]][0]=-8
-                Ennemi[effaces[len(effaces)-1]][1]=0
+                E[0]=-8
+                E[1]=0
+                E[5]=sprite+"G4"
             del effaces[len(effaces)-1]
 
             
@@ -741,7 +800,13 @@ def mouvement_perso():
     val_y=mon_perso[3] 
     mon_perso[2]+=mon_perso[0]
     mon_perso[3]+=mon_perso[1]
-    orientation(mon_perso)
+    if mon_perso[11]>0:
+        mon_perso[11]-=1
+        if mon_perso[11]==0:
+            mon_perso[0]=0
+            mon_perso[1]=0
+    else:
+        orientation(mon_perso)
     bloquer_entite(val_x,val_y,mon_perso)
     bouger_sprite(mon_perso[4],mon_perso[5],mon_perso[2],mon_perso[3])
 
@@ -827,18 +892,18 @@ def vitesse(event):
     global attendre
 
     touche=event.keysym
-    
-    if touche=="Up":
-        mon_perso[1]=-8
+    if mon_perso[11]<=0:
+        if touche=="Up":
+            mon_perso[1]=-8
 
-    if touche=="Down":
-        mon_perso[1]=8
+        if touche=="Down":
+            mon_perso[1]=8
 
-    if touche=="Right":
-        mon_perso[0]=8
+        if touche=="Right":
+            mon_perso[0]=8
 
-    if touche=="Left":
-        mon_perso[0]=-8
+        if touche=="Left":
+            mon_perso[0]=-8
 
         
     if(touche=="a"):
@@ -869,12 +934,11 @@ def placer_sol(x,y):
 
 def stop(event):
     touche=event.keysym
-    if(touche=="Up" or touche=="Down"):
-        
-        mon_perso[1]=0
-
-    if(touche=="Right" or touche=="Left"):
-        mon_perso[0]=0
+    if mon_perso[11]<=0:
+        if(touche=="Up" or touche=="Down"):
+            mon_perso[1]=0
+        if(touche=="Right" or touche=="Left"):
+            mon_perso[0]=0
 
 def evenement():
     global mapx
@@ -888,8 +952,8 @@ def evenement():
         if(coffre1==False):
             if(not(len(Ennemi)>0)):                 
                 coffre1=True
-                listeitem.append(["7",160,192,0,0,[]])
-                placer("./spriteObjet/objet2",160,192,2)
+                listeitem.append(["07",256,224,0,0,[]])
+                placer("./spriteObjet/objet02",256,224,2)
                 
 
         
@@ -939,10 +1003,10 @@ def efface(liste):
         del liste[len(liste)-1]
 
 def compt(liste):
-    if liste[0]=="5" or liste[0]=="6" or liste[0]=="7" or liste[0]=="8":
+    if liste[0]=="05" or liste[0]=="06" or liste[0]=="07" or liste[0]=="08":
         liste[3]-=1
         if liste[3]==0:
-            placer("./spriteObjet/objet4",liste[1],liste[2],0)
+            placer("./spriteObjet/objet04",liste[1],liste[2],0)
             
 def efface_listeitem():
     global listeitem
@@ -957,32 +1021,30 @@ def efface_item(liste):
 def interaction(liste):
     global inventaire
     global listechangement
-    global mapx
-    global mapy
     global bloque_x
     global bloque_y
     numero_eff=[]
     global idmessage
     global rectangle
     global attendre
-    
-    if liste[0]=="5" or liste[0]=="6" or liste[0]=="7" or liste[0]=="8":
+    global nommap
+    if liste[0]=="05" or liste[0]=="06" or liste[0]=="07" or liste[0]=="08":
         if liste[4]!=1:
             liste[3]=10
             liste[4]=1
-            listechangement.append([liste[1],liste[2],mapx,mapy,liste[0]])
+            listechangement.append([liste[1],liste[2],nommap,0,liste[0]])
             placer("./spriteObjet/objet"+liste[0],liste[1],liste[2],0)
-            if liste[0]=="5":
+            if liste[0]=="05":
                 inventaire[0]+=1
                 print inventaire[0]
-            elif liste[0]=="6":
+            elif liste[0]=="06":
                 inventaire[0]+=5
                 print inventaire[0]
-            elif liste[0]=="7":
+            elif liste[0]=="07":
                 inventaire[1]+=1
 
             
-    if (liste[0]=="C" or liste[0]=="G" or liste[0]=="F") and inventaire[1]>0 and liste[4]!=1:
+    if (liste[0]=="12" or liste[0]=="16" or liste[0]=="15") and inventaire[1]>0 and liste[4]!=1:
         
         inventaire[1]-=1
         print inventaire[1]
@@ -1049,8 +1111,9 @@ fenetre = Tk()
 canvas = Canvas(fenetre, width=640, height=639, background="black")
 mapx=1
 mapy=1
+nommap="./map/map1-1"
 deplacement=0
-mon_perso=[0,0,320,80,[],"./spritePerso/PersoB1","Bas",0,0,[0,False,""],[0,0,0,0,[],"Bas"]] # vitesse x,y ,pos x,y ,perso,sprite,orientation,cptAttaque,cptOriente,CouldownAttaque,fleche
+mon_perso=[0,0,320,400,[],"./spritePerso/PersoB1","Bas",0,0,[0,False,""],[0,0,0,0,[],"Bas"],0] #[vitessex,vitessey,posx,posy,idsprite,sprite,orientation,d,d,[Epee],[Fleche],compteurDegat]
 Ennemi=[]
 bloque_y=[]
 bloque_x=[]
@@ -1073,7 +1136,7 @@ listecassable=[]
 listechangement=[]
 inventaire=[0,0]
 #accueil()
-affiche_terrain()
+affiche_terrain(nommap)
 frame()
 
 
