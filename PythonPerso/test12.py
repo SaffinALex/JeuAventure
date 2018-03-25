@@ -529,6 +529,7 @@ def frame():
         evenement()
         changeMap()
         joueur_toucher()
+	test_changement_map(listeitem)
 
         for i in range(0,len(Ennemi)):
             if Ennemi[i][9]<=0:
@@ -1018,6 +1019,34 @@ def efface_item(liste):
         canvas.delete(liste[5][0])
         del liste[5][0]
 
+def test_changement_map(liste):
+	global idmap
+	global fichier
+	global mon_perso
+	global nommap
+	for i in range (0,len(listeitem)) : 
+		  if((liste[i][0]=="12" or liste[i][0]=="16" or liste[i][0]=="15" or liste[i][0]=="D") and listeitem[i][4] == 1 ):			
+			if(mon_perso[2]+16>listeitem[i][1] and mon_perso[2]+16<listeitem[i][1]+31 and mon_perso[3]+16>listeitem[i][2] and mon_perso[3]+16<listeitem[i][2]+32):
+				tp = str(mapx)+str(mapy)+str(liste[i][1])+str(liste[i][2])
+
+
+				print(tp)
+				nom="./tp/"+str(tp)
+    				fichier=open(nom,"r")
+				lignes = fichier.readlines()
+				map_tp1 = lignes[0]
+				mon_perso[2] = int(lignes[1])
+				mon_perso[3] = int(lignes[2])
+				map_tp = "./map/"+str(map_tp1[:(len(map_tp1)-1)])
+				nommap = map_tp
+
+
+				efface_bloque()
+        			efface_listeitem()
+				affiche_terrain(map_tp)
+				mouvement_perso()
+				
+
 def interaction(liste):
     global inventaire
     global listechangement
@@ -1063,7 +1092,7 @@ def interaction(liste):
                 del bloque_y[numero_eff[len(numero_eff)-1]]
                 del numero_eff[len(numero_eff)-1]
                 
-    if liste[0]=="A":
+    if liste[0]=="10":
 	fichier = str(mapx)+str(mapy)+str(liste[1])+str(liste[2])
 	chemin = "messages/sign/"+fichier
 	mon_fichier = open(chemin, "r")
