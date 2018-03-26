@@ -140,11 +140,12 @@ def affiche_ennemi(nom):
     fichier.close()
     
 
-def placer(nom,x,y,option): #0=Transparent, 1=bloquer, 2=item
+def placer(nom,x,y,option): #0=Transparent, 1=bloquer, 2=item, 3 =objet
     global bloque_x
     global bloque_y
     global bloquer
     global listeitem
+    global listeobjet
     
     val_x=x
     val_y=y
@@ -152,7 +153,7 @@ def placer(nom,x,y,option): #0=Transparent, 1=bloquer, 2=item
     lignes  = fichier.readlines()
     fig=0
     
-    if (option!=0):
+    if (option!=0 and option!=3):
         bloque_x.append(x)
         bloque_y.append(y)
         bloquer[x/32+y/32*20].append(x)
@@ -164,6 +165,8 @@ def placer(nom,x,y,option): #0=Transparent, 1=bloquer, 2=item
                 fig=couleur(ligne[i],val_x,val_y)
                 if(option==2 and len(listeitem)!=0):
                     listeitem[len(listeitem)-1][5].append(fig)
+                elif(option==3 and len(listeobjet)!=0):
+                    listeobjet[len(listeobjet)-1][3].append(fig)
                 
             val_x+=2
         val_y+=2
@@ -209,9 +212,8 @@ def efface_bloque():
     global bloque_x
     global bloque_y
     
-    while len(bloque_x)>0:
-        del bloque_x[len(bloque_x)-1]
-        del bloque_y[len(bloque_y)-1]
+    bloque_x=[]
+    bloque_y=[]
 
 
 def bloquer_entite(val_x, val_y,entite):
@@ -450,8 +452,53 @@ def placer_attaque(num,val_x,val_y):
     if num!="0":           
         fig=couleur(num,val_x,val_y)
         sprite_att.append(fig)
+        
+def ramasse_objet():
+    global inventaire
+    global listeobjet
+    global mon_perso
+
+    posx=mon_perso[2]
+    posy=mon_perso[3]
+    i=0
+    ramasse=False
     
-                
+    for E in listeobjet:
+            if E[1]>=posx and E[1]<posx+31 and E[2]+31>=posy and E[2]+31<posy+31:
+                ramasse=True
+                break
+            elif E[1]+31>=posx and E[1]+31<posx+31 and E[2]+31>=posy and E[2]+31<posy+31:
+                ramasse=True
+                break
+            elif E[1]>=posx and E[1]<posx+31 and E[2]>=posy and E[2]<posy+31:
+                ramasse=True
+                break
+            elif E[1]+31>=posx and E[1]+31<posx+31 and E[2]>=posy and E[2]<posy+31:
+                ramasse=True
+                break
+            i+=1
+    if ramasse:
+        num=E[0]
+        if E[0]=="00":
+            inventaire[4]+=1
+            print inventaire
+        elif E[0]=="01":
+            inventaire[4]+=5
+            print inventaire
+        elif E[0]=="02":
+            inventaire[5]+=5
+            print inventaire
+        elif E[0]=="03":
+            inventaire[1]+=3
+            if inventaire[1]>10:
+                inventaire[1]=10
+            print inventaire
+        elif E[0]=="04":
+            inventaire[0]+=1
+            print inventaire
+        efface(E[3])
+        del listeobjet[i]
+              
 def frame():
     global Ennemi
     global mon_perso
@@ -468,6 +515,7 @@ def frame():
 
         for i in range(0,len(Ennemi)):
             if Ennemi[i][9]<=0:
+                item_aleatoire(Ennemi[i][2],Ennemi[i][3])
                 efface.append(i)
         mort(efface)
         
@@ -549,6 +597,7 @@ def mort(effaces):
 def joueur_toucher():
     global mon_perso
     global Ennemi
+    global inventaire
     touche=False
 
     if mon_perso[6]=="Haut":
@@ -568,15 +617,23 @@ def joueur_toucher():
             
         if posx2>=posx and posx2<posx+31 and posy2+31>=posy and posy2+16<posy+31:
             touche=True
+            inventaire[1]-=E[10]
+            print inventaire
             break
         elif posx2+31>=posx and posx2+31<posx+31 and posy2+16>=posy and posy2+16<posy+31:
             touche=True
+            inventaire[1]-=E[10]
+            print inventaire
             break       
         elif posx2>=posx and posx2<posx+31 and posy2>=posy and posy2<posy+31:
             touche=True
+            inventaire[1]-=E[10]
+            print inventaire
             break   
         elif posx2+31>=posx and posx2+31<posx+31 and posy2>=posy and posy2<posy+31:
             touche=True
+            inventaire[1]-=E[10]
+            print inventaire
             break       
                 
     if(touche):
@@ -675,21 +732,25 @@ def couper_herbe():
 		        effaces.append(E)
 		        efface(E[5])
                         placer(sprite,E[1],E[2],0)
+                        item_aleatoire(E[1],E[2])
 		        del listeitem[i]
                     elif E[1]+31>=posx and E[1]+31<posx+31 and E[2]+31>=posy and E[2]+31<posy+31:
 		        effaces.append(E)
 		        efface(E[5])
                         placer(sprite,E[1],E[2],0)
-		        del listeitem[i]  
+                        item_aleatoire(E[1],E[2])
+		        del listeitem[i]
                     elif E[1]>=posx and E[1]<posx+31 and E[2]>=posy and E[2]<posy+31:
 		        effaces.append(E)
 		        efface(E[5])
                         placer(sprite,E[1],E[2],0)
+                        item_aleatoire(E[1],E[2])
 		        del listeitem[i]
                     elif E[1]+31>=posx and E[1]+31<posx+31 and E[2]>=posy and E[2]<posy+31:
 		        effaces.append(E)
 		        efface(E[5])
                         placer(sprite,E[1],E[2],0)
+                        item_aleatoire(E[1],E[2])
 		        del listeitem[i]
                 i+=1
                     
@@ -708,21 +769,25 @@ def couper_herbe():
 		        effaces.append(E)
 		        efface(E[5])
                         placer(sprite,E[1],E[2],0)
+                        item_aleatoire(E[1],E[2])
 		        del listeitem[i]
                     elif E[1]+31>=posx and E[1]+31<posx+31 and E[2]+31>=posy and E[2]+31<posy+31:
 		        effaces.append(E)
 		        efface(E[5])
                         placer(sprite,E[1],E[2],0)
+                        item_aleatoire(E[1],E[2])
 		        del listeitem[i]
                     elif E[1]>=posx and E[1]<posx+31 and E[2]>=posy and E[2]<posy+31:
 		        effaces.append(E)
 		        efface(E[5])
                         placer(sprite,E[1],E[2],0)
+                        item_aleatoire(E[1],E[2])
 		        del listeitem[i]
                     elif E[1]+31>=posx and E[1]+31<posx+31 and E[2]>=posy and E[2]<posy+31:
 		        effaces.append(E)
 		        efface(E[5])
                         placer(sprite,E[1],E[2],0)
+                        item_aleatoire(E[1],E[2])
 		        del listeitem[i]
                 i+=1
         nul=[]
@@ -738,6 +803,29 @@ def couper_herbe():
                 del bloque_x[nul[len(nul)-1]]
                 del bloque_y[nul[len(nul)-1]]
                 del nul[len(nul)-1]
+
+def item_aleatoire(posx,posy):
+    global listeobjet
+    chiffre=randint(0,1)
+    if chiffre==0 :
+        chiffre=randint(0,10)
+        if chiffre % 3==0:
+            chiffre=randint(0,3)
+            if chiffre==0:
+                listeobjet.append(["01",posx,posy,[]])
+                placer("./item/item01",posx,posy,3)
+            elif chiffre==1 or chiffre==2:
+                listeobjet.append(["03",posx,posy,[]])
+                placer("./item/item03",posx,posy,3)
+                
+        elif chiffre % 2==0:
+            chiffre=randint(0,1)
+            if chiffre==0:
+                listeobjet.append(["00",posx,posy,[]])
+                placer("./item/item00",posx,posy,3)
+            elif chiffre==1:
+                listeobjet.append(["04",posx,posy,[]])
+                placer("./item/item04",posx,posy,3)
             
 def toucher(entite):
 
@@ -820,6 +908,7 @@ def toucher(entite):
                     
 def mouvement_perso():
     global mon_perso
+    global inventaire
            
     val_x=mon_perso[2]
     val_y=mon_perso[3] 
@@ -834,6 +923,8 @@ def mouvement_perso():
         orientation(mon_perso)
     bloquer_entite(val_x,val_y,mon_perso)
     bouger_sprite(mon_perso[4],mon_perso[5],mon_perso[2],mon_perso[3])
+    if len(inventaire)>0:
+        ramasse_objet()
 
 def orientation(entite) : 
 	sprite=""
@@ -1031,8 +1122,9 @@ def compt(liste):
             
 def efface_listeitem():
     global listeitem
-    while len(listeitem)>0:
-        del listeitem[len(listeitem)-1]
+    global listeobjet
+    listeitem=[]
+    listeobjet=[]
 
 def efface_item(liste):
     for i in range(0,len(liste[5])):
@@ -1056,18 +1148,18 @@ def interaction(liste):
             listechangement.append([liste[1],liste[2],nommap,0,liste[0],1])
             placer("./spriteObjet/objet"+liste[0],liste[1],liste[2],0)
             if liste[0]=="05":
-                inventaire[0]+=1
+                inventaire[4]+=1
                 print inventaire[0]
             elif liste[0]=="06":
-                inventaire[0]+=5
+                inventaire[4]+=5
                 print inventaire[0]
             elif liste[0]=="07":
-                inventaire[1]+=1
+                inventaire[5]+=1
 
             
-    if (liste[0]=="12" or liste[0]=="16" or liste[0]=="15") and inventaire[1]>0 and liste[4]!=1:
+    if (liste[0]=="12" or liste[0]=="16" or liste[0]=="15") and inventaire[5]>0 and liste[4]!=1:
         
-        inventaire[1]-=1
+        inventaire[5]-=1
         print inventaire[1]
         listechangement.append([liste[1],liste[2],nommap,mapy,liste[0],1])
         
@@ -1133,7 +1225,8 @@ mapx=1
 mapy=1
 nommap="./map/map1-1"
 deplacement=0
-mon_perso=[0,0,320,400,[],"./spritePerso/PersoB1","Bas",0,0,[0,False,""],[0,0,0,0,[],"Bas"],0] #[vitessex,vitessey,posx,posy,idsprite,sprite,orientation,d,d,[Epee],[Fleche],compteurDegat]
+inventaire=[0,10,True,True,0,0]#[fleche,vie,Epee,Arc,Gold,clef]
+mon_perso=[0,0,320,400,[],"./spritePerso/PersoB1","Bas",0,inventaire,[0,False,""],[0,0,0,0,[],"Bas"],0] #[vitessex,vitessey,posx,posy,idsprite,sprite,orientation,d,[Inventaire],[Epee],[Fleche],compteurDegat]
 Ennemi=[]
 bloque_y=[]
 bloque_x=[]
@@ -1146,6 +1239,7 @@ rectangle = 1
 idmessage = 0
 
 sprite_att=[]
+listeobjet=[]
 coffre1=False
 attendre = False
 attendre_principal = False
@@ -1154,7 +1248,6 @@ listeitem=[]
 joueur_touche=False
 listecassable=[]
 listechangement=[]
-inventaire=[0,0]
 #accueil()
 affiche_terrain(nommap)
 frame()
