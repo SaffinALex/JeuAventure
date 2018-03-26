@@ -3,6 +3,7 @@
 
 from Tkinter import *
 from random import *
+import os
         
 def affiche_terrain(nom):
     global nommap
@@ -86,9 +87,12 @@ def affiche_obj(nom):
                         placer(nom,(i*16),j,2)                        
                             
                 else:
-                    listeitem.append([num,i*16,j,0,0,[]])
-                    nom="./spriteObjet/objet"+num
-                    placer(nom,(i*16),j,2)
+                    if num!="18":
+                        listeitem.append([num,i*16,j,0,0,[]])
+                        nom="./spriteObjet/objet"+num
+                        placer(nom,(i*16),j,2)
+                    else :
+                        listeitem.append([num,i*16,j,0,1,[]])
             i+=2
         j+=32
     fichier.close()
@@ -143,7 +147,7 @@ def affiche_ennemi(nom):
 def placer(nom,x,y,option): #0=Transparent, 1=bloquer, 2=item, 3 =objet
     global bloque_x
     global bloque_y
-    global bloquer
+    global bloque_num
     global listeitem
     global listeobjet
     
@@ -156,6 +160,8 @@ def placer(nom,x,y,option): #0=Transparent, 1=bloquer, 2=item, 3 =objet
     if (option!=0 and option!=3):
         bloque_x.append(x)
         bloque_y.append(y)
+        num=nom[len(nom)-2]+nom[len(nom)-1]
+        bloque_num.append(num)
         bloquer[x/32+y/32*20].append(x)
         bloquer[x/32+y/32*20].append(y)
 
@@ -179,7 +185,8 @@ def changeMap():
     global mapx
     global mapy
     global nommap
-
+    global nommap2
+    
     change=(mon_perso[2]+32>640 or mon_perso[2]<0 or mon_perso[3]+32>640 or mon_perso[3]<0)
 
     if (mon_perso[2]+32>640):
@@ -203,6 +210,7 @@ def changeMap():
         mon_perso[10]=[0,0,0,0,[],""]
         efface_bloque()
         efface_listeitem()
+        nommap2="map"+str(mapx)+"-"+str(mapy)
         nommap="./map/map"+str(mapx)+"-"+str(mapy)
         affiche_terrain(nommap)    
 	mouvement_perso()
@@ -211,9 +219,11 @@ def changeMap():
 def efface_bloque():
     global bloque_x
     global bloque_y
+    global bloque_num
     
     bloque_x=[]
     bloque_y=[]
+    bloque_num=[]
 
 
 def bloquer_entite(val_x, val_y,entite):
@@ -457,6 +467,7 @@ def ramasse_objet():
     global inventaire
     global listeobjet
     global mon_perso
+    global nommap2
 
     posx=mon_perso[2]
     posy=mon_perso[3]
@@ -553,38 +564,88 @@ def frame():
                 compt(liste)
         
         canvas.after(30,frame)
+        
+def teleportation():
+    global mon_perso
+    global listeitem
+    global Ennemi
+    global nommap2
+    global nommap
+
+    if mon_perso[6]=="Haut":
+        posx=mon_perso[2]
+        posy=mon_perso[3]+16
+    else:
+        posx=mon_perso[2]
+        posy=mon_perso[3]
+    tp=False
+    for liste in listeitem:
+        est_porte=(liste[0]=="12" or liste[0]=="15" or liste[0]=="16" or liste[0]=="17" or liste[0]=="18")
+        nom=("./tp/"+nommap2+"."+liste[0]+"."+str(liste[1])+"."+str(liste[2]))     
+        if os.path.isfile(nom) and liste[4]==1 and est_porte:
+            
+            if liste[1]>=posx and liste[1]<posx+31 and liste[2]+31>=posy and liste[2]+31<posy+5:
+                tp=True
+                break
+            elif liste[1]+31>=posx and liste[1]+31<posx+31 and liste[2]+31>=posy and liste[2]+31<posy+5:
+                tp=True
+                break
+            elif liste[1]>=posx and liste[1]<posx+16 and liste[2]>=posy and liste[2]<posy+5:
+                tp=True
+                break
+            elif liste[1]+31>=posx and liste[1]+31<posx+31 and liste[2]>=posy and liste[2]<posy+5:
+                tp=True           
+                break
+
+    if tp:
+        fichier=open(nom,"r")
+        lignes=fichier.readlines()
+        nommap2=lignes[0][:len(lignes[0])-1]
+        mon_perso[2]=int(lignes[1])
+        mon_perso[3]=int(lignes[2])
+        
+        canvas.delete("all")
+        Ennemi=[]
+        mon_perso[10]=[0,0,0,0,[],""]
+        efface_bloque()
+        efface_listeitem()
+        nommap="./map/"+nommap2
+        affiche_terrain(nommap)    
+	mouvement_perso()
 
 def bloquer_fleche(entite):
     global bloque_x
     global bloque_y
     global mon_perso
+    global bloque_num
 
 
     for i in range(len(bloque_x)):
-        if(entite[2]>=bloque_x[i] and entite[2]<=bloque_x[i]+31):
-            if( entite[3]+16>=bloque_y[i] and  entite[3]+16<=bloque_y[i]+31): #Coin Haut gauche
-                efface(entite[4])
-                mon_perso[10]=[0,0,0,0,[],""]
-                break
+        if bloque_num[i]!="40":
+            if(entite[2]>=bloque_x[i] and entite[2]<=bloque_x[i]+31):
+                if( entite[3]+16>=bloque_y[i] and  entite[3]+16<=bloque_y[i]+31): #Coin Haut gauche
+                    efface(entite[4])
+                    mon_perso[10]=[0,0,0,0,[],""]
+                    break
                
-            elif( entite[3]+31>=bloque_y[i] and  entite[3]+31<=bloque_y[i]+31): #Coin Bas gauche
-                efface(entite[4])
-                mon_perso[10]=[0,0,0,0,[],""]
-                break
+                elif( entite[3]+31>=bloque_y[i] and  entite[3]+31<=bloque_y[i]+31): #Coin Bas gauche
+                    efface(entite[4])
+                    mon_perso[10]=[0,0,0,0,[],""]
+                    break
                 
-        if( entite[2]+31>=bloque_x[i] and  entite[2]+32<=bloque_x[i]+31):
-            if( entite[3]+31>=bloque_y[i] and entite[3]+31<=bloque_y[i]+31): #Coin Bas Droite
-                efface(entite[4])
-                mon_perso[10]=[0,0,0,0,[],""]
-                break
+            if( entite[2]+31>=bloque_x[i] and  entite[2]+32<=bloque_x[i]+31):
+                if( entite[3]+31>=bloque_y[i] and entite[3]+31<=bloque_y[i]+31): #Coin Bas Droite
+                    efface(entite[4])
+                    mon_perso[10]=[0,0,0,0,[],""]
+                    break
             
-            elif( entite[3]+16>=bloque_y[i] and  entite[3]+16<=bloque_y[i]+31): #Coin Haut Droite
-                efface(entite[4])
-                mon_perso[10]=[0,0,0,0,[],""]
-                break
+                elif( entite[3]+16>=bloque_y[i] and  entite[3]+16<=bloque_y[i]+31): #Coin Haut Droite
+                    efface(entite[4])
+                    mon_perso[10]=[0,0,0,0,[],""]
+                    break
                 
     if(entite[3]>620 or entite[3]<-8 or entite[2]>620 or entite[2]<-8):
-        efface(mon_perso[4])
+        efface(entite[4])
         mon_perso[10]=[0,0,0,0,[],""]
         
 def mort(effaces):
@@ -923,6 +984,7 @@ def mouvement_perso():
         orientation(mon_perso)
     bloquer_entite(val_x,val_y,mon_perso)
     bouger_sprite(mon_perso[4],mon_perso[5],mon_perso[2],mon_perso[3])
+    teleportation()
     if len(inventaire)>0:
         ramasse_objet()
 
@@ -1160,7 +1222,8 @@ def interaction(liste):
     if (liste[0]=="12" or liste[0]=="16" or liste[0]=="15") and inventaire[5]>0 and liste[4]!=1:
         
         inventaire[5]-=1
-        print inventaire[1]
+        print liste[1]
+        print liste[2]
         listechangement.append([liste[1],liste[2],nommap,mapy,liste[0],1])
         
         for i in range(0,len(bloque_x)):
@@ -1224,14 +1287,17 @@ canvas = Canvas(fenetre, width=640, height=639, background="black")
 mapx=1
 mapy=1
 nommap="./map/map1-1"
+nommap2="map1-1"
 deplacement=0
 inventaire=[0,10,True,True,0,0]#[fleche,vie,Epee,Arc,Gold,clef]
 mon_perso=[0,0,320,400,[],"./spritePerso/PersoB1","Bas",0,inventaire,[0,False,""],[0,0,0,0,[],"Bas"],0] #[vitessex,vitessey,posx,posy,idsprite,sprite,orientation,d,[Inventaire],[Epee],[Fleche],compteurDegat]
 Ennemi=[]
 bloque_y=[]
 bloque_x=[]
+bloque_num=[]
 cpt=0
 bloquer=[]
+
 for i in range(0,20*20):
     bloquer.append([])
 
