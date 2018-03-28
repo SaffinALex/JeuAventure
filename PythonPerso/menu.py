@@ -6,8 +6,6 @@ from random import *
 import os
 
 def placer(nom,x,y,canvas):
-
-    global ma_map
     val_x=x
     val_y=y
     fichier = open(nom,'r')
@@ -87,6 +85,8 @@ def vitesse(event):
     global nom
     global mode
     global nommap
+    global pasouvert
+    global fenetre2
     touche=event.keysym
     if(commence==True):
     
@@ -114,16 +114,17 @@ def vitesse(event):
         if touche=="Delete":
             effacer()
 
-        if touche=="h":
+        if touche=="c":
+            if not(pasouvert):
+                fenetre2.destroy()
+                del copie[0]
+            pasouvert=True
             fichier=open("./map/"+nommap+".cp","r")
             lignes=fichier.readlines()
 
             num1=lignes[curseur1[3]/32+60]
-            print num1
             num1=num1[:curseur1[2]/32*2+2]
-            print num1
             num1=num1[curseur1[2]/32*2:]
-            print num1
             num=num1
             chemin="./tp/"+nommap+"."+num+"."+str(curseur1[2])+"."+str(curseur1[3])
             if num!="00":
@@ -131,8 +132,23 @@ def vitesse(event):
                     fichier2=open(chemin,"w")
                     fichier2.close()
             fichier.close()
-        if touche=="g":
-            t=Toplevel(fenetre)
+            
+        if touche=="t":
+            if not(pasouvert):
+                fenetre2.destroy()
+                del copie[0]
+            pasouvert=False
+            i=0
+            list = os.listdir('./tp')
+            fenetre2=Toplevel(fenetre)
+            liste = Listbox(fenetre2)
+            for fiche in list:
+                liste.insert(i,fiche)
+                i+=1
+            liste.pack()
+            copie.append(liste)
+            bouton=Button(fenetre2, text="Valider", command=validerTP)
+            bouton.pack()
 
             
         if touche=="space":
@@ -221,6 +237,18 @@ def vitesse(event):
                     else:
                         posx+=32
 
+def validerTP():
+    global pasouvert
+    global fenetre2
+    pasouvert=True
+    liste=copie[0]
+    nom=liste.get(liste.curselection())
+    fichier=open("./tp/"+nom,"w")
+    fichier.write(nommap+"\n"+str(curseur1[2])+"\n"+str(curseur1[3]))
+    fichier.close()
+    del copie[0]
+    fenetre2.destroy()
+                  
 def placer_map():
     
     global commence
@@ -234,7 +262,6 @@ def placer_map():
     i=0
     if selection<10:
         nom2=nom+"0"+str(selection)
-        print nom2
     else:
         nom2=nom+str(selection)
     fichier=open("./map/"+nommap+".cp","r")
@@ -271,20 +298,16 @@ def placer_map():
     lignex=curseur1[2]/32
     
     num=lignes[ligney][lignex*2]+lignes[ligney][lignex*2+1]
-    print num
     if num!="00":
         placer("./spriteSurface/bloc"+num,curseur1[2],curseur1[3],canvas2)
     else:
         canvas2.create_rectangle(curseur1[2],curseur1[3],curseur1[2]+32,curseur1[3]+32,outline="",fill="#0dac07")
         
     num=lignes[ligney+20][lignex*2]+lignes[ligney+20][lignex*2+1]
-    print num
     placer("./spriteDecor/bloc"+num,curseur1[2],curseur1[3],canvas2)
     num=lignes[ligney+40][lignex*2]+lignes[ligney+40][lignex*2+1]
-    print num
     placer("./spriteEnnemi/Ennemi"+num,curseur1[2],curseur1[3],canvas2)
     num=lignes[ligney+60][lignex*2]+lignes[ligney+60][lignex*2+1]
-    print num
     placer("./spriteObjet/objet"+num,curseur1[2],curseur1[3],canvas2)
 
 def effacer():
@@ -318,8 +341,6 @@ def effacer():
                         else:
                             deb=ligne[:i]
                             fin=ligne[i+2:]
-                        print len(deb)
-                        print len(fin)
                         ligne=deb+"00"+fin
                 i+=2
             fichier2.write(ligne)
@@ -416,7 +437,6 @@ def affiche_terrain(nom):
             cpt=0
             h+=1
             j=0
-            print ligne
         while i<40:
             num=ligne[i]+ligne[i+1]
             ma_map[i/32+j/32*20]=[]
@@ -446,9 +466,9 @@ def validernom2():
     global curseur2
     global pasouvert
     global fenetre2
-
-    nommap= copie[0].get()
     
+    liste=copie[0]
+    nommap=liste.get(liste.curselection())     
     if(os.path.isfile("./map/"+nommap)):
         if commence:
             canvas.destroy()
@@ -477,8 +497,7 @@ def validernom2():
         commence=True
         affiche_terrain("./map/"+nommap)
         pasouvert=True
-        fenetre2.destroy
-        
+        fenetre2.destroy()
     else:
         print "Fichier inexistant"
 
@@ -515,8 +534,7 @@ def validernom():
     global fenetre2
 
     nommap= copie[0].get()
-    print "./map/"+nommap
-    
+
     if(os.path.isfile("./map/"+nommap)):
         print "Existe deja"
 
@@ -544,16 +562,14 @@ def validernom():
         del copie[0]
         commence=True
         pasouvert=True
-        fenetre2.destroy
-
-    
-    
+        fenetre2.destroy()
+ 
 def editer():
     global copie
     global mode
     global pasouvert
     global fenetre2
-
+    i=0
     if not(pasouvert):
         copie[1].destroy()
         copie[0].destroy()
@@ -563,10 +579,15 @@ def editer():
         
     pasouvert=False
     mode=1
+    list = os.listdir('./map')
     fenetre2=Toplevel(fenetre)
-    entree = Entry(fenetre2, width=30)
-    copie.append(entree)
-    entree.pack()
+    liste = Listbox(fenetre2)
+    for fiche in list:
+        if fiche[len(fiche)-2:]!="cp":
+            liste.insert(i,fiche)
+            i+=1
+    liste.pack()
+    copie.append(liste)
     bouton=Button(fenetre2, text="Valider", command=validernom2)
     copie.append(bouton)
     bouton.pack()

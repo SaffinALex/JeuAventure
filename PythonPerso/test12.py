@@ -675,6 +675,7 @@ def bloquer_fleche(entite):
                 if( entite[3]+16>=bloque_y[i] and  entite[3]+16<=bloque_y[i]+31): #Coin Haut gauche
                     efface(entite[4])
                     mon_perso[10]=[0,0,0,0,[],""]
+                    print bloque_num[i]
                     if bloque_num[i]=="./spriteObjet/objet21" or bloque_num[i]=="./spriteObjet/objet21bis":
                         active_interrupteur()
                     break
@@ -913,6 +914,7 @@ def couper_herbe():
             for n in range(0,len(nul)):
                 del bloque_x[nul[len(nul)-1]]
                 del bloque_y[nul[len(nul)-1]]
+                del bloque_num[nul[len(nul)-1]]
                 del nul[len(nul)-1]
 
 def item_aleatoire(posx,posy):
