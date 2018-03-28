@@ -4,8 +4,12 @@
 from Tkinter import *
 from random import *
 
+def efface():
+    print x
 
-liste=[1,1]
+liste=[1,2]
+x=0
+efface()
+print liste
 
-for i in liste:
-    print "a"
+

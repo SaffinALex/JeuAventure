@@ -7,7 +7,6 @@ import os
         
 def affiche_terrain(nom):
     global nommap
-
     canvas.delete("all")
     nommap=nom
     fichier=open(nom,"r")
@@ -30,9 +29,6 @@ def affiche_terrain(nom):
 
 
 def affiche_obj(nom):
-
-    global listeitem
-    global listechangement
     ouvert=False
     porte_ouverte=False
     
@@ -87,20 +83,20 @@ def affiche_obj(nom):
                         placer(nom,(i*16),j,2)                        
                             
                 else:
-                    if num!="18":
-                        listeitem.append([num,i*16,j,0,0,[]])
+                    if num=="18":
+                        listeitem.append([num,i*16,j,0,1,[]])
+                    else :
+                        if num=="19" or num=="20":
+                            listeitem.append([num,i*16,j,0,1,[]])
+                        else:
+                            listeitem.append([num,i*16,j,0,0,[]])
                         nom="./spriteObjet/objet"+num
                         placer(nom,(i*16),j,2)
-                    else :
-                        listeitem.append([num,i*16,j,0,1,[]])
             i+=2
         j+=32
     fichier.close()
 
 def affiche_surf(nom):
-    global mapx
-    global mapy
-    
     fichier=open(nom,"r")
     lignes=fichier.readlines()
     j=0
@@ -118,8 +114,6 @@ def affiche_surf(nom):
     fichier.close()
 
 def ajout_ennemi(nom,x,y):
-    global Ennemi
-    
     fichier=open(nom+"-carac","r")
     lignes=fichier.readlines()
     liste=[0,0,x,y,[],nom+"B1","Bas",0,int(lignes[0][8]),int(lignes[1][4]),int(lignes[2][8]),0] #[vitessex,vitessey,posx,posy,[sprite],fichier,orientation,cpt,vitesse,vie,dommage]
@@ -145,12 +139,6 @@ def affiche_ennemi(nom):
     
 
 def placer(nom,x,y,option): #0=Transparent, 1=bloquer, 2=item, 3 =objet
-    global bloque_x
-    global bloque_y
-    global bloque_num
-    global listeitem
-    global listeobjet
-    
     val_x=x
     val_y=y
     fichier = open(nom,'r')
@@ -161,7 +149,7 @@ def placer(nom,x,y,option): #0=Transparent, 1=bloquer, 2=item, 3 =objet
         bloque_x.append(x)
         bloque_y.append(y)
         num=nom[len(nom)-2]+nom[len(nom)-1]
-        bloque_num.append(num)
+        bloque_num.append(nom)
         bloquer[x/32+y/32*20].append(x)
         bloquer[x/32+y/32*20].append(y)
 
@@ -180,12 +168,11 @@ def placer(nom,x,y,option): #0=Transparent, 1=bloquer, 2=item, 3 =objet
     fichier.close()
            
 def changeMap():
-    global mon_perso
-    global Ennemi
     global mapx
     global mapy
     global nommap
     global nommap2
+    global Ennemi
     
     change=(mon_perso[2]+32>640 or mon_perso[2]<0 or mon_perso[3]+32>640 or mon_perso[3]<0)
 
@@ -220,16 +207,12 @@ def efface_bloque():
     global bloque_x
     global bloque_y
     global bloque_num
-    
     bloque_x=[]
     bloque_y=[]
     bloque_num=[]
 
 
 def bloquer_entite(val_x, val_y,entite):
-    global bloque_x
-    global bloque_y
-
     for i in range(len(bloque_x)):
         if(entite[2]>=bloque_x[i] and entite[2]<=bloque_x[i]+31):
             if( entite[3]+16>=bloque_y[i] and  entite[3]+16<=bloque_y[i]+31): #Coin Haut gauche
@@ -258,7 +241,6 @@ def bloquer_entite(val_x, val_y,entite):
         entite[2]=val_x
 
 def aff_attaque():
-    global mon_perso
     global sprite_att
 
     x=mon_perso[2]
@@ -327,7 +309,6 @@ def aff_attaque():
         mon_perso[7]-=1
     
 def aff_arc():
-    global mon_perso
     global sprite_att
 
     x=mon_perso[2]
@@ -464,10 +445,6 @@ def placer_attaque(num,val_x,val_y):
         sprite_att.append(fig)
         
 def ramasse_objet():
-    global inventaire
-    global listeobjet
-    global mon_perso
-    global nommap2
 
     posx=mon_perso[2]
     posy=mon_perso[3]
@@ -511,12 +488,6 @@ def ramasse_objet():
         del listeobjet[i]
               
 def frame():
-    global Ennemi
-    global mon_perso
-    global listeitem
-    global attendre
-    global joueur_touche
-
     efface=[]
     if(not attendre):
 
@@ -566,11 +537,9 @@ def frame():
         canvas.after(30,frame)
         
 def teleportation():
-    global mon_perso
-    global listeitem
-    global Ennemi
     global nommap2
     global nommap
+    global Ennemi
 
     if mon_perso[6]=="Haut":
         posx=mon_perso[2]
@@ -613,35 +582,116 @@ def teleportation():
         affiche_terrain(nommap)    
 	mouvement_perso()
 
+def interrupteur_boucle(liste,num):
+    fichier = open("./spriteObjet/objet"+num,'r')
+    lignes  = fichier.readlines()
+    val_x=liste[1]
+    val_y=liste[2]
+    for ligne in lignes:
+        for i in range(0,16):
+            if ligne[i]!="0":           
+                fig=couleur(ligne[i],val_x,val_y)
+                liste[5].append(fig)
+            val_x+=2
+        val_y+=2
+        val_x=liste[1]
+
+    fichier.close()
+
+def verifie_interrupteur():
+    print interrupteur
+    if interrupteur==1:
+        for liste in listeitem:
+            if liste[0]=="19" and liste[4]==1:
+                for i in range (0,len(bloque_x)):
+                    if bloque_x[i]==liste[1] and bloque_y[i]==liste[2]:
+                        del bloque_x[i]
+                        del bloque_y[i]
+                        del bloque_num[i]
+                        break
+                liste[4]=0
+                efface(liste[5])
+                interrupteur_boucle(liste,"19bis")
+                    
+            if liste[0]=="20" and liste[4]==0:
+                bloque_x.append(liste[1])
+                bloque_y.append(liste[2])
+                bloque_num.append("./spriteObjet/objet20")
+                liste[4]=1
+                efface(liste[5])
+                interrupteur_boucle(liste,"20bis")
+
+    elif interrupteur==0:
+        for liste in listeitem:
+            if liste[0]=="19" and  liste[4]==0:
+                    bloque_x.append(liste[1])
+                    bloque_y.append(liste[2])
+                    bloque_num.append("./spriteObjet/objet19")
+                    liste[4]=1
+                    efface(liste[5])
+                    interrupteur_boucle(liste,"19")
+                
+            if liste[0]=="20" and liste[4]==1:
+                for i in range (0,len(bloque_x)):
+                    if bloque_x[i]==liste[1] and bloque_y[i]==liste[2]:
+                        del bloque_x[i]
+                        del bloque_y[i]
+                        del bloque_num[i]
+                        break
+                    
+                liste[4]=0
+                efface(liste[5])
+                interrupteur_boucle(liste,"20")
+                
+def active_interrupteur():
+    global interrupteur
+    if interrupteur==0:
+        interrupteur+=1
+        for liste in listeitem:
+            if liste[0]=="21":
+                efface(liste[5])
+                placer("./spriteObjet/objet21bis",liste[1],liste[2],0)
+        verifie_interrupteur()
+    else:
+        interrupteur=0
+        for liste in listeitem:
+            if liste[0]=="21":
+                efface(liste[5])
+                placer("./spriteObjet/objet21",liste[1],liste[2],0)
+        verifie_interrupteur()
+                
 def bloquer_fleche(entite):
-    global bloque_x
-    global bloque_y
-    global mon_perso
-    global bloque_num
-
-
+    global interrupteur
     for i in range(len(bloque_x)):
-        if bloque_num[i]!="40":
+        if bloque_num[i]!="./spriteDecor/bloc40":
             if(entite[2]>=bloque_x[i] and entite[2]<=bloque_x[i]+31):
                 if( entite[3]+16>=bloque_y[i] and  entite[3]+16<=bloque_y[i]+31): #Coin Haut gauche
                     efface(entite[4])
                     mon_perso[10]=[0,0,0,0,[],""]
+                    if bloque_num[i]=="./spriteObjet/objet21":
+                        active_interrupteur()
                     break
                
                 elif( entite[3]+31>=bloque_y[i] and  entite[3]+31<=bloque_y[i]+31): #Coin Bas gauche
                     efface(entite[4])
                     mon_perso[10]=[0,0,0,0,[],""]
+                    if bloque_num[i]=="./spriteObjet/objet21":
+                        active_interrupteur()
                     break
                 
             if( entite[2]+31>=bloque_x[i] and  entite[2]+32<=bloque_x[i]+31):
                 if( entite[3]+31>=bloque_y[i] and entite[3]+31<=bloque_y[i]+31): #Coin Bas Droite
                     efface(entite[4])
                     mon_perso[10]=[0,0,0,0,[],""]
+                    if bloque_num[i]=="./spriteObjet/objet21":
+                        active_interrupteur()
                     break
             
                 elif( entite[3]+16>=bloque_y[i] and  entite[3]+16<=bloque_y[i]+31): #Coin Haut Droite
                     efface(entite[4])
                     mon_perso[10]=[0,0,0,0,[],""]
+                    if bloque_num[i]=="./spriteObjet/objet21":
+                        active_interrupteur()
                     break
                 
     if(entite[3]>620 or entite[3]<-8 or entite[2]>620 or entite[2]<-8):
@@ -656,9 +706,6 @@ def mort(effaces):
         del effaces[len(effaces)-1]
 
 def joueur_toucher():
-    global mon_perso
-    global Ennemi
-    global inventaire
     touche=False
 
     if mon_perso[6]=="Haut":
@@ -724,8 +771,6 @@ def joueur_toucher():
                 E[5]=sprite+"G4"
 
 def toucher_fleche(fleche):
-    global Ennemi
-    global mon_perso
     effaces=[]
     if fleche[0]!=0 or fleche[1]!=0:
         posx=fleche[2]
@@ -769,8 +814,6 @@ def toucher_fleche(fleche):
             del effaces[0]
 
 def couper_herbe():
-	global listeitem
-	global mon_perso
 	effaces=[]	
 	
 	posx=mon_perso[2]
@@ -866,7 +909,6 @@ def couper_herbe():
                 del nul[len(nul)-1]
 
 def item_aleatoire(posx,posy):
-    global listeobjet
     chiffre=randint(0,1)
     if chiffre==0 :
         chiffre=randint(0,10)
@@ -889,8 +931,6 @@ def item_aleatoire(posx,posy):
                 placer("./item/item04",posx,posy,3)
             
 def toucher(entite):
-
-    global Ennemi
     effaces=[]
 
     if entite[6]=="Haut" or entite[6]=="Bas":
@@ -967,10 +1007,7 @@ def toucher(entite):
 
             
                     
-def mouvement_perso():
-    global mon_perso
-    global inventaire
-           
+def mouvement_perso():        
     val_x=mon_perso[2]
     val_y=mon_perso[3] 
     mon_perso[2]+=mon_perso[0]
@@ -1064,7 +1101,6 @@ def mouvement_ennemi(mon_ennemi):
     bloquer_entite(mon_ennemi[2]-mon_ennemi[0],mon_ennemi[3]-mon_ennemi[1],mon_ennemi)
 
 def vitesse(event):
-    global mon_perso
     global rectangle
     global idmessage
     global attendre
@@ -1098,13 +1134,11 @@ def vitesse(event):
         attaque("Arc")
 
 def attaque(arme):
-    global mon_perso
     if not mon_perso[9][1]:
         mon_perso[9][1]=True
         mon_perso[9][0]=0
         mon_perso[9][2]=arme
         mon_perso[7]=3
-
 
 def placer_sol(x,y):
     canvas.create_rectangle(x,y,x+32,y+32,fill="#219a21",outline="") #vert
@@ -1119,12 +1153,11 @@ def stop(event):
             mon_perso[0]=0
 
 def evenement():
+    global nommap
     global mapx
     global mapy
     global coffre1
     global ferme1
-    global Ennemi
-    global listeitem
 
     if(mapx==1 and mapy==1):
         if(coffre1==False):
@@ -1194,15 +1227,14 @@ def efface_item(liste):
         del liste[5][0]
 
 def interaction(liste):
-    global inventaire
-    global listechangement
-    global bloque_x
-    global bloque_y
-    numero_eff=[]
     global idmessage
     global rectangle
     global attendre
     global nommap
+    global nommap2
+
+    numero_eff=[]
+    
     if liste[0]=="05" or liste[0]=="06" or liste[0]=="07" or liste[0]=="08":
         if liste[4]!=1:
             liste[3]=10
@@ -1239,19 +1271,16 @@ def interaction(liste):
                 del bloque_y[numero_eff[len(numero_eff)-1]]
                 del numero_eff[len(numero_eff)-1]
                 
-    if liste[0]=="A":
-	fichier = str(mapx)+str(mapy)+str(liste[1])+str(liste[2])
-	chemin = "messages/sign/"+fichier
-	mon_fichier = open(chemin, "r")
-	message = mon_fichier.read()	
-	attendre = True
-	rectangle = canvas.create_rectangle(100, 550, 550, 625, width=5, fill='white')
-	idmessage = canvas.create_text(320, 590, text = message)
+    else:
+        nom=("./messages/"+nommap2+"."+liste[0]+"."+str(liste[1])+"."+str(liste[2]))
+        if os.path.isfile(nom):
+	    mon_fichier = open(nom, "r")
+	    message = mon_fichier.read()	
+	    attendre = True
+	    rectangle = canvas.create_rectangle(100, 550, 550, 625, width=5, fill='white')
+	    idmessage = canvas.create_text(320, 590, text = message)
         
 def interagir():
-    global listeitem
-    global mon_perso
-    
     posx=mon_perso[2]+16
     posy=mon_perso[3]+16
 
@@ -1303,7 +1332,7 @@ for i in range(0,20*20):
 
 rectangle = 1
 idmessage = 0
-
+interrupteur=0
 sprite_att=[]
 listeobjet=[]
 coffre1=False
@@ -1316,6 +1345,7 @@ listecassable=[]
 listechangement=[]
 #accueil()
 affiche_terrain(nommap)
+verifie_interrupteur()
 frame()
 
 

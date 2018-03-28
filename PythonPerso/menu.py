@@ -114,6 +114,26 @@ def vitesse(event):
         if touche=="Delete":
             effacer()
 
+        if touche=="h":
+            fichier=open("./map/"+nommap+".cp","r")
+            lignes=fichier.readlines()
+
+            num1=lignes[curseur1[3]/32+60]
+            print num1
+            num1=num1[:curseur1[2]/32*2+2]
+            print num1
+            num1=num1[curseur1[2]/32*2:]
+            print num1
+            num=num1
+            chemin="./tp/"+nommap+"."+num+"."+str(curseur1[2])+"."+str(curseur1[3])
+            if num!="00":
+                if not os.path.isfile(chemin):
+                    fichier2=open(chemin,"w")
+                    fichier2.close()
+            fichier.close()
+        if touche=="g":
+            t=Toplevel(fenetre)
+
             
         if touche=="space":
             posx=0
@@ -425,7 +445,7 @@ def validernom2():
     global curseur1
     global curseur2
     global pasouvert
-
+    global fenetre2
 
     nommap= copie[0].get()
     
@@ -457,6 +477,7 @@ def validernom2():
         commence=True
         affiche_terrain("./map/"+nommap)
         pasouvert=True
+        fenetre2.destroy
         
     else:
         print "Fichier inexistant"
@@ -465,18 +486,21 @@ def validernom2():
 def nouveau():
     global copie
     global pasouvert
+    global fenetre2
 
     if not(pasouvert):
         copie[1].destroy()
         copie[0].destroy()
         del copie[1]
         del copie[0]
+        fenetre2.destroy()
         
     pasouvert=False
-    entree = Entry(fenetre, width=30)
+    fenetre2=Toplevel(fenetre)
+    entree = Entry(fenetre2, width=30)
     copie.append(entree)
     entree.pack()
-    bouton=Button(fenetre, text="Valider", command=validernom)
+    bouton=Button(fenetre2, text="Valider", command=validernom)
     copie.append(bouton)
     bouton.pack()
 
@@ -488,6 +512,7 @@ def validernom():
     global curseur1
     global curseur2
     global pasouvert
+    global fenetre2
 
     nommap= copie[0].get()
     print "./map/"+nommap
@@ -519,6 +544,7 @@ def validernom():
         del copie[0]
         commence=True
         pasouvert=True
+        fenetre2.destroy
 
     
     
@@ -526,19 +552,22 @@ def editer():
     global copie
     global mode
     global pasouvert
+    global fenetre2
 
     if not(pasouvert):
         copie[1].destroy()
         copie[0].destroy()
         del copie[1]
         del copie[0]
+        fenetre2.destroy()
         
     pasouvert=False
     mode=1
-    entree = Entry(fenetre, width=30)
+    fenetre2=Toplevel(fenetre)
+    entree = Entry(fenetre2, width=30)
     copie.append(entree)
     entree.pack()
-    bouton=Button(fenetre, text="Valider", command=validernom2)
+    bouton=Button(fenetre2, text="Valider", command=validernom2)
     copie.append(bouton)
     bouton.pack()
 
