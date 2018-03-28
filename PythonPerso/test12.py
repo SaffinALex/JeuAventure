@@ -43,7 +43,7 @@ def affiche_obj(nom):
         while i<40:
             num=lignes[cpt][i]+lignes[cpt][i+1]
             est_coffre=(num=="05" or num=="06" or num=="07" or num=="08")
-            est_porte=(num=="12" or num=="15" or num=="16")
+            est_porte=(num=="12" or num=="15" or num=="16" or num=="17")
             ouvert=False
             if num =="00":
                 for monitem in listechangement:
@@ -88,6 +88,11 @@ def affiche_obj(nom):
                     else :
                         if num=="19" or num=="20":
                             listeitem.append([num,i*16,j,0,1,[]])
+                            if interrupteur==1 and num=="20":
+                                num+="bis"
+                        elif num=="21" and interrupteur==1:
+                            listeitem.append([num,i*16,j,0,0,[]])
+                            num+="bis"
                         else:
                             listeitem.append([num,i*16,j,0,0,[]])
                         nom="./spriteObjet/objet"+num
@@ -201,6 +206,7 @@ def changeMap():
         nommap="./map/map"+str(mapx)+"-"+str(mapy)
         affiche_terrain(nommap)    
 	mouvement_perso()
+        verifie_interrupteur()
 
 
 def efface_bloque():
@@ -581,6 +587,7 @@ def teleportation():
         nommap="./map/"+nommap2
         affiche_terrain(nommap)    
 	mouvement_perso()
+        verifie_interrupteur()
 
 def interrupteur_boucle(liste,num):
     fichier = open("./spriteObjet/objet"+num,'r')
@@ -668,14 +675,14 @@ def bloquer_fleche(entite):
                 if( entite[3]+16>=bloque_y[i] and  entite[3]+16<=bloque_y[i]+31): #Coin Haut gauche
                     efface(entite[4])
                     mon_perso[10]=[0,0,0,0,[],""]
-                    if bloque_num[i]=="./spriteObjet/objet21":
+                    if bloque_num[i]=="./spriteObjet/objet21" or bloque_num[i]=="./spriteObjet/objet21bis":
                         active_interrupteur()
                     break
                
                 elif( entite[3]+31>=bloque_y[i] and  entite[3]+31<=bloque_y[i]+31): #Coin Bas gauche
                     efface(entite[4])
                     mon_perso[10]=[0,0,0,0,[],""]
-                    if bloque_num[i]=="./spriteObjet/objet21":
+                    if bloque_num[i]=="./spriteObjet/objet21" or bloque_num[i]=="./spriteObjet/objet21bis":
                         active_interrupteur()
                     break
                 
@@ -683,14 +690,14 @@ def bloquer_fleche(entite):
                 if( entite[3]+31>=bloque_y[i] and entite[3]+31<=bloque_y[i]+31): #Coin Bas Droite
                     efface(entite[4])
                     mon_perso[10]=[0,0,0,0,[],""]
-                    if bloque_num[i]=="./spriteObjet/objet21":
+                    if bloque_num[i]=="./spriteObjet/objet21" or bloque_num[i]=="./spriteObjet/objet21bis":
                         active_interrupteur()
                     break
             
                 elif( entite[3]+16>=bloque_y[i] and  entite[3]+16<=bloque_y[i]+31): #Coin Haut Droite
                     efface(entite[4])
                     mon_perso[10]=[0,0,0,0,[],""]
-                    if bloque_num[i]=="./spriteObjet/objet21":
+                    if bloque_num[i]=="./spriteObjet/objet21" or bloque_num[i]=="./spriteObjet/objet21bis":
                         active_interrupteur()
                     break
                 
@@ -1251,7 +1258,7 @@ def interaction(liste):
                 inventaire[5]+=1
 
             
-    if (liste[0]=="12" or liste[0]=="16" or liste[0]=="15") and inventaire[5]>0 and liste[4]!=1:
+    if (liste[0]=="12" or liste[0]=="16" or liste[0]=="15" or liste[0]=="17") and inventaire[5]>0 and liste[4]!=1:
         
         inventaire[5]-=1
         print liste[1]
