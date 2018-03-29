@@ -206,6 +206,9 @@ def changeMap():
         nommap="./map/map"+str(mapx)+"-"+str(mapy)
         affiche_terrain(nommap)    
 	mouvement_perso()
+	placerHUD()
+	HUD()
+	
 
 
 def efface_bloque():
@@ -497,6 +500,7 @@ def ramasse_objet():
             inventaire[0]+=1
             print inventaire
         efface(E[3])
+	HUD()
         del listeobjet[i]
               
 def frame():
@@ -512,7 +516,7 @@ def frame():
         evenement()
         changeMap()
         joueur_toucher()
-	HUD()
+
 
         for i in range(0,len(Ennemi)):
             if Ennemi[i][9]<=0:
@@ -1185,7 +1189,8 @@ def interaction(liste):
 	attendre = True
 	rectangle = canvas.create_rectangle(100, 550, 550, 625, width=5, fill='white')
 	idmessage = canvas.create_text(320, 590, text = message)
-        
+    
+    HUD()    
 
 
 def HUD():
@@ -1203,21 +1208,22 @@ def HUD():
 	canvas.delete(bow_HUD)
 	canvas.delete(sword_HUD)
 
-	canvas.create_rectangle(5,5,635,45,fill='',outline='white') #vert
-	
-	placer("./item/item05",7,7,3)
-	placer("./item/item00",107,7,3)
-	placer("./item/item04",207,7,3)
-	placer("./item/item02",307,7,3)
-	placer("./item/item06",407,10,3)
-	placer("./item/item07",507,10,3)
-
 	vie_HUD = canvas.create_text(55,30, text = "x" + str(mon_perso[8][1]),fill='white')
 	coin_HUD = canvas.create_text(150 ,30, text = "x" + str(mon_perso[8][4]),fill='white')
 	fleche_HUD = canvas.create_text(250 ,30, text = "x" + str(mon_perso[8][0]),fill='white')
 	clef_HUD = canvas.create_text(350 ,30, text = "x" + str(mon_perso[8][5]),fill='white')
 	bow_HUD = canvas.create_text(450 ,30, text = "\"c\"",fill='white')
 	sword_HUD = canvas.create_text(550 ,30, text = "\"b\"",fill='white')
+
+def placerHUD():
+
+	canvas.create_rectangle(5,5,635,45,fill='',outline='white')
+	placer("./item/item05",7,7,0)
+	placer("./item/item00",107,7,0)
+	placer("./item/item04",207,7,0)
+	placer("./item/item02",307,7,0)
+	placer("./item/item06",407,10,0)
+	placer("./item/item07",507,10,0)
 
 def interagir():
     global listeitem
@@ -1278,6 +1284,8 @@ bow_HUD = 6
 sword_HUD = 7
 
 
+
+
 sprite_att=[]
 listeobjet=[]
 coffre1=False
@@ -1290,7 +1298,10 @@ listecassable=[]
 listechangement=[]
 #accueil()
 affiche_terrain(nommap)
+HUD()
+placerHUD()
 frame()
+
 
 
 canvas.pack()
