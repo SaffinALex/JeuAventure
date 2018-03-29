@@ -132,6 +132,7 @@ def vitesse(event):
                     fichier2=open(chemin,"w")
                     fichier2.close()
             fichier.close()
+    
             
         if touche=="t":
             if not(pasouvert):
@@ -149,6 +150,42 @@ def vitesse(event):
             copie.append(liste)
             bouton=Button(fenetre2, text="Valider", command=validerTP)
             bouton.pack()
+
+        if touche=="m":
+            if not(pasouvert):
+                fenetre2.destroy()
+                del copie[0]
+            pasouvert=True
+            fichier=open("./map/"+nommap+".cp","r")
+            lignes=fichier.readlines()
+
+            num1=lignes[curseur1[3]/32+60]
+            num1=num1[:curseur1[2]/32*2+2]
+            num1=num1[curseur1[2]/32*2:]
+            num=num1
+            chemin="./messages/"+nommap+"."+num+"."+str(curseur1[2])+"."+str(curseur1[3])
+            if num!="00":
+                if not os.path.isfile(chemin):
+                    fichier2=open(chemin,"w")
+                    fichier2.close()
+            fichier.close()
+
+        # if touche=="p":
+        #     if not(pasouvert):
+        #         fenetre2.destroy()
+        #         del copie[0]
+        #     pasouvert=False
+        #     i=0
+        #     list = os.listdir('./messages')
+        #     fenetre2=Toplevel(fenetre)
+        #     liste = Listbox(fenetre2)
+        #     for fiche in list:
+        #         liste.insert(i,fiche)
+        #         i+=1
+        #     liste.pack()
+        #     copie.append(liste)
+        #     bouton=Button(fenetre2, text="Valider", command=validerMessage(bouton))
+        #     bouton.pack()
 
             
         if touche=="space":
@@ -248,6 +285,34 @@ def validerTP():
     fichier.close()
     del copie[0]
     fenetre2.destroy()
+
+# def validerMessage(bouton):
+#     global pasouvert
+#     global fenetre2
+#     liste=copie[0]
+#     fenetre2.destroy()
+#     entree = Entry(fenetre2, width=30)
+#     entree.pack()
+#     bouton=Button(fenetre2, text="Valider", command=validerMessage2(entree,liste))
+#     bouton.pack()
+    
+# def validerMessage2(entree,liste):
+#     i=0
+#     pasouvert=True
+#     ligne=""
+#     nom=liste.get(liste.curselection())
+#     fichier=open("./tp/"+nom,"w")
+#     texte=copie[0].get()
+#     for lettre in texte:
+#         if i>60:
+#             fichier.write(ligne+"\n")
+#             i=0
+#             ligne=""
+#         ligne+=lettre
+#         i+=1       
+#     fichier.close()
+#     del copie[0]
+#     fenetre2.destroy()
                   
 def placer_map():
     
@@ -489,10 +554,6 @@ def validernom2():
         
         fichier.close()
         fichier2.close()
-        
-        copie[1].destroy()
-        copie[0].destroy()
-        del copie[1]
         del copie[0]
         commence=True
         affiche_terrain("./map/"+nommap)
@@ -508,9 +569,6 @@ def nouveau():
     global fenetre2
 
     if not(pasouvert):
-        copie[1].destroy()
-        copie[0].destroy()
-        del copie[1]
         del copie[0]
         fenetre2.destroy()
         
@@ -520,7 +578,6 @@ def nouveau():
     copie.append(entree)
     entree.pack()
     bouton=Button(fenetre2, text="Valider", command=validernom)
-    copie.append(bouton)
     bouton.pack()
 
 def validernom():
@@ -555,10 +612,6 @@ def validernom():
             fichier.write(ligne+"\n")
         fichier.write(ligne)
         fichier.close()
-    
-        copie[1].destroy()
-        copie[0].destroy()
-        del copie[1]
         del copie[0]
         commence=True
         pasouvert=True
@@ -571,9 +624,6 @@ def editer():
     global fenetre2
     i=0
     if not(pasouvert):
-        copie[1].destroy()
-        copie[0].destroy()
-        del copie[1]
         del copie[0]
         fenetre2.destroy()
         
@@ -589,7 +639,6 @@ def editer():
     liste.pack()
     copie.append(liste)
     bouton=Button(fenetre2, text="Valider", command=validernom2)
-    copie.append(bouton)
     bouton.pack()
 
 def souris(event):

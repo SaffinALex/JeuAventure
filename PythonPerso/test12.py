@@ -50,6 +50,7 @@ def affiche_obj(nom):
                     if nom_bis==monitem[2]  and monitem[0]==i*16 and monitem[1]==j and (monitem[4]=="05" or monitem[4]=="06" or monitem[4]=="07" or monitem[4]=="08"):
                         if monitem[5]==1:
                             nom="./spriteObjet/objet"+"04"
+                            listeitem.append(["04",i*16,j,0,1,[]])
                             placer(nom,(i*16),j,1)
  
                         else:
@@ -62,6 +63,7 @@ def affiche_obj(nom):
                     for monitem in listechangement:
                         if nom_bis==monitem[2]  and monitem[0]==i*16 and monitem[1]==j:
                             nom="./spriteObjet/objet"+"04"
+                            listeitem.append(["04",i*16,j,0,1,[]])
                             placer(nom,(i*16),j,2)
                             ouvert=True
 
@@ -203,7 +205,12 @@ def changeMap():
         efface_bloque()
         efface_listeitem()
         nommap2="map"+str(mapx)+"-"+str(mapy)
-        nommap="./map/map"+str(mapx)+"-"+str(mapy)
+        if(os.path.isfile("./map/"+nommap2)):
+            nommap="./map/map"+str(mapx)+"-"+str(mapy)
+        else:
+            nommap="./map/bug"
+            mon_perso[2]=224
+            mon_perso[3]=224
         affiche_terrain(nommap)    
 	mouvement_perso()
         verifie_interrupteur()
