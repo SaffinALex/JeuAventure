@@ -7,9 +7,6 @@ from random import *
 def efface():
     print x
 
-liste=[1,2]
-x=0
-efface()
-print liste
-
+if ","==".":
+    print "con"
 
