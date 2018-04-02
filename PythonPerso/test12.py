@@ -4,7 +4,7 @@
 from Tkinter import *
 from random import *
 import os
-        
+
 def affiche_terrain(nom):
     global nommap
     canvas.delete("all")
@@ -84,8 +84,12 @@ def affiche_obj(nom):
                         placer(nom,(i*16),j,2)                        
                             
                 else:
-                    if num=="18":
+                    if num=="18" or num=="38":
                         listeitem.append([num,i*16,j,0,1,[]])
+                        if num=="38":
+                            nom="./spriteObjet/objet"+num
+                            placer(nom,(i*16),j,0)
+                            
                     else :
                         if num=="19" or num=="20":
                             listeitem.append([num,i*16,j,0,1,[]])
@@ -155,10 +159,8 @@ def placer(nom,x,y,option): #0=Transparent, 1=bloquer, 2=item, 3 =objet
     if (option!=0 and option!=3):
         bloque_x.append(x)
         bloque_y.append(y)
-        num=nom[len(nom)-2]+nom[len(nom)-1]
         bloque_num.append(nom)
-        bloquer[x/32+y/32*20].append(x)
-        bloquer[x/32+y/32*20].append(y)
+        bloque.append([x,y,nom])
 
     for ligne in lignes:
         for i in range (0,16):
@@ -179,7 +181,6 @@ def changeMap():
     global mapy
     global nommap
     global nommap2
-    global Ennemi
     
     change=(mon_perso[2]+32>640 or mon_perso[2]<0 or mon_perso[3]+32>640 or mon_perso[3]<0)
 
@@ -200,7 +201,7 @@ def changeMap():
         mon_perso[3]=0
         
     if change:
-        Ennemi=[]
+        Ennemi[:]=[]
         mon_perso[10]=[0,0,0,0,[],""]
         efface_bloque()
         efface_listeitem()
@@ -217,12 +218,9 @@ def changeMap():
 
 
 def efface_bloque():
-    global bloque_x
-    global bloque_y
-    global bloque_num
-    bloque_x=[]
-    bloque_y=[]
-    bloque_num=[]
+    bloque_x[:]=[]
+    bloque_y[:]=[]
+    bloque_num[:]=[]
 
 
 def bloquer_entite(val_x, val_y,entite):
@@ -252,10 +250,37 @@ def bloquer_entite(val_x, val_y,entite):
     if(entite[3]>620 or entite[3]<-8 or entite[2]>620 or entite[2]<-8):
         entite[3]=val_y
         entite[2]=val_x
-
+        
+def interrupteur_epee(direction):
+        if True:
+            if direction=="Haut":
+                posx=mon_perso[2]
+                posy=mon_perso[3]-16
+        
+            if direction=="Bas":
+                posx=mon_perso[2]
+                posy=mon_perso[3]+16
+                
+            if mon_perso[6]=="Gauche":
+                posx=mon_perso[2]-16
+                posy=mon_perso[3]
+ 
+            if mon_perso[6]=="Droite":
+                posx=mon_perso[2]+16
+                posy=mon_perso[3]
+            
+            for E in listeitem:
+                if E[0]=="21" or E[0]=="21bis":
+                    if E[1]>=posx and E[1]<posx+31 and E[2]+31>=posy and E[2]+31<posy+31:
+		        active_interrupteur()
+                    elif E[1]+31>=posx and E[1]+31<posx+31 and E[2]+31>=posy and E[2]+31<posy+31:
+		        active_interrupteur()
+                    elif E[1]>=posx and E[1]<posx+31 and E[2]>=posy and E[2]<posy+31:
+                        active_interrupteur()
+                    elif E[1]+31>=posx and E[1]+31<posx+31 and E[2]>=posy and E[2]<posy+31:
+                        active_interrupteur()
+                        
 def aff_attaque():
-    global sprite_att
-
     x=mon_perso[2]
     y=mon_perso[3]
     fichier = open("./Attaque/epee",'r')
@@ -266,7 +291,12 @@ def aff_attaque():
     
     else:
         efface(mon_perso[4])
-
+        
+        if mon_perso[7]==1:
+            touche_interrupteur=True
+        else:
+            touche_interrupteur=False
+        
         if mon_perso[6]=="Bas":
             
             num=0*96+96-mon_perso[7]*32
@@ -277,6 +307,8 @@ def aff_attaque():
                     x+=2
                 x-=32
                 y+=2
+            if touche_interrupteur:
+                interrupteur_epee("Bas")
                 
         elif mon_perso[6]=="Haut":
             num=1*96+96-mon_perso[7]*32
@@ -290,6 +322,8 @@ def aff_attaque():
                     y-=64
                     
                 y+=2
+            if touche_interrupteur:
+                interrupteur_epee("Haut")
                 
         elif mon_perso[6]=="Droite":
             num=2*96+96-mon_perso[7]*32
@@ -304,6 +338,9 @@ def aff_attaque():
                     x+=32
                     
                 y+=2
+            if touche_interrupteur:
+                interrupteur_epee("Droite")
+                
         elif mon_perso[6]=="Gauche":
             num=3*96+96-mon_perso[7]*32
             for i in range (0,32):
@@ -317,12 +354,13 @@ def aff_attaque():
                     x-=32
                     
                 y+=2
+            if touche_interrupteur:
+                interrupteur_epee("Gauche")
 
 
         mon_perso[7]-=1
     
 def aff_arc():
-    global sprite_att
 
     x=mon_perso[2]
     y=mon_perso[3]
@@ -335,7 +373,7 @@ def aff_arc():
     
     else:
         efface(mon_perso[4])
-
+        
         if mon_perso[6]=="Bas":
             num=0
             for i in range (0,16):
@@ -350,6 +388,7 @@ def aff_arc():
                 fleche[2]=mon_perso[2]
                 fleche[3]=mon_perso[3]
                 fleche[5]="Bas"
+                inventaire[0]-=1
                 create_HUD()
             
                 
@@ -367,6 +406,7 @@ def aff_arc():
                 fleche[2]=mon_perso[2]
                 fleche[3]=mon_perso[3]
                 fleche[5]="Haut"
+                inventaire[0]-=1
                 create_HUD()
                 
         elif mon_perso[6]=="Droite":
@@ -383,6 +423,7 @@ def aff_arc():
                 fleche[2]=mon_perso[2]
                 fleche[3]=mon_perso[3]
                 fleche[5]="Droite"
+                inventaire[0]-=1
                 create_HUD()
                 
         elif mon_perso[6]=="Gauche":
@@ -399,6 +440,7 @@ def aff_arc():
                 fleche[2]=mon_perso[2]
                 fleche[3]=mon_perso[3]
                 fleche[5]="Gauche"
+                inventaire[0]-=1
                 create_HUD()
 
 
@@ -432,9 +474,16 @@ def couleur(num,val_x,val_y):
         hexa="#e3e570" #JAUNECLAIRE
     elif num=="D": 
         hexa="#b2d5f6" #BleuClaire
+<<<<<<< HEAD
     elif num=="S":
         hexa="#174402" #rouge/noire
         
+=======
+    elif num=="E":
+        hexa="#261f2f" #bleu/foncéé/gris
+    elif num=="F":
+        hexa="#c66f04" #orange   
+>>>>>>> 169addbbe3f6a371385d5ed212ca721619767ca5
     if num!="0":
         fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill=hexa,outline="")
         return fig
@@ -458,7 +507,6 @@ def placer_fleche(nom,x,y,sprite):
     fichier.close()
         
 def placer_attaque(num,val_x,val_y):
-    global sprite_att
     if num!="0":           
         fig=couleur(num,val_x,val_y)
         sprite_att.append(fig)
@@ -486,7 +534,7 @@ def ramasse_objet():
             i+=1
     if ramasse:
         num=E[0]
-        if E[0]=="00":
+        if E[0]=="00" and inventaire[4]<FLECHE_MAX:
             inventaire[4]+=1
         elif E[0]=="01":
             inventaire[4]+=5
@@ -494,7 +542,7 @@ def ramasse_objet():
             inventaire[5]+=5
         elif E[0]=="03":
             inventaire[1]+=3
-            if inventaire[1]>10:
+            if inventaire[1]>VIE_MAX:
                 inventaire[1]=10
         elif E[0]=="04":
             inventaire[0]+=1
@@ -540,9 +588,9 @@ def frame():
             mouvement_ennemi(E)
         
         if(len(Ennemi)>0):             
-            if mon_perso[9][1] and (mon_perso[10][1]==0 and mon_perso[10][0]==0):
+            if mon_perso[9][1]:
                 toucher(mon_perso)
-            elif mon_perso[10][0]!=0 or mon_perso[10][1]!=0:
+            if mon_perso[10][0]!=0 or mon_perso[10][1]!=0:
                 toucher_fleche(mon_perso[10])
             
         for liste in listeitem:
@@ -554,7 +602,6 @@ def frame():
 def teleportation():
     global nommap2
     global nommap
-    global Ennemi
 
     if mon_perso[6]=="Haut":
         posx=mon_perso[2]
@@ -564,7 +611,7 @@ def teleportation():
         posy=mon_perso[3]
     tp=False
     for liste in listeitem:
-        est_porte=(liste[0]=="12" or liste[0]=="15" or liste[0]=="16" or liste[0]=="17" or liste[0]=="18")
+        est_porte=(liste[0]=="12" or liste[0]=="15" or liste[0]=="16" or liste[0]=="17" or liste[0]=="18" or liste[0]=="38")
         nom=("./tp/"+nommap2+"."+liste[0]+"."+str(liste[1])+"."+str(liste[2]))     
         if os.path.isfile(nom) and liste[4]==1 and est_porte:
             
@@ -593,11 +640,10 @@ def teleportation():
         efface_bloque()
         efface_listeitem()
         nommap="./map/"+nommap2
-        Ennemi=[]
+        Ennemi[:]=[]
         affiche_terrain(nommap)    
 	mouvement_perso()
         verifie_interrupteur()
-        print listeitem
 
 def interrupteur_boucle(liste,num):
     fichier = open("./spriteObjet/objet"+num,'r')
@@ -661,25 +707,45 @@ def verifie_interrupteur():
                 
 def active_interrupteur():
     global interrupteur
-    if interrupteur==0:
+    if interrupteur==0 and not(verifie_bloquer()) :
         interrupteur+=1
         for liste in listeitem:
             if liste[0]=="21":
                 efface(liste[5])
                 placer("./spriteObjet/objet21bis",liste[1],liste[2],0)
         verifie_interrupteur()
-    else:
+    elif interrupteur>0 and not(verifie_bloquer()):
         interrupteur=0
         for liste in listeitem:
             if liste[0]=="21":
                 efface(liste[5])
                 placer("./spriteObjet/objet21",liste[1],liste[2],0)
         verifie_interrupteur()
-                
+
+def verifie_bloquer():
+    posx=mon_perso[2]
+    posy=mon_perso[3]+16
+    est_bloque=False
+    for E in listeitem:
+        if E[0]=="20" or E[0]=="20bis" or E[0]=="19" or E[0]=="19bis":
+            if E[1]>=posx and E[1]<posx+31 and E[2]+31>=posy and E[2]+31<posy+16:
+		est_bloque=True
+                break
+            elif E[1]+31>=posx and E[1]+31<posx+31 and E[2]+31>=posy and E[2]+31<posy+16:
+		est_bloque=True
+                break
+            elif E[1]>=posx and E[1]<posx+31 and E[2]>=posy and E[2]<posy+16:
+		est_bloque=True
+                break
+            elif E[1]+31>=posx and E[1]+31<posx+31 and E[2]>=posy and E[2]<posy+16:
+		est_bloque=True
+                break
+    return est_bloque
+            
 def bloquer_fleche(entite):
     global interrupteur
     for i in range(len(bloque_x)):
-        if bloque_num[i]!="./spriteDecor/bloc40":
+        if bloque_num[i]!="./spriteDecor/bloc40" and bloque_num[i]!="./spriteDecor/bloc54" and bloque_num[i]!="./spriteDecor/bloc55" :
             if(entite[2]>=bloque_x[i] and entite[2]<=bloque_x[i]+31):
                 if( entite[3]+16>=bloque_y[i] and  entite[3]+16<=bloque_y[i]+31): #Coin Haut gauche
                     efface(entite[4])
@@ -715,11 +781,11 @@ def bloquer_fleche(entite):
         mon_perso[10]=[0,0,0,0,[],""]
         
 def mort(effaces):
-    global Ennemi
     for i in range(0,len(effaces)):
         efface(Ennemi[effaces[len(effaces)-1]][4])
         del Ennemi[effaces[len(effaces)-1]]
         del effaces[len(effaces)-1]
+    
 def recule(E):
     if E[3]>mon_perso[3] and E[2]>mon_perso[2]:
         E[0]=4
@@ -852,7 +918,7 @@ def couper_herbe():
         sprite="./spriteSurface/bloc05"
         i=0
         
-        if mon_perso[6]=="Haut" or mon_perso[6]=="Bas":
+        if True:
             if mon_perso[6]=="Haut":
                 posx=mon_perso[2]
                 posy=mon_perso[3]-16
@@ -860,6 +926,14 @@ def couper_herbe():
             if mon_perso[6]=="Bas":
                 posx=mon_perso[2]
                 posy=mon_perso[3]+16
+                
+            if mon_perso[6]=="Gauche":
+                posx=mon_perso[2]-16
+                posy=mon_perso[3]
+ 
+            if mon_perso[6]=="Droite":
+                posx=mon_perso[2]+16
+                posy=mon_perso[3]
             
             for E in listeitem:
                 if E[0]=="09":
@@ -889,42 +963,6 @@ def couper_herbe():
 		        del listeitem[i]
                 i+=1
                     
-        if mon_perso[6]=="Droite" or mon_perso[6]=="Gauche":
-            if mon_perso[6]=="Gauche":
-                posx=mon_perso[2]-16
-                posy=mon_perso[3]
- 
-            if mon_perso[6]=="Droite":
-                posx=mon_perso[2]+16
-                posy=mon_perso[3]
-
-            for E in listeitem:
-                if E[0]=="09":
-                    if E[1]>=posx and E[1]<posx+31 and E[2]+31>=posy and E[2]+31<posy+31:
-		        effaces.append(E)
-		        efface(E[5])
-                        placer(sprite,E[1],E[2],0)
-                        item_aleatoire(E[1],E[2])
-		        del listeitem[i]
-                    elif E[1]+31>=posx and E[1]+31<posx+31 and E[2]+31>=posy and E[2]+31<posy+31:
-		        effaces.append(E)
-		        efface(E[5])
-                        placer(sprite,E[1],E[2],0)
-                        item_aleatoire(E[1],E[2])
-		        del listeitem[i]
-                    elif E[1]>=posx and E[1]<posx+31 and E[2]>=posy and E[2]<posy+31:
-		        effaces.append(E)
-		        efface(E[5])
-                        placer(sprite,E[1],E[2],0)
-                        item_aleatoire(E[1],E[2])
-		        del listeitem[i]
-                    elif E[1]+31>=posx and E[1]+31<posx+31 and E[2]>=posy and E[2]<posy+31:
-		        effaces.append(E)
-		        efface(E[5])
-                        placer(sprite,E[1],E[2],0)
-                        item_aleatoire(E[1],E[2])
-		        del listeitem[i]
-                i+=1
         nul=[]
     
 	for i in range(0, len(bloque_x)):
@@ -986,6 +1024,7 @@ def toucher(entite):
                 
             elif E[2]+31>=posx and E[2]+31<posx+31 and E[3]>=posy and E[3]<posy+31:
                 effaces.append(E)
+        
                 
     if entite[6]=="Droite" or entite[6]=="Gauche":
         if entite[6]=="Gauche":
@@ -1136,29 +1175,32 @@ def vitesse(event):
     global rectangle
     global idmessage
     global attendre
+    global message_active
 
     touche=event.keysym
-    if(not attendre):
+    if(not attendre and not message_active):
         if mon_perso[11]<=0:
             if touche=="Up":
                 mon_perso[1]=-8
             if touche=="Down":
                 mon_perso[1]=8
-
             if touche=="Right":
                 mon_perso[0]=8
-
             if touche=="Left":
                 mon_perso[0]=-8
-            if(touche=="b"):
-                attaque("Epee")
-            elif(touche=="c"):
-                attaque("Arc")
+
+        if(touche=="b"):
+            attaque("Epee")
+            mon_perso[11]=0
+        elif(touche=="c" and inventaire[0]>0):
+            attaque("Arc")
+            mon_perso[11]=0
         if touche=="Escape":
             menu()
         if(touche=="a"):
             interagir()
-    else:
+            
+    elif (attendre):
         if touche=="Escape":
             attendre=False
             lemenu[2][1]=280
@@ -1196,15 +1238,18 @@ def vitesse(event):
                 charger()
             elif lemenu[3]==1:
                 fenetre.destroy()
+                attendre=True
             frame()
-        
+            
+    elif message_active:
         if(touche=="a"):
-            attendre = False
+            message_active = False
 	    canvas.delete(rectangle)
 	    canvas.delete(idmessage)
 
 
 def menu():
+    
     global attendre
     mon_fichier = open("menu", "r")
     message = mon_fichier.read()	
@@ -1214,6 +1259,7 @@ def menu():
     lemenu[1].append(canvas.create_text(500, 300, text = message))
     mon_fichier.close()
     placer_curseur()
+    
 def placer_curseur():
     fichier=open("curseur","r")
     lignes=fichier.readlines()
@@ -1251,13 +1297,13 @@ def stop(event):
 
 def evenement():
     global coffre1
-    global ferme1
 
-    if(nommap2=="map1-1"):
+    if(nommap2=="tuto3"):
         if(coffre1==False):
             if(not(len(Ennemi)>0)):                 
                 coffre1=True
                 listeitem.append(["07",256,224,0,0,[]])
+                listechangement.append([256,224,nommap,0,"07",0])
                 placer("./spriteObjet/objet02",256,224,2)
 
 
@@ -1269,31 +1315,12 @@ def bouger_sprite(sprite_pos,nom,x,y):
     lignes  = fichier.readlines()
 
     for ligne in lignes:
-        for i in range (0,16):                
-            if ligne[i]=="1":
-                pos=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#0a650a",outline="")
-            elif ligne[i]=="2":
-                pos=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="black",outline="")
-            elif ligne[i]=="3":
-                pos=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="blue",outline="")
-            elif ligne[i]=="4":
-                pos=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#808180",outline="")
-            elif ligne[i]=="5":
-                 pos=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#614919",outline="")
-            elif ligne[i]=="6":
-                 pos=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="red",outline="")
-            elif ligne[i]=="7":
-                 pos=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#d4a566",outline="")
-            elif ligne[i]=="8":
-                 pos= canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#96c14b",outline="") #vertClaire
-            elif ligne[i]=="9":
-                 pos=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="white",outline="")
-                 
-            if ligne[i]!="0":
-                sprite_pos.append(pos)
+        for i in ligne:
+            if i!="0":           
+                fig=couleur(i,val_x,val_y)
+                sprite_pos.append(fig)
                 
             val_x+=2
-
         val_y+=2
         val_x=x
         fichier.close()
@@ -1310,15 +1337,15 @@ def compt(liste):
             placer("./spriteObjet/objet04",liste[1],liste[2],0)
             
 def efface_listeitem():
-    global listeitem
-    global listeobjet
-    listeitem=[]
-    listeobjet=[]
+
+    listeitem[:]=[]
+    listeobjet[:]=[]
+    listecassable[:]=[]
 
 def efface_item(liste):
-    for i in range(0,len(liste[5])):
-        canvas.delete(liste[5][0])
-        del liste[5][0]
+    for ele in liste[5]:
+        canvas.delete(ele)
+        del ele
 
 def interaction(liste):
     global idmessage
@@ -1326,14 +1353,22 @@ def interaction(liste):
     global attendre
     global nommap
     global nommap2
+    global message_active
 
     numero_eff=[]
+    existe=False
     
     if liste[0]=="05" or liste[0]=="06" or liste[0]=="07" or liste[0]=="08":
         if liste[4]!=1:
             liste[3]=10
             liste[4]=1
-            listechangement.append([liste[1],liste[2],nommap,0,liste[0],1])
+            for item in listechangement:
+                if item[0]==liste[1] and item[1]==liste[2] and item[2]==nommap:
+                    item[5]=1
+                    existe=True
+                    break
+            if not existe:
+                listechangement.append([liste[1],liste[2],nommap,0,liste[0],1])
             placer("./spriteObjet/objet"+liste[0],liste[1],liste[2],0)
             if liste[0]=="05":
                 inventaire[4]+=1
@@ -1369,7 +1404,7 @@ def interaction(liste):
         if os.path.isfile(nom):
 	    mon_fichier = open(nom, "r")
 	    message = mon_fichier.read()	
-	    attendre = True
+	    message_active = True
 	    rectangle = canvas.create_rectangle(100, 550, 550, 625, width=5, fill='white')
 	    idmessage = canvas.create_text(320, 590, text = message)
         
@@ -1402,27 +1437,29 @@ def interagir():
 
 
 def create_HUD():
-
-        for id in HUD:
-            canvas.delete(id)
-
-	HUD.append(canvas.create_text(55,30, text = "x" + str(mon_perso[8][1]),fill='white'))
-	HUD.append(canvas.create_text(150 ,30, text = "x" + str(mon_perso[8][4]),fill='white'))
-	HUD.append(canvas.create_text(250 ,30, text = "x" + str(mon_perso[8][0]),fill='white'))
-	HUD.append(canvas.create_text(350 ,30, text = "x" + str(mon_perso[8][5]),fill='white'))
-	HUD.append(canvas.create_text(450 ,30, text = "\"c\"",fill='white'))
-	HUD.append(canvas.create_text(550 ,30, text = "\"b\"",fill='white'))
-        placerHUD()
+    
+    for id in HUD:
+        for id2 in id:
+            canvas.delete(id2)
+    HUD[:]=[[],[]]
+                
+    HUD[0].append(canvas.create_text(55,30, text = "x" + str(mon_perso[8][1]),fill='white'))
+    HUD[0].append(canvas.create_text(150 ,30, text = "x" + str(mon_perso[8][4]),fill='white'))
+    HUD[0].append(canvas.create_text(250 ,30, text = "x" + str(mon_perso[8][0]),fill='white'))
+    HUD[0].append(canvas.create_text(350 ,30, text = "x" + str(mon_perso[8][5]),fill='white'))
+    HUD[0].append(canvas.create_text(450 ,30, text = "\"c\"",fill='white'))
+    HUD[0].append(canvas.create_text(550 ,30, text = "\"b\"",fill='white'))
+    placerHUD()
 
 def placerHUD():
 
-	canvas.create_rectangle(5,5,635,45,fill='',outline='white')
-	placer_HUD2("./item/item05",7,7)
-	placer_HUD2("./item/item00",107,7)
-	placer_HUD2("./item/item04",207,7)
-	placer_HUD2("./item/item02",307,7)
-	placer_HUD2("./item/item06",407,10)
-        placer_HUD2("./item/item07",507,10)
+    HUD[1].append(canvas.create_rectangle(5,5,635,45,fill='',outline='white'))
+    placer_HUD2("./item/item05",7,7)
+    placer_HUD2("./item/item00",107,7)
+    placer_HUD2("./item/item04",207,7)
+    placer_HUD2("./item/item02",307,7)
+    placer_HUD2("./item/item06",407,10)
+    placer_HUD2("./item/item07",507,10)
         
 def placer_HUD2(nom,x,y):
     val_x=x
@@ -1434,11 +1471,18 @@ def placer_HUD2(nom,x,y):
         for i in range (0,16):
             if ligne[i]!="0":           
                 fig=couleur(ligne[i],val_x,val_y)
-                HUD.append(fig)
+                HUD[1].append(fig)
             val_x+=2
         val_y+=2
         val_x=x
     fichier.close()
+def set_coeur():
+    global VIE_MAX
+    VIE_MAX+=10
+
+def set_fleche():
+    global FLECHE_MAX
+    FLECHE_MAX+=20
     
 def sauvegarder():
     fichier=open("./save/save1","w")
@@ -1455,7 +1499,7 @@ def sauvegarder():
         fichier.write(",")
     fichier.write("]\n")
     for i in Ennemi:
-        mot="["+str(i[2])+","+str(i[3])+","+str(i[9])+","+i[5]+",]\n"
+        mot="["+str(i[2])+","+str(i[3])+","+str(i[9])+","+i[5]+","+str(i[8])+","+str(i[10])+",]\n"
         fichier.write(mot)  
     fichier.close()
 
@@ -1464,12 +1508,9 @@ def charger():
     global nommap2
     global mapx
     global mapy
-    global Ennemi
-    global listechangement
     global interrupteur
-    global inventaire
 
-    listechangement=[]
+    listechangement[:]=[]
     cpt=0
     fichier=open("./save/save1")
     lignes=fichier.readlines()
@@ -1481,7 +1522,7 @@ def charger():
     finit_option1=False
     i=0
     mot=""
-    inventaire=[]
+    inventaire[:]=[]
     Ennemi2=[]
     for ligne in lignes:
         if finit_option1:
@@ -1587,7 +1628,7 @@ def charger():
                     est_changement=False
                     
                 elif c==",":
-                    if(cpt==0 or cpt==1 or cpt==2):
+                    if(cpt!=3):
                         Ennemi2[i].append(int(mot))
                     else:
                         Ennemi2[i].append(mot)
@@ -1597,8 +1638,7 @@ def charger():
 
                 elif est_changement:
                     mot+=c
-    print Ennemi2
-    Ennemi=[]
+    Ennemi[:]=[]
     mon_perso[10]=[0,0,0,0,[],"Bas"]
     efface_bloque()
     efface_listeitem()
@@ -1611,46 +1651,57 @@ def charger():
         copie[j][3]=Ennemi2[j][1]
         copie[j][5]=Ennemi2[j][3]
         copie[j][9]=Ennemi2[j][2]
+        copie[j][8]=Ennemi2[j][4]
+        copie[j][10]=Ennemi2[j][5]
     for e in Ennemi:
         efface(e[4])
-    Ennemi=copie
+    Ennemi[:]=copie
     create_HUD()
     mouvement_perso()
     verifie_interrupteur()
                         
 
 fenetre = Tk()
-canvas = Canvas(fenetre, width=640, height=639, background="black")
+canvas = Canvas(fenetre, width=640, height=640, background="black")
+
 mapx=1
 mapy=1
-nommap="./map/map1-1"
-nommap2="map1-1"
-deplacement=0
-inventaire=[0,10,True,True,0,0]#[fleche,vie,Epee,Arc,Gold,clef]
+
+nommap="./map/tuto1"
+nommap2="tuto1"
+
+inventaire=[30,10,True,True,0,0]#[fleche,vie,Epee,Arc,Gold,clef]
 mon_perso=[0,0,320,400,[],"./spritePerso/PersoB1","Bas",0,inventaire,[0,False,""],[0,0,0,0,[],"Bas"],0] #[vitessex,vitessey,posx,posy,idsprite,sprite,orientation,d,[Inventaire],[Epee],[Fleche],compteurDegat]
+
 Ennemi=[]
+
 bloque_y=[]
 bloque_x=[]
 bloque_num=[]
-bloquer=[]
 
-HUD=[]
-for i in range(0,20*20):
-    bloquer.append([])
+bloque=[]
+
+HUD=[[],[]]
+    
 lemenu=[[],[],[485,280,[]],0] # Menu,Option,Curseur,Num_Option
-rectangle = 1
+
+rectangle = 0
 idmessage = 0
 interrupteur=0
-sprite_att=[]
-listeobjet=[]
+
+message_active=False
 coffre1=False
 attendre = False
-attendre_principal = False
-premier_passage = False
 listeitem=[]
-joueur_touche=False
+
+sprite_att=[]
+listeobjet=[]
 listecassable=[]
 listechangement=[]
+
+VIE_MAX=10
+FLECHE_MAX=40
+
 affiche_terrain(nommap)
 verifie_interrupteur()
 frame()
@@ -1662,3 +1713,10 @@ canvas.bind("<Key>", vitesse)
 canvas.bind("<KeyRelease>", stop)
         
 fenetre.mainloop()
+<<<<<<< HEAD
+=======
+
+
+
+# REGLER MONSTRE, sauvegarde(booleen evenement+Herbe)+ REGLER BLOCAGE(pas activé interrupteur si dessus)+ COMMENCER FICHIER NOMBRE MAGIQUE+ MAPPIN MAISON+ VIDE+HITBOX.
+>>>>>>> 169addbbe3f6a371385d5ed212ca721619767ca5

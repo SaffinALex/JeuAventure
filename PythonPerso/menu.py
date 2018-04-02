@@ -41,7 +41,8 @@ def placer(nom,x,y,canvas):
                fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#b2d5f6",outline="")
             elif ligne[i]=="E":
                fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#261f2f",outline="") #BleuFoncée/Gris
-
+            elif ligne[i]=="F":
+                fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#c66f04",outline="") #orange 
             if ligne[i]!="0":    
                 ma_map[x/32+y/32*20].append(fig)
                                         
@@ -708,6 +709,7 @@ test()
 fenetre.bind("<Key>", vitesse)
 fenetre.bind("<KeyRelease>", stop)
 fenetre.bind("<Button-1>", souris)
+fenetre.bind("<B1-Motion>", souris)
         
 fenetre.mainloop()
 

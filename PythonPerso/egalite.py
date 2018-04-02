@@ -4,9 +4,9 @@
 from Tkinter import *
 from random import *
 
-def efface():
-    print x
-
-if ","==".":
-    print "con"
-
+def l():
+    Bool=False
+    
+Bool=True
+l()
+print Bool
