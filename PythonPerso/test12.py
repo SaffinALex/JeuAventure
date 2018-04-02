@@ -1713,10 +1713,6 @@ canvas.bind("<Key>", vitesse)
 canvas.bind("<KeyRelease>", stop)
         
 fenetre.mainloop()
-<<<<<<< HEAD
-=======
-
 
 
 # REGLER MONSTRE, sauvegarde(booleen evenement+Herbe)+ REGLER BLOCAGE(pas activé interrupteur si dessus)+ COMMENCER FICHIER NOMBRE MAGIQUE+ MAPPIN MAISON+ VIDE+HITBOX.
->>>>>>> 169addbbe3f6a371385d5ed212ca721619767ca5
