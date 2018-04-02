@@ -1,0 +1,14 @@
+
+
+
+V 0.5.2:
+
+- Il n'est plus possible d'activer un interrupteur si on se trouve sur une case descendu.
+
+- Optimisation des performances.
+
+- Sauvegarde fonctionnelle pour les monstres.
+
+- Création de nouveau sprite pour les maisons.
+
+
