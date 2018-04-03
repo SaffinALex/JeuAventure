@@ -84,9 +84,9 @@ def affiche_obj(nom):
                         placer(nom,(i*16),j,2)                        
                             
                 else:
-                    if num=="18" or num=="38":
+                    if num=="18" or num=="38" or num=="13":
                         listeitem.append([num,i*16,j,0,1,[]])
-                        if num=="38":
+                        if num=="38" or num=="13":
                             nom="./spriteObjet/objet"+num
                             placer(nom,(i*16),j,0)
                             
@@ -224,28 +224,58 @@ def efface_bloque():
 
 
 def bloquer_entite(val_x, val_y,entite):
+    est_bloquer=False
+
     for i in range(len(bloque_x)):
         if(entite[2]>=bloque_x[i] and entite[2]<=bloque_x[i]+31):
             if( entite[3]+16>=bloque_y[i] and  entite[3]+16<=bloque_y[i]+31): #Coin Haut gauche
                 entite[3]=val_y
                 entite[2]=val_x
+                est_bloquer=True
                 break
                
             elif( entite[3]+31>=bloque_y[i] and  entite[3]+31<=bloque_y[i]+31): #Coin Bas gauche
                 entite[3]=val_y
                 entite[2]=val_x
+                est_bloquer=True
                 break
                 
         if( entite[2]+31>=bloque_x[i] and  entite[2]+32<=bloque_x[i]+31):
             if( entite[3]+31>=bloque_y[i] and entite[3]+31<=bloque_y[i]+31): #Coin Bas Droite
                 entite[3]=val_y
                 entite[2]=val_x
+                est_bloquer=True
                 break
             
             elif( entite[3]+16>=bloque_y[i] and  entite[3]+16<=bloque_y[i]+31): #Coin Haut Droite
                 entite[3]=val_y
                 entite[2]=val_x
+                est_bloquer=True
                 break
+            
+    if not est_bloquer and entite!=mon_perso:
+        for E in Ennemi:
+            if(entite[2]>=E[2] and entite[2]<=E[2]+31 and entite!=E and entite!=E):
+                if( entite[3]>=E[3] and  entite[3]<=E[3]+31): #Coin Haut gauche
+                    entite[3]=val_y
+                    entite[2]=val_x
+                    break
+                
+                elif( entite[3]+31>=E[3] and  entite[3]+31<=E[3]+31): #Coin Bas gauche
+                    entite[3]=val_y
+                    entite[2]=val_x
+                    break
+                
+            if( entite[2]+31>=E[2] and  entite[2]+32<=E[2]+31 and entite!=E and entite!=E):
+                if( entite[3]+31>=E[3] and entite[3]+31<=E[3]+31): #Coin Bas Droite
+                    entite[3]=val_y
+                    entite[2]=val_x
+                    break
+            
+                elif( entite[3]>=E[3] and  entite[3]<=E[3]+31): #Coin Haut Droite
+                    entite[3]=val_y
+                    entite[2]=val_x
+                    break
                 
     if(entite[3]>620 or entite[3]<-8 or entite[2]>620 or entite[2]<-8):
         entite[3]=val_y
@@ -539,7 +569,7 @@ def ramasse_objet():
         elif E[0]=="03":
             inventaire[1]+=3
             if inventaire[1]>VIE_MAX:
-                inventaire[1]=10
+                inventaire[1]=VIE_MAX
         elif E[0]=="04":
             inventaire[0]+=1
         efface(E[3])
@@ -607,39 +637,43 @@ def teleportation():
         posy=mon_perso[3]
     tp=False
     for liste in listeitem:
-        est_porte=(liste[0]=="12" or liste[0]=="15" or liste[0]=="16" or liste[0]=="17" or liste[0]=="18" or liste[0]=="38")
+        est_porte=(liste[0]=="12" or liste[0]=="15" or liste[0]=="16" or liste[0]=="17" or liste[0]=="18" or liste[0]=="38" or liste[0]=="13")
         nom=("./tp/"+nommap2+"."+liste[0]+"."+str(liste[1])+"."+str(liste[2]))     
         if os.path.isfile(nom) and liste[4]==1 and est_porte:
             
             if liste[1]>=posx and liste[1]<posx+31 and liste[2]+31>=posy and liste[2]+31<posy+5:
                 tp=True
+                num=liste[0]
                 break
             elif liste[1]+31>=posx and liste[1]+31<posx+31 and liste[2]+31>=posy and liste[2]+31<posy+5:
                 tp=True
+                num=liste[0]
                 break
             elif liste[1]>=posx and liste[1]<posx+16 and liste[2]>=posy and liste[2]<posy+5:
                 tp=True
+                num=liste[0]
                 break
             elif liste[1]+31>=posx and liste[1]+31<posx+31 and liste[2]>=posy and liste[2]<posy+5:
-                tp=True           
+                tp=True
+                num=liste[0]
                 break
 
     if tp:
         fichier=open(nom,"r")
         lignes=fichier.readlines()
-        nommap2=lignes[0][:len(lignes[0])-1]
         mon_perso[2]=int(lignes[1])
         mon_perso[3]=int(lignes[2])
-        
-        canvas.delete("all")
-        mon_perso[10]=[0,0,0,0,[],""]
-        efface_bloque()
-        efface_listeitem()
-        nommap="./map/"+nommap2
-        Ennemi[:]=[]
-        affiche_terrain(nommap)    
-	mouvement_perso()
-        verifie_interrupteur()
+        if num!="38":
+            nommap2=lignes[0][:len(lignes[0])-1]
+            canvas.delete("all")
+            mon_perso[10]=[0,0,0,0,[],""]
+            efface_bloque()
+            efface_listeitem()
+            nommap="./map/"+nommap2
+            Ennemi[:]=[]
+            affiche_terrain(nommap)    
+	    mouvement_perso()
+            verifie_interrupteur()
 
 def interrupteur_boucle(liste,num):
     fichier = open("./spriteObjet/objet"+num,'r')
@@ -1350,6 +1384,7 @@ def interaction(liste):
     global nommap
     global nommap2
     global message_active
+    global VIE_MAX
 
     numero_eff=[]
     existe=False
@@ -1372,6 +1407,9 @@ def interaction(liste):
                 inventaire[4]+=5
             elif liste[0]=="07":
                 inventaire[5]+=1
+            elif liste[0]=="08":
+                set_coeur()
+                inventaire[1]=VIE_MAX
             create_HUD()
 
             
