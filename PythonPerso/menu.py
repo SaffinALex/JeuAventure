@@ -326,55 +326,65 @@ def placer_map():
 
     cpt=0
     i=0
+    if mode==0:
+        nom="./spriteSurface/bloc"
+    elif mode==1:
+        nom="./spriteDecor/bloc"
+    elif mode==2:
+        nom="./spriteEnnemi/Ennemi"
+    elif mode==3:
+        nom="./spriteObjet/objet"
+
+        
     if selection<10:
         nom2=nom+"0"+str(selection)
     else:
         nom2=nom+str(selection)
-    fichier=open("./map/"+nommap+".cp","r")
-    lignes=fichier.readlines()
-    fichier2=open("./map/"+nommap+".cp","w")
-            
-    for ligne in lignes:
-        i=0
-        while i<40:
-            if cpt==curseur1[3]/32+(mode*20):
-                if i/2==curseur1[2]/32:
-                    if i/2==0:
-                        deb=""
-                        fin=ligne[2:]
-                    else:
-                        deb=ligne[:i]
-                        fin=ligne[i+2:]
-  
-
-
-                    ligne=deb+nom2[len(nom2)-2:]+fin
-            i+=2
-                            
-        fichier2.write(ligne)
-        cpt+=1
-                
-    fichier2.close()
-    fichier.close()
-    fichier=open("./map/"+nommap+".cp","r")
-    lignes=fichier.readlines()
-    
-    ma_map[curseur1[2]/32+curseur1[3]/32*20]=[]
-    ligney=curseur1[3]/32
-    lignex=curseur1[2]/32
-    
-    num=lignes[ligney][lignex*2]+lignes[ligney][lignex*2+1]
-    if num!="00":
-        placer("./spriteSurface/bloc"+num,curseur1[2],curseur1[3],canvas2)
-    else:
-        canvas2.create_rectangle(curseur1[2],curseur1[3],curseur1[2]+32,curseur1[3]+32,outline="",fill="#0dac07")
+    print nom2
+    if os.path.isfile(nom2):
         
-    num=lignes[ligney+20][lignex*2]+lignes[ligney+20][lignex*2+1]
-    placer("./spriteDecor/bloc"+num,curseur1[2],curseur1[3],canvas2)
-    num=lignes[ligney+40][lignex*2]+lignes[ligney+40][lignex*2+1]
-    placer("./spriteEnnemi/Ennemi"+num,curseur1[2],curseur1[3],canvas2)
-    num=lignes[ligney+60][lignex*2]+lignes[ligney+60][lignex*2+1]
-    placer("./spriteObjet/objet"+num,curseur1[2],curseur1[3],canvas2)
+        fichier=open("./map/"+nommap+".cp","r")
+        lignes=fichier.readlines()
+        fichier2=open("./map/"+nommap+".cp","w")
+        
+        for ligne in lignes:
+            i=0
+            while i<40:
+                if cpt==curseur1[3]/32+(mode*20):
+                    if i/2==curseur1[2]/32:
+                        if i/2==0:
+                            deb=""
+                            fin=ligne[2:]
+                        else:
+                            deb=ligne[:i]
+                            fin=ligne[i+2:]
+
+                        ligne=deb+nom2[len(nom2)-2:]+fin
+                i+=2        
+            fichier2.write(ligne)
+            cpt+=1
+                
+        fichier2.close()
+        fichier.close()
+        fichier=open("./map/"+nommap+".cp","r")
+        lignes=fichier.readlines()
+    
+        ma_map[curseur1[2]/32+curseur1[3]/32*20]=[]
+        ligney=curseur1[3]/32
+        lignex=curseur1[2]/32
+    
+        num=lignes[ligney][lignex*2]+lignes[ligney][lignex*2+1]
+        if num!="00":
+            placer("./spriteSurface/bloc"+num,curseur1[2],curseur1[3],canvas2)
+        else:
+            canvas2.create_rectangle(curseur1[2],curseur1[3],curseur1[2]+32,curseur1[3]+32,outline="",fill="#0dac07")
+        
+        num=lignes[ligney+20][lignex*2]+lignes[ligney+20][lignex*2+1]
+        placer("./spriteDecor/bloc"+num,curseur1[2],curseur1[3],canvas2)
+        num=lignes[ligney+40][lignex*2]+lignes[ligney+40][lignex*2+1]
+        placer("./spriteEnnemi/Ennemi"+num,curseur1[2],curseur1[3],canvas2)
+        num=lignes[ligney+60][lignex*2]+lignes[ligney+60][lignex*2+1]
+        placer("./spriteObjet/objet"+num,curseur1[2],curseur1[3],canvas2)
 
 def effacer():
     global ma_map
@@ -451,7 +461,7 @@ def initialisecanvas():
     posx=0
     posy=0
     canvas2 =Canvas(fenetre, width=640, height=640, background="#219a21")
-    canvas =Canvas(fenetre, width=640, height=300)
+    canvas =Canvas(fenetre, width=640, height=200)
     canvas.pack()
     canvas.focus_set()
     canvas2.pack()
