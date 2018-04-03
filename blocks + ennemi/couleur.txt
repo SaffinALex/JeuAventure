@@ -1,0 +1,28 @@
+1 #0a650a #vert
+2 #000000 #noir
+3  #bleu
+4 #808180 #gris
+5 #614919 #marron
+6 #ca0f0f #rouge 
+7 #d4a566 #beige
+8 #0dac07 #vertClaire
+9 #ffffff #Blanc
+A #6d5331 #MarronClaire
+B #383837 #NOIRCLAIRE(OMBRE)
+C #e3e570 #JAUNECLAIRE
+D #b2d5f6 #BleuClaire
+E #261f2f #BleuFoncée/Gris
+F #c66f04" #Oranfe
+G #8f6739 marron clair
+H #1e4c41 bleue foncé
+I #2b7261 bleue turquoise
+J #91331f rouge foncé
+K #bc4b2c rouge clair
+L #a58021 jaune foncé
+M #e3c94d jaune clair
+N #c0c0c0 gris clair
+O #9b8f8f gris foncé
+P #e9bf7a pale
+Q #d99648 orange pale
+R #170402 noir/rouge
+S #522318 rouge/noir
