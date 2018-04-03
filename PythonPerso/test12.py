@@ -474,16 +474,12 @@ def couleur(num,val_x,val_y):
         hexa="#e3e570" #JAUNECLAIRE
     elif num=="D": 
         hexa="#b2d5f6" #BleuClaire
-<<<<<<< HEAD
-    elif num=="S":
-        hexa="#174402" #rouge/noire
-        
-=======
+
     elif num=="E":
         hexa="#261f2f" #bleu/foncéé/gris
     elif num=="F":
         hexa="#c66f04" #orange   
->>>>>>> 169addbbe3f6a371385d5ed212ca721619767ca5
+
     if num!="0":
         fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill=hexa,outline="")
         return fig
