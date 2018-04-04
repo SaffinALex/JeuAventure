@@ -188,8 +188,9 @@ def changeMap():
     elif(mon_perso[2]<0):
         mapx-=1
         mon_perso[2]=640-32
+        print mapx,mapy
 
-    elif(mon_perso[3]<0):
+    elif(mon_perso[3]<40):
         mapy+=1
         mon_perso[3]=640-32
   
@@ -207,6 +208,7 @@ def changeMap():
             nommap="./map/map"+str(mapx)+"-"+str(mapy)
         else:
             nommap="./map/bug"
+            nommap2="bug"
             mon_perso[2]=224
             mon_perso[3]=224
         affiche_terrain(nommap)    
@@ -271,7 +273,7 @@ def bloquer_entite(val_x, val_y,entite):
                     entite[2]=val_x
                     break
                 
-    if(entite[3]>620 or entite[3]<-8 or entite[2]>620 or entite[2]<-8):
+    if(entite[3]>620 or entite[3]<48 or entite[2]>620 or entite[2]<-8):
         entite[3]=val_y
         entite[2]=val_x
         
@@ -621,6 +623,8 @@ def frame():
 def teleportation():
     global nommap2
     global nommap
+    global mapx
+    global mapy
 
     if mon_perso[6]=="Haut":
         posx=mon_perso[2]
@@ -658,6 +662,22 @@ def teleportation():
         mon_perso[3]=int(lignes[2])
         if num!="38":
             nommap2=lignes[0][:len(lignes[0])-1]
+            if nommap2[:3]=="map":
+                num=nommap2[3:]
+                if num[0]=="-":
+                    mapx=int(num[1])*-1
+                    if num[3]=="-":
+                        mapy=int(num[4])*-1
+                    else:
+                        mapy=int(num[3])
+                else:
+                    mapx=int(num[0])
+                    if num[2]=="-":
+                        mapy=int(num[3])*-1
+                    else:
+                        mapy=int(num[2])
+                nommap2="map"+str(mapx)+"-"+str(mapy)
+                print nommap2
             canvas.delete("all")
             mon_perso[10]=[0,0,0,0,[],""]
             efface_bloque()
@@ -870,22 +890,22 @@ def joueur_toucher():
             if(E[6]=="Bas"):
                 # E[1]=-8
                 # E[0]=0
-                E[3]-=8
+                E[3]-=4
                 E[5]=sprite+"B4"            
             elif(E[6]=="Haut"):
                 # E[1]=8
                 # E[0]=0
-                E[3]+=8
+                E[3]+=4
                 E[5]=sprite+"H4"
             elif(E[6]=="Droite"):
                 # E[0]=-8
                 # E[1]=0
-                E[2]-=8
+                E[2]-=4
                 E[5]=sprite+"D4"
             elif(E[6]=="Gauche"):
                 # E[0]=8
                 # E[1]=0
-                E[2]+=8
+                E[2]+=4
                 E[5]=sprite+"G4"
             create_HUD()
 

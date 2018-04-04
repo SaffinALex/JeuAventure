@@ -141,12 +141,16 @@ def vitesse(event):
                 del copie[0]
             pasouvert=False
             i=0
-            list = os.listdir('./tp')
+            mesfichier = os.listdir('./tp')
+            mesfichier.sort()
             fenetre2=Toplevel(fenetre)
-            liste = Listbox(fenetre2)
-            for fiche in list:
+            scrollbar = Scrollbar(fenetre2)
+            scrollbar.pack(side=RIGHT, fill=Y)
+            liste = Listbox(fenetre2,yscrollcommand=scrollbar.set)
+            for fiche in mesfichier:
                 liste.insert(i,fiche)
                 i+=1
+            scrollbar.config(command=liste.yview)
             liste.pack()
             copie.append(liste)
             bouton=Button(fenetre2, text="Valider", command=validerTP)
@@ -627,7 +631,7 @@ def validernom():
         commence=True
         pasouvert=True
         fenetre2.destroy()
- 
+
 def editer():
     global copie
     global mode
@@ -640,13 +644,17 @@ def editer():
         
     pasouvert=False
     mode=1
-    list = os.listdir('./map')
+    maliste = os.listdir('./map')
+    maliste.sort()
     fenetre2=Toplevel(fenetre)
-    liste = Listbox(fenetre2)
-    for fiche in list:
+    scrollbar = Scrollbar(fenetre2)
+    scrollbar.pack(side=RIGHT, fill=Y)
+    liste = Listbox(fenetre2,yscrollcommand=scrollbar.set)
+    for fiche in maliste:
         if fiche[len(fiche)-2:]!="cp":
             liste.insert(i,fiche)
             i+=1
+    scrollbar.config(command=liste.yview)
     liste.pack()
     copie.append(liste)
     bouton=Button(fenetre2, text="Valider", command=validernom2)
@@ -720,6 +728,5 @@ fenetre.bind("<Key>", vitesse)
 fenetre.bind("<KeyRelease>", stop)
 fenetre.bind("<Button-1>", souris)
 fenetre.bind("<B1-Motion>", souris)
-        
 fenetre.mainloop()
 
