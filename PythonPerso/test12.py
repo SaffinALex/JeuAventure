@@ -179,7 +179,7 @@ def changeMap():
     global nommap
     global nommap2
     
-    change=(mon_perso[2]+32>640 or mon_perso[2]<0 or mon_perso[3]+32>640 or mon_perso[3]<0)
+    change=(mon_perso[2]+32>640 or mon_perso[2]<0 or mon_perso[3]+32>640 or mon_perso[3]<60)
 
     if (mon_perso[2]+32>640):
         mapx+=1
@@ -188,15 +188,15 @@ def changeMap():
     elif(mon_perso[2]<0):
         mapx-=1
         mon_perso[2]=640-32
-        print mapx,mapy
 
-    elif(mon_perso[3]<40):
+    elif(mon_perso[3]<60):
         mapy+=1
-        mon_perso[3]=640-32
+        mon_perso[3]=600
+ 
   
     elif(mon_perso[3]+32>640):
         mapy-=1
-        mon_perso[3]=0
+        mon_perso[3]=60
         
     if change:
         Ennemi[:]=[]
@@ -554,17 +554,17 @@ def ramasse_objet():
             i+=1
     if ramasse:
         num=E[0]
-        if E[0]=="00" and inventaire[4]<FLECHE_MAX:
-            inventaire[4]+=1
-        elif E[0]=="01":
+        if E[0]=="00":
             inventaire[4]+=5
+        elif E[0]=="01":
+            inventaire[4]+=10
         elif E[0]=="02":
-            inventaire[5]+=5
+            inventaire[5]+=1
         elif E[0]=="03":
             inventaire[1]+=3
             if inventaire[1]>VIE_MAX:
                 inventaire[1]=VIE_MAX
-        elif E[0]=="04":
+        elif E[0]=="04"  and inventaire[0]<FLECHE_MAX :
             inventaire[0]+=1
         efface(E[3])
         del listeobjet[i]
@@ -677,7 +677,6 @@ def teleportation():
                     else:
                         mapy=int(num[2])
                 nommap2="map"+str(mapx)+"-"+str(mapy)
-                print nommap2
             canvas.delete("all")
             mon_perso[10]=[0,0,0,0,[],""]
             efface_bloque()
@@ -890,22 +889,22 @@ def joueur_toucher():
             if(E[6]=="Bas"):
                 # E[1]=-8
                 # E[0]=0
-                E[3]-=4
+                # E[3]-=8
                 E[5]=sprite+"B4"            
             elif(E[6]=="Haut"):
                 # E[1]=8
                 # E[0]=0
-                E[3]+=4
+                # E[3]+=8
                 E[5]=sprite+"H4"
             elif(E[6]=="Droite"):
                 # E[0]=-8
                 # E[1]=0
-                E[2]-=4
+                # E[2]-=8
                 E[5]=sprite+"D4"
             elif(E[6]=="Gauche"):
                 # E[0]=8
                 # E[1]=0
-                E[2]+=4
+                # E[2]+=8
                 E[5]=sprite+"G4"
             create_HUD()
 
@@ -1281,10 +1280,18 @@ def vitesse(event):
             
     elif message_active:
         if(touche=="a"):
-            message_active = False
-	    canvas.delete(rectangle)
-	    canvas.delete(idmessage)
-            frame()
+            print "1"
+            if len(boss)>0:
+                for i in boss:
+                    canvas.delete(i)
+                boss[:]=[]
+                message_active=False
+                frame()
+            else:
+                message_active = False
+	        canvas.delete(rectangle)
+	        canvas.delete(idmessage)
+                frame()
     elif achat:
         selection_achat(touche)
 
@@ -1395,7 +1402,10 @@ def stop(event):
 
 def evenement():
     global coffre1
+    global vague1
 
+    coffrepris=False
+    existe=False
     if(nommap2=="tuto3"):
         if(coffre1==False):
             if(not(len(Ennemi)>0)):                 
@@ -1403,8 +1413,146 @@ def evenement():
                 listeitem.append(["07",256,224,0,0,[]])
                 listechangement.append([256,224,nommap,0,"07",0])
                 placer("./spriteObjet/objet02",256,224,2)
+                
+    elif(nommap2=="temple6"):
+        if (not vague1):
+            for liste in listechangement:
+                if liste[4]=="07" and liste[2]==nommap:
+                    coffrepris=True
+                    break
+            for liste in listeitem:
+                if liste[0]=="63":
+                    existe=True
+            if (not coffrepris):
+                if not existe:
+                    listeitem.append(["63",160,320,0,0,[]])
+                    placer("./spriteDecor/bloc63",160,320,2)  
+                if(not(len(Ennemi)>0)):                 
+                    vague1=True
+                    listeitem.append(["07",256,224,0,0,[]])
+                    listechangement.append([256,224,nommap,0,"07",0])
+                    placer("./spriteObjet/objet02",256,224,2)
+        else:
+            Ennemi[:]=[]
+            for liste in bloque:
+                if liste[0]==160 and liste[1]==320:
+                    bloque.remove(liste)
+                    break
+    
+            for liste in listeitem:
+                if liste[0]=="63":
+                    efface(liste[5])
+                    break
 
+    elif nommap2=="boss1":
+        combat_boss()
 
+def combat_boss():
+    global boss1
+    global boss2
+    global boss3
+    global boss4
+    global cptboss
+    global message_active
+
+    existe=False
+
+    for j in timer:
+        canvas.delete(j)
+    timer[:]=[]
+    timer.append(canvas.create_rectangle(600, 100,650, 120,fill='white'))
+    timer.append(canvas.create_text(615, 110, text = str (cptboss/10)))    
+    if cptboss==2000:
+        boss.append(canvas.create_rectangle(100, 550, 550, 625, width=5, fill='white'))
+        boss.append(canvas.create_text(320, 590, text = "Le Rituel à déjà débuté ! Tu ne pourras pas m'arrêter ! "))
+        message_active=True
+
+    if cptboss==1500:
+        boss.append(canvas.create_rectangle(100, 550, 550, 625, width=5, fill='white'))
+        boss.append(canvas.create_text(320, 590, text = "Abandonne tu n'as aucune chance ! "))
+        message_active=True
+
+    if cptboss==500:
+        boss.append(canvas.create_rectangle(100, 550, 550, 625, width=5, fill='white'))
+        boss.append(canvas.create_text(320, 590, text = "Dans quelques secondes le rituel sera achevé, c'est terminé !"))
+        message_active=True
+        
+    if cptboss==0:
+        boss.append(canvas.create_rectangle(100, 550, 550, 625, width=5, fill='white'))
+        boss.append(canvas.create_text(320, 590, text = "Quelle déception...Ainsi se termine ton périple et celui du Monde..."))
+        inventaire[1]=0
+        boss1=False
+        boss2=False
+        boss3=False
+        boss4=False
+        message_active=True
+
+    if cptboss<0:
+        joueur_mort()
+
+    if boss4:
+        boss4=True
+    elif boss3 and len(Ennemi)==0:
+        for liste in bloque:
+            if liste[0]==320 and liste[1]==96:
+                bloque.remove(liste)
+                break
+        for liste in listeitem:
+            if liste[0]=="63":
+                efface(liste[5])
+                listeitem.remove(liste)
+                break
+    elif boss2 and len(Ennemi)==0:
+        ajout_ennemi("./spriteEnnemi/ennemi04/ennemi04",200,150)
+        ajout_ennemi("./spriteEnnemi/ennemi07/ennemi07",200,280)
+        ajout_ennemi("./spriteEnnemi/ennemi05/ennemi05",250,280)
+        ajout_ennemi("./spriteEnnemi/ennemi06/ennemi06",250,320)
+        ajout_ennemi("./spriteEnnemi/ennemi08/ennemi08",500,320)
+        ajout_ennemi("./spriteEnnemi/ennemi06/ennemi06",500,500)
+        ajout_ennemi("./spriteEnnemi/ennemi07/ennemi07",500,532)
+        boss3=True
+        for liste in bloque:
+            if liste[0]==320 and liste[1]==192:
+                bloque.remove(liste)
+                break
+        for liste in listeitem:
+            if liste[0]=="63":
+                efface(liste[5])
+                listeitem.remove(liste)
+                break
+        listeitem.append(["63",320,96,0,0,[]])
+        placer("./spriteDecor/bloc63",320,96,2)
+    elif boss1 and len(Ennemi)==0:
+        ajout_ennemi("./spriteEnnemi/ennemi07/ennemi07",200,280)
+        ajout_ennemi("./spriteEnnemi/ennemi05/ennemi05",250,280)
+        ajout_ennemi("./spriteEnnemi/ennemi06/ennemi06",250,320)
+        ajout_ennemi("./spriteEnnemi/ennemi08/ennemi08",500,320)
+        ajout_ennemi("./spriteEnnemi/ennemi07/ennemi07",500,280)
+        boss2=True
+        for liste in bloque:
+            if liste[0]==320 and liste[1]==384:
+                bloque.remove(liste)
+                break
+        for liste in listeitem:
+            if liste[0]=="63":
+                efface(liste[5])
+                listeitem.remove(liste)
+                break
+        listeitem.append(["63",320,192,0,0,[]])
+        placer("./spriteDecor/bloc63",320,192,2)
+            
+    elif not boss1 and len(Ennemi)==0:
+        ajout_ennemi("./spriteEnnemi/ennemi07/ennemi07",250,500)
+        ajout_ennemi("./spriteEnnemi/ennemi06/ennemi06",250,540)
+        ajout_ennemi("./spriteEnnemi/ennemi06/ennemi06",500,500)
+        ajout_ennemi("./spriteEnnemi/ennemi07/ennemi07",500,532)
+        listeitem.append(["63",320,384,0,0,[]])
+        placer("./spriteDecor/bloc63",320,384,2)
+            
+        boss1=True
+    
+    cptboss-=1
+    
 def bouger_sprite(sprite_pos,nom,x,y):
     efface(sprite_pos)
     val_x=x
@@ -1457,7 +1605,6 @@ def interaction(liste):
 
     numero_eff=[]
     existe=False
-    
     if liste[0]=="05" or liste[0]=="06" or liste[0]=="07" or liste[0]=="08":
         if liste[4]!=1:
             liste[3]=10
@@ -1471,9 +1618,9 @@ def interaction(liste):
                 listechangement.append([liste[1],liste[2],nommap,0,liste[0],1])
             placer("./spriteObjet/objet"+liste[0],liste[1],liste[2],0)
             if liste[0]=="05":
-                inventaire[4]+=1
+                inventaire[4]+=10
             elif liste[0]=="06":
-                inventaire[4]+=5
+                inventaire[4]+=100
             elif liste[0]=="07":
                 inventaire[5]+=1
             elif liste[0]=="08":
@@ -1516,14 +1663,13 @@ def interagir():
     posy=mon_perso[3]+16
 
     for liste in listeitem:
-        
         if mon_perso[6]=="Bas":
-            if mon_perso[3]+33>=liste[2] and mon_perso[3]+33<=liste[2]+32 and posx>liste[1] and posx<liste[1]+32:
+            if mon_perso[3]+38>=liste[2] and mon_perso[3]+38<=liste[2]+32 and posx>liste[1] and posx<liste[1]+32:
                 interaction(liste)
                 break
                 
         elif mon_perso[6]=="Haut":
-            if mon_perso[3]+16>=liste[2]and mon_perso[3]+16<=liste[2]+32 and posx>liste[1] and posx<liste[1]+32:
+            if mon_perso[3]+12>=liste[2]and mon_perso[3]+12<=liste[2]+32 and posx>liste[1] and posx<liste[1]+32:
                 interaction(liste)
                 break
 
@@ -1597,7 +1743,7 @@ def sauvegarder():
             
         fichier.write("]\n")
     fichier.write("@\n")
-    fichier.write("["+nommap+","+nommap2+","+str(mon_perso[2])+","+str(mon_perso[3])+","+str(mapx)+","+str(mapy)+","+str(interrupteur)+",]"+"\n")
+    fichier.write("["+nommap+","+nommap2+","+str(mon_perso[2])+","+str(mon_perso[3])+","+str(mapx)+","+str(mapy)+","+str(interrupteur)+","+str(VIE_MAX)+","+str(FLECHE_MAX)+",]"+"\n")
     fichier.write("@\n")
     fichier.write("[")
     
@@ -1629,6 +1775,8 @@ def charger():
     global mapx
     global mapy
     global interrupteur
+    global FLECHE_MAX
+    global VIE_MAX
 
     listechangement[:]=[]
     inventaire[:]=[]
@@ -1689,6 +1837,10 @@ def charger():
                             mapy=int(mot)
                         elif cpt==6:
                             interrupteur=int(mot)
+                        elif cpt==7:
+                            VIE_MAX=int(mot)
+                        elif cpt==8:
+                            FLECHE_MAX=int(mot)
                         mot=""
                         est_changement=True
                         cpt+=1
@@ -1800,7 +1952,6 @@ def charger():
         listeitem.remove(eff)
         
     copie=[]
-    print Ennemi2
     for j in range(0,len(Ennemi2)):
         copie.append(Ennemi[j])
         copie[j][2]=Ennemi2[j][0]
@@ -1858,8 +2009,8 @@ canvas = Canvas(fenetre, width=640, height=640, background="black")
 mapx=1
 mapy=1
 
-nommap="./map/tuto1"
-nommap2="tuto1"
+nommap="./map/temple1"
+nommap2="temple1"
 
 inventaire=[30,10,True,True,1500,0]#[fleche,vie,Epee,Arc,Gold,clef]
 mon_perso=[0,0,320,400,[],"./spritePerso/PersoB1","Bas",0,inventaire,[0,False,""],[0,0,0,0,[],"Bas"],0] #[vitessex,vitessey,posx,posy,idsprite,sprite,orientation,d,[Inventaire],[Epee],[Fleche],compteurDegat]
@@ -1885,6 +2036,15 @@ message_active=False
 coffre1=False
 attendre = False
 achat=False
+vague1=False
+
+boss1=False
+boss2=False
+boss3=False
+boss4=False
+boss=[]
+cptboss=2000
+timer=[]
 
 listeitem=[]
 
