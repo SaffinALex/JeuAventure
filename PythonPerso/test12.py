@@ -503,7 +503,9 @@ def couleur(num,val_x,val_y):
     elif num=="E":
         hexa="#261f2f" #bleu/foncéé/gris
     elif num=="F":
-        hexa="#c66f04" #orange   
+        hexa="#c66f04" #orange
+    elif num=="G":
+        hexa="#5a2a10" #pourpre
     if num!="0":
         fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill=hexa,outline="")
         return fig
@@ -1173,28 +1175,52 @@ def orientation(entite) :
         if numero>3 : 
     	    entite[5]=sprite+lettre+str(1)
 
-
+def aleatoire(chiffre,mon_ennemi):
+    diffx=mon_perso[2]-mon_ennemi[2]
+    diffy=mon_perso[3]-mon_ennemi[3]
+    if (not (-160<diffx<160 and -160<diffy<160)):
+        chiffre=randint(0,4)
+    
+    if(chiffre==0):
+        mon_ennemi[0]+=mon_ennemi[8]
+        mon_ennemi[6]="Droite"
+    elif(chiffre==1):
+        mon_ennemi[0]-=mon_ennemi[8]
+        mon_ennemi[6]="Gauche"
+    elif(chiffre==2):
+        mon_ennemi[1]+=mon_ennemi[8]
+        mon_ennemi[6]="Bas"
+    elif(chiffre==3):
+        mon_ennemi[1]-=mon_ennemi[8]
+        mon_ennemi[6]="Haut"
+    mon_ennemi[7]=10
     	
 def mouvement_ennemi(mon_ennemi):
 
     if(mon_ennemi[7]<=0):
-        chiffre=randint(0,4)
         mon_ennemi[0]=0
         mon_ennemi[1]=0
-        
-        if(chiffre==0):
-            mon_ennemi[0]+=mon_ennemi[8]
-            mon_ennemi[6]="Droite"
-        elif(chiffre==1):
-            mon_ennemi[0]-=mon_ennemi[8]
-            mon_ennemi[6]="Gauche"
-        elif(chiffre==2):
-            mon_ennemi[1]+=mon_ennemi[8]
-            mon_ennemi[6]="Bas"
-        elif(chiffre==3):
-            mon_ennemi[1]-=mon_ennemi[8]
-            mon_ennemi[6]="Haut"
-        mon_ennemi[7]=10
+        if mon_perso[2]<mon_ennemi[2]:
+            chiffre=randint(0,2)
+            if mon_perso[3]>mon_ennemi[3]:
+                if chiffre==1:
+                    aleatoire(2,mon_ennemi)
+            else:
+                if chiffre==1:
+                    aleatoire(3,mon_ennemi)
+            if chiffre==2:
+                aleatoire(1,mon_ennemi)
+
+        else:
+            chiffre=randint(0,2)
+            if mon_perso[3]>mon_ennemi[3]:
+                if chiffre==1:
+                    aleatoire(2,mon_ennemi)
+            else:
+                if chiffre==1:
+                    aleatoire(3,mon_ennemi)
+            if chiffre==2:
+                aleatoire(0,mon_ennemi)
 
     mon_ennemi[2]+=mon_ennemi[0]
     mon_ennemi[3]+=mon_ennemi[1]
@@ -2009,8 +2035,8 @@ canvas = Canvas(fenetre, width=640, height=640, background="black")
 mapx=1
 mapy=1
 
-nommap="./map/temple1"
-nommap2="temple1"
+nommap="./map/map0-0"
+nommap2="map0-0"
 
 inventaire=[30,10,True,True,1500,0]#[fleche,vie,Epee,Arc,Gold,clef]
 mon_perso=[0,0,320,400,[],"./spritePerso/PersoB1","Bas",0,inventaire,[0,False,""],[0,0,0,0,[],"Bas"],0] #[vitessex,vitessey,posx,posy,idsprite,sprite,orientation,d,[Inventaire],[Epee],[Fleche],compteurDegat]

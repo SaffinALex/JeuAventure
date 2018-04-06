@@ -42,7 +42,9 @@ def placer(nom,x,y,canvas):
             elif ligne[i]=="E":
                fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#261f2f",outline="") #BleuFoncée/Gris
             elif ligne[i]=="F":
-                fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#c66f04",outline="") #orange 
+                fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#c66f04",outline="") #orange
+            elif ligne[i]=="G":
+                fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#5a2a10",outline="") #orange/POurpre
             if ligne[i]!="0":    
                 ma_map[x/32+y/32*20].append(fig)
                                         
