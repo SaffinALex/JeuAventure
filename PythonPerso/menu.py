@@ -24,7 +24,7 @@ def placer(nom,x,y,canvas):
             elif ligne[i]=="5":
                  fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#614919",outline="") #marron
             elif ligne[i]=="6":
-                 fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="red",outline="") #rouge 
+                 fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#b81e1e",outline="") #rouge 
             elif ligne[i]=="7":
                  fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#d4a566",outline="") #beige
             elif ligne[i]=="8":

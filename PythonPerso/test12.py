@@ -485,7 +485,7 @@ def couleur(num,val_x,val_y):
     elif num=="5":
         hexa="#614919" #marron
     elif num=="6":
-        hexa="red" #rouge 
+        hexa="#b81e1e" #rouge 
     elif num=="7":
         hexa="#d4a566" #beige
     elif num=="8":
