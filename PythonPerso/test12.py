@@ -2470,7 +2470,7 @@ nommap="./map/boss1"
 nommap2="boss1"
 
 inventaire=[40,30,True,True,1500,0]#[fleche,vie,Epee,Arc,Gold,clef]
-mon_perso=[0,0,352,300,[],"./spritePerso/PersoB1","Bas",0,inventaire,[0,False,""],[0,0,0,0,[],"Bas"],0] #[vitessex,vitessey,posx,posy,idsprite,sprite,orientation,d,[Inventaire],[Epee],[Fleche],compteurDegat]
+mon_perso=[0,0,352,500,[],"./spritePerso/PersoB1","Bas",0,inventaire,[0,False,""],[0,0,0,0,[],"Bas"],0] #[vitessex,vitessey,posx,posy,idsprite,sprite,orientation,d,[Inventaire],[Epee],[Fleche],compteurDegat]
 
 Ennemi=[]
 
