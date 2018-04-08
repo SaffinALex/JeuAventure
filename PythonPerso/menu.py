@@ -24,7 +24,7 @@ def placer(nom,x,y,canvas):
             elif ligne[i]=="5":
                  fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#614919",outline="") #marron
             elif ligne[i]=="6":
-                 fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="red",outline="") #rouge 
+                 fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#b81e1e",outline="") #rouge 
             elif ligne[i]=="7":
                  fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#d4a566",outline="") #beige
             elif ligne[i]=="8":
@@ -42,7 +42,9 @@ def placer(nom,x,y,canvas):
             elif ligne[i]=="E":
                fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#261f2f",outline="") #BleuFoncée/Gris
             elif ligne[i]=="F":
-                fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#c66f04",outline="") #orange 
+                fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#c66f04",outline="") #orange
+            elif ligne[i]=="G":
+                fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill="#5a2a10",outline="") #orange/POurpre
             if ligne[i]!="0":    
                 ma_map[x/32+y/32*20].append(fig)
                                         
@@ -141,12 +143,16 @@ def vitesse(event):
                 del copie[0]
             pasouvert=False
             i=0
-            list = os.listdir('./tp')
+            mesfichier = os.listdir('./tp')
+            mesfichier.sort()
             fenetre2=Toplevel(fenetre)
-            liste = Listbox(fenetre2)
-            for fiche in list:
+            scrollbar = Scrollbar(fenetre2)
+            scrollbar.pack(side=RIGHT, fill=Y)
+            liste = Listbox(fenetre2,yscrollcommand=scrollbar.set)
+            for fiche in mesfichier:
                 liste.insert(i,fiche)
                 i+=1
+            scrollbar.config(command=liste.yview)
             liste.pack()
             copie.append(liste)
             bouton=Button(fenetre2, text="Valider", command=validerTP)
@@ -326,55 +332,65 @@ def placer_map():
 
     cpt=0
     i=0
+    if mode==0:
+        nom="./spriteSurface/bloc"
+    elif mode==1:
+        nom="./spriteDecor/bloc"
+    elif mode==2:
+        nom="./spriteEnnemi/Ennemi"
+    elif mode==3:
+        nom="./spriteObjet/objet"
+
+        
     if selection<10:
         nom2=nom+"0"+str(selection)
     else:
         nom2=nom+str(selection)
-    fichier=open("./map/"+nommap+".cp","r")
-    lignes=fichier.readlines()
-    fichier2=open("./map/"+nommap+".cp","w")
-            
-    for ligne in lignes:
-        i=0
-        while i<40:
-            if cpt==curseur1[3]/32+(mode*20):
-                if i/2==curseur1[2]/32:
-                    if i/2==0:
-                        deb=""
-                        fin=ligne[2:]
-                    else:
-                        deb=ligne[:i]
-                        fin=ligne[i+2:]
-  
-
-
-                    ligne=deb+nom2[len(nom2)-2:]+fin
-            i+=2
-                            
-        fichier2.write(ligne)
-        cpt+=1
-                
-    fichier2.close()
-    fichier.close()
-    fichier=open("./map/"+nommap+".cp","r")
-    lignes=fichier.readlines()
-    
-    ma_map[curseur1[2]/32+curseur1[3]/32*20]=[]
-    ligney=curseur1[3]/32
-    lignex=curseur1[2]/32
-    
-    num=lignes[ligney][lignex*2]+lignes[ligney][lignex*2+1]
-    if num!="00":
-        placer("./spriteSurface/bloc"+num,curseur1[2],curseur1[3],canvas2)
-    else:
-        canvas2.create_rectangle(curseur1[2],curseur1[3],curseur1[2]+32,curseur1[3]+32,outline="",fill="#0dac07")
+    print nom2
+    if os.path.isfile(nom2):
         
-    num=lignes[ligney+20][lignex*2]+lignes[ligney+20][lignex*2+1]
-    placer("./spriteDecor/bloc"+num,curseur1[2],curseur1[3],canvas2)
-    num=lignes[ligney+40][lignex*2]+lignes[ligney+40][lignex*2+1]
-    placer("./spriteEnnemi/Ennemi"+num,curseur1[2],curseur1[3],canvas2)
-    num=lignes[ligney+60][lignex*2]+lignes[ligney+60][lignex*2+1]
-    placer("./spriteObjet/objet"+num,curseur1[2],curseur1[3],canvas2)
+        fichier=open("./map/"+nommap+".cp","r")
+        lignes=fichier.readlines()
+        fichier2=open("./map/"+nommap+".cp","w")
+        
+        for ligne in lignes:
+            i=0
+            while i<40:
+                if cpt==curseur1[3]/32+(mode*20):
+                    if i/2==curseur1[2]/32:
+                        if i/2==0:
+                            deb=""
+                            fin=ligne[2:]
+                        else:
+                            deb=ligne[:i]
+                            fin=ligne[i+2:]
+
+                        ligne=deb+nom2[len(nom2)-2:]+fin
+                i+=2        
+            fichier2.write(ligne)
+            cpt+=1
+                
+        fichier2.close()
+        fichier.close()
+        fichier=open("./map/"+nommap+".cp","r")
+        lignes=fichier.readlines()
+    
+        ma_map[curseur1[2]/32+curseur1[3]/32*20]=[]
+        ligney=curseur1[3]/32
+        lignex=curseur1[2]/32
+    
+        num=lignes[ligney][lignex*2]+lignes[ligney][lignex*2+1]
+        if num!="00":
+            placer("./spriteSurface/bloc"+num,curseur1[2],curseur1[3],canvas2)
+        else:
+            canvas2.create_rectangle(curseur1[2],curseur1[3],curseur1[2]+32,curseur1[3]+32,outline="",fill="#0dac07")
+        
+        num=lignes[ligney+20][lignex*2]+lignes[ligney+20][lignex*2+1]
+        placer("./spriteDecor/bloc"+num,curseur1[2],curseur1[3],canvas2)
+        num=lignes[ligney+40][lignex*2]+lignes[ligney+40][lignex*2+1]
+        placer("./spriteEnnemi/Ennemi"+num,curseur1[2],curseur1[3],canvas2)
+        num=lignes[ligney+60][lignex*2]+lignes[ligney+60][lignex*2+1]
+        placer("./spriteObjet/objet"+num,curseur1[2],curseur1[3],canvas2)
 
 def effacer():
     global ma_map
@@ -451,7 +467,7 @@ def initialisecanvas():
     posx=0
     posy=0
     canvas2 =Canvas(fenetre, width=640, height=640, background="#219a21")
-    canvas =Canvas(fenetre, width=640, height=300)
+    canvas =Canvas(fenetre, width=640, height=200)
     canvas.pack()
     canvas.focus_set()
     canvas2.pack()
@@ -617,7 +633,7 @@ def validernom():
         commence=True
         pasouvert=True
         fenetre2.destroy()
- 
+
 def editer():
     global copie
     global mode
@@ -630,13 +646,17 @@ def editer():
         
     pasouvert=False
     mode=1
-    list = os.listdir('./map')
+    maliste = os.listdir('./map')
+    maliste.sort()
     fenetre2=Toplevel(fenetre)
-    liste = Listbox(fenetre2)
-    for fiche in list:
+    scrollbar = Scrollbar(fenetre2)
+    scrollbar.pack(side=RIGHT, fill=Y)
+    liste = Listbox(fenetre2,yscrollcommand=scrollbar.set)
+    for fiche in maliste:
         if fiche[len(fiche)-2:]!="cp":
             liste.insert(i,fiche)
             i+=1
+    scrollbar.config(command=liste.yview)
     liste.pack()
     copie.append(liste)
     bouton=Button(fenetre2, text="Valider", command=validernom2)
@@ -710,6 +730,5 @@ fenetre.bind("<Key>", vitesse)
 fenetre.bind("<KeyRelease>", stop)
 fenetre.bind("<Button-1>", souris)
 fenetre.bind("<B1-Motion>", souris)
-        
 fenetre.mainloop()
 
