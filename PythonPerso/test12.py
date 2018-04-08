@@ -553,14 +553,10 @@ def couleur(num,val_x,val_y):
     elif num=="E":
         hexa="#261f2f" #bleu/foncéé/gris
     elif num=="F":
-<<<<<<< HEAD
         hexa="#c66f04" #orange   
-
-=======
         hexa="#c66f04" #orange
     elif num=="G":
         hexa="#5a2a10" #pourpre
->>>>>>> 5e455d7f93049b332546af60bbb796ea04f074f0
     if num!="0":
         fig=canvas.create_rectangle(val_x,val_y,val_x+2,val_y+2,fill=hexa,outline="")
         return fig
@@ -2537,8 +2533,4 @@ canvas.bind("<KeyRelease>", stop)
         
 fenetre.mainloop()
 
-<<<<<<< HEAD
-
 # REGLER MONSTRE, sauvegarde(booleen evenement+Herbe)+ REGLER BLOCAGE(pas activé interrupteur si dessus)+ COMMENCER FICHIER NOMBRE MAGIQUE+ MAPPIN MAISON+ VIDE+HITBOX.
-=======
->>>>>>> 5e455d7f93049b332546af60bbb796ea04f074f0
