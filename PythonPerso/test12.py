@@ -554,7 +554,6 @@ def couleur(num,val_x,val_y):
         hexa="#261f2f" #bleu/foncéé/gris
     elif num=="F":
         hexa="#c66f04" #orange   
-        hexa="#c66f04" #orange
     elif num=="G":
         hexa="#5a2a10" #pourpre
     if num!="0":
@@ -2467,7 +2466,7 @@ canvas = Canvas(fenetre, width=640, height=640, background="black")
 mapx=1
 mapy=1
 
-nommap="./map/bos1"
+nommap="./map/boss1"
 nommap2="boss1"
 
 inventaire=[40,30,True,True,1500,0]#[fleche,vie,Epee,Arc,Gold,clef]
