@@ -1,7 +1,14 @@
 @
-[./map/marchand1,marchand1,288,344,0,1,0,20,120,]
+[./map/detruit1,detruit1,320,276,1,1,0,20,40,]
 @
-[120,20,True,True,805,0,]
+[2,2,True,True,1580,0,]
+@
+[384,288,2,./spriteEnnemi/ennemi03/ennemi03G3,2,2,]
+[384,288,2,./spriteEnnemi/ennemi03/ennemi03H1,2,2,]
+[384,288,2,./spriteEnnemi/ennemi03/ennemi03H1,2,2,]
+[312,158,2,./spriteEnnemi/ennemi02/ennemi02B1,2,1,]
+[384,288,2,./spriteEnnemi/ennemi03/ennemi03H2,2,2,]
 @
 @
+[False,False,False,False,False,]
 @
