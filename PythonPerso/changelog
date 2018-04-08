@@ -1,7 +1,7 @@
 
 
 
-V 0.5.2:
+AJout:
 
 - Il n'est plus possible d'activer un interrupteur si on se trouve sur une case descendu.
 
@@ -11,4 +11,6 @@ V 0.5.2:
 
 - Création de nouveau sprite pour les maisons.
 
+- Grotte+map diverse
 
+- Les monstres se rapproche di joueur si il s'avance trop prés d'eux.

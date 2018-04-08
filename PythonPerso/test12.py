@@ -126,7 +126,7 @@ def affiche_surf(nom):
 def ajout_ennemi(nom,x,y):
     fichier=open(nom+"-carac","r")
     lignes=fichier.readlines()
-    liste=[0,0,x,y,[],nom+"B1","Bas",0,int(lignes[0][8]),int(lignes[1][4]),int(lignes[2][8]),0] #[vitessex,vitessey,posx,posy,[sprite],fichier,orientation,cpt,vitesse,vie,dommage]
+    liste=[0,0,x,y,[],nom+"B1","Bas",0,int(lignes[0][8]),int(lignes[1][4:]),int(lignes[2][8]),0] #[vitessex,vitessey,posx,posy,[sprite],fichier,orientation,cpt,vitesse,vie,dommage]
     Ennemi.append(liste)
     mouvement_ennemi(Ennemi[len(Ennemi)-1])
     fichier.close()
@@ -221,33 +221,60 @@ def efface_bloque():
 
 def bloquer_entite(val_x, val_y,entite):
     est_bloquer=False
+    bloque_x=False
+    bloque_y=False
+    for liste in bloque:
+        if entite[0]!=0:
+            if(entite[2]>=liste[0] and entite[2]<=liste[0]+31):
+                if( val_y+16>=liste[1] and  val_y+16<=liste[1]+31): #Coin Haut gauche
+                    est_bloquer=True
+                    bloque_x=True
+                    break
+               
+                elif( val_y+31>=liste[1] and  val_y+31<=liste[1]+31): #Coin Bas gauche
+                    bloque_x=True
+                    est_bloquer=True
+                    break
+                
+            if( entite[2]+31>=liste[0] and  entite[2]+32<=liste[0]+31):
+                if( val_y+31>=liste[1] and val_y+31<=liste[1]+31): #Coin Bas Droite
+                    est_bloquer=True
+                    bloque_x=True
+                    break
+                
+                elif( val_y+16>=liste[1] and  val_y+16<=liste[1]+31): #Coin Haut Droite
+                    est_bloquer=True
+                    bloque_x=True
+                    break
 
     for liste in bloque:
-        if(entite[2]>=liste[0] and entite[2]<=liste[0]+31):
-            if( entite[3]+16>=liste[1] and  entite[3]+16<=liste[1]+31): #Coin Haut gauche
-                entite[3]=val_y
-                entite[2]=val_x
-                est_bloquer=True
-                break
+        if entite[1]!=0:
+            if(val_x>=liste[0] and val_x<=liste[0]+31):
+                if( entite[3]+16>=liste[1] and  entite[3]+16<=liste[1]+31): #Coin Haut gauche
+                    est_bloquer=True
+                    bloque_y=True
+                    break
                
-            elif( entite[3]+31>=liste[1] and  entite[3]+31<=liste[1]+31): #Coin Bas gauche
-                entite[3]=val_y
-                entite[2]=val_x
-                est_bloquer=True
-                break
+                elif( entite[3]+31>=liste[1] and  entite[3]+31<=liste[1]+31): #Coin Bas gauche
+                    bloque_y=True
+                    est_bloquer=True
+                    break
                 
-        if( entite[2]+31>=liste[0] and  entite[2]+32<=liste[0]+31):
-            if( entite[3]+31>=liste[1] and entite[3]+31<=liste[1]+31): #Coin Bas Droite
-                entite[3]=val_y
-                entite[2]=val_x
-                est_bloquer=True
-                break
-            
-            elif( entite[3]+16>=liste[1] and  entite[3]+16<=liste[1]+31): #Coin Haut Droite
-                entite[3]=val_y
-                entite[2]=val_x
-                est_bloquer=True
-                break
+            if( val_x+31>=liste[0] and  val_x+32<=liste[0]+31):
+                if( entite[3]+31>=liste[1] and entite[3]+31<=liste[1]+31): #Coin Bas Droite
+                    est_bloquer=True
+                    bloque_y=True
+                    break
+                
+                elif( entite[3]+16>=liste[1] and  entite[3]+16<=liste[1]+31): #Coin Haut Droite
+                    est_bloquer=True
+                    bloque_y=True
+                    break
+
+    if bloque_x:
+        entite[2]=val_x
+    if bloque_y:
+        entite[3]=val_y
             
     if not est_bloquer and entite!=mon_perso:
         for E in Ennemi:
@@ -272,7 +299,29 @@ def bloquer_entite(val_x, val_y,entite):
                     entite[3]=val_y
                     entite[2]=val_x
                     break
+    for liste in bloque:
+        if(entite[2]>=liste[0] and entite[2]<=liste[0]+31):
+            if( entite[3]+16>=liste[1] and  entite[3]+16<=liste[1]+31): #Coin Haut gauche
+                est_bloquer=True
+                bloque_x=True
+                break
+               
+            elif( entite[3]+31>=liste[1] and  entite[3]+31<=liste[1]+31): #Coin Bas gauche
+                bloque_x=True
+                est_bloquer=True
+                break
                 
+        if( entite[2]+31>=liste[0] and  entite[2]+32<=liste[0]+31):
+            if( entite[3]+31>=liste[1] and entite[3]+31<=liste[1]+31): #Coin Bas Droite
+                est_bloquer=True
+                bloque_x=True
+                break
+            
+            elif( entite[3]+16>=liste[1] and  entite[3]+16<=liste[1]+31): #Coin Haut Droite
+                est_bloquer=True
+                bloque_x=True
+                break
+            
     if(entite[3]>620 or entite[3]<48 or entite[2]>620 or entite[2]<-8):
         entite[3]=val_y
         entite[2]=val_x
@@ -575,8 +624,6 @@ def ramasse_objet():
 def frame():
     efface=[]
     if(not attendre and not achat and not message_active):
-
-        evenement()
         changeMap()
         joueur_toucher()
 
@@ -603,12 +650,12 @@ def frame():
             mon_perso[10][3]+=mon_perso[10][1]
             placer_fleche("./Attaque/arc/fleche"+mon_perso[10][5][0],mon_perso[10][2],mon_perso[10][3],mon_perso[10][4])
             bloquer_fleche(mon_perso[10])
-                
-        if(not mon_perso[9][1]):
-            mouvement_perso()
             
         for E in Ennemi:
             mouvement_ennemi(E)
+
+        if(not mon_perso[9][1]):
+            mouvement_perso()
         
         if(len(Ennemi)>0):             
             if mon_perso[9][1]:
@@ -619,7 +666,7 @@ def frame():
         for liste in listeitem:
             if(liste[3]>0):
                 compt(liste)
-        
+        evenement()
         canvas.after(30,frame)
         
 def teleportation():
@@ -826,27 +873,40 @@ def mort(effaces):
         del effaces[len(effaces)-1]
     
 def recule(E):
+    posx=E[2]
+    posy=E[3]
     if E[3]>mon_perso[3] and E[2]>mon_perso[2]:
-        E[0]=4
-        E[1]=4
+        E[1]=6
+        mouvement_ennemi(E)
+        if E[3]==posy:
+            E[0]=-6
+            E[1]=0
     elif E[3]<=mon_perso[3] and E[2]>mon_perso[2]:
-        E[0]=4
-        E[1]=-4
+        E[1]=-6
+        mouvement_ennemi(E)
+        if E[3]==posy:
+            E[0]=6
+            E[1]=0
     elif E[3]<=mon_perso[3] and E[2]<=mon_perso[2]:
-        E[0]=-4
-        E[1]=-4
+        E[1]=-6
+        mouvement_ennemi(E)
+        if E[3]==posy:
+            E[0]=-6
+            E[1]=0
     elif E[3]>mon_perso[3] and E[2]<=mon_perso[2]:
-        E[0]=-4
-        E[1]=4
+        E[1]=6
+        mouvement_ennemi(E)
+        if E[3]==posy:
+            E[0]=6
+            E[1]=0
 def joueur_toucher():
     touche=False
-
-    if mon_perso[6]=="Haut":
+    if mon_perso[5]=="Haut":
         posx=mon_perso[2]
         posy=mon_perso[3]+16
     else:
         posx=mon_perso[2]
-        posy=mon_perso[3]
+        posy=mon_perso[3]+16
         
     for E in Ennemi:
         if(E[6]=="Haut"):
@@ -855,31 +915,35 @@ def joueur_toucher():
         else:
             posx2=E[2]
             posy2=E[3]
-            
-        if posx2>=posx and posx2<posx+31 and posy2+31>=posy and posy2+16<posy+31:
-            touche=True
-            if mon_perso[11]<=0:
-                inventaire[1]-=E[10]
-            recule(E)
-            break
-        elif posx2+31>=posx and posx2+31<posx+31 and posy2+16>=posy and posy2+16<posy+31:
-            touche=True
-            if mon_perso[11]<=0:
-                inventaire[1]-=E[10]
-            recule(E)
-            break       
-        elif posx2>=posx and posx2<posx+31 and posy2>=posy and posy2<posy+31:
-            touche=True
-            if mon_perso[11]<=0:
-                inventaire[1]-=E[10]
-            recule(E)
-            break   
-        elif posx2+31>=posx and posx2+31<posx+31 and posy2>=posy and posy2<posy+31:
-            touche=True
-            if mon_perso[11]<=0:
-                inventaire[1]-=E[10]
-            recule(E)
-            break       
+        if E[11]==0:
+            if posx2>=posx and posx2<posx+32 and posy2>=posy and posy2<posy+16:
+                touche=True
+                if mon_perso[11]<=0:
+                    inventaire[1]-=E[10]
+                ennemi=E
+                recule(E)
+                break
+            elif posx2+32>=posx and posx2+32<posx+32 and posy2>=posy and posy2<posy+16:
+                touche=True
+                if mon_perso[11]<=0:
+                    inventaire[1]-=E[10]
+                ennemi=E
+                recule(E)
+                break       
+            elif posx2>=posx and posx2<posx+32 and posy2+32>=posy and posy2+32<posy+16:
+                touche=True
+                if mon_perso[11]<=0:
+                    inventaire[1]-=E[10]
+                ennemi=E
+                recule(E)
+                break   
+            elif posx2+32>=posx and posx2+32<posx+32 and posy2+32>=posy and posy2+32<posy+16:
+                touche=True
+                if mon_perso[11]<=0:
+                    inventaire[1]-=E[10]
+                ennemi=E
+                recule(E)
+                break
                 
     if(touche):
             sprite=""
@@ -889,27 +953,66 @@ def joueur_toucher():
                 
             E[11]=5
             if(E[6]=="Bas"):
-                # E[1]=-8
-                # E[0]=0
-                # E[3]-=8
                 E[5]=sprite+"B4"            
             elif(E[6]=="Haut"):
-                # E[1]=8
-                # E[0]=0
-                # E[3]+=8
                 E[5]=sprite+"H4"
             elif(E[6]=="Droite"):
-                # E[0]=-8
-                # E[1]=0
-                # E[2]-=8
                 E[5]=sprite+"D4"
             elif(E[6]=="Gauche"):
-                # E[0]=8
-                # E[1]=0
-                # E[2]+=8
                 E[5]=sprite+"G4"
+            recule_perso(ennemi)
             create_HUD()
-
+            
+def recule_perso(E):
+    posx=mon_perso[2]
+    posy=mon_perso[3]
+    if mon_perso[3]>E[3] and mon_perso[2]>E[2]:
+        mon_perso[1]=+8
+        mouvement_perso()
+        mon_perso[1]=0
+        if mon_perso[3]==posy:
+            mon_perso[0]=-8
+            mouvement_perso()
+            mon_perso[0]=0
+    elif mon_perso[3]<=E[3] and mon_perso[2]>E[2]:
+        mon_perso[1]=-8
+        mouvement_perso()
+        mon_perso[1]=0
+        if mon_perso[3]==posy:
+            mon_perso[0]=8
+            mouvement_perso()
+            mon_perso[0]=0
+    elif mon_perso[3]<=E[3] and mon_perso[2]<=E[2]:
+        mon_perso[1]=-8
+        mouvement_perso()
+        mon_perso[1]=0
+        if mon_perso[3]==posy:
+            mon_perso[0]=-8
+            mouvement_perso()
+            mon_perso[0]=0
+    elif mon_perso[3]>E[3] and mon_perso[2]<=E[2]:
+        mon_perso[1]=8
+        mouvement_perso()
+        mon_perso[1]=0
+        if mon_perso[3]==posy:
+            mon_perso[0]=8
+            mouvement_perso()
+            mon_perso[0]=0
+            
+def mini_boss2(entite,fleche,liste):
+    if entite[6]=="Bas" and fleche[5]=="Bas":
+        entite[9]-=1
+        liste.append(entite)
+    elif entite[6]=="Droite" and fleche[5]=="Droite":
+        entite[9]-=1
+        liste.append(entite)
+    elif entite[6]=="Gauche" and fleche[5]=="Gauche":
+        entite[9]-=1
+        liste.append(entite)
+    elif entite[6]=="Haut" and fleche[5]=="Haut":
+        entite[9]-=1
+        liste.append(entite)
+        
 def toucher_fleche(fleche):
     effaces=[]
     if fleche[0]!=0 or fleche[1]!=0:
@@ -917,13 +1020,33 @@ def toucher_fleche(fleche):
         posy=fleche[3]
         for E in Ennemi:
             if E[2]>=posx and E[2]<posx+31 and E[3]+31>=posy and E[3]+31<posy+31:
-                effaces.append(E)
+                if E[5][:32]=="./spriteEnnemi/ennemi10/ennemi10":
+                    mini_boss2(E,fleche,effaces)
+                if E[5][:32]=="./spriteEnnemi/ennemi09/ennemi09":
+                    toucher_cristal(E)
+                else:
+                    effaces.append(E)
             elif E[2]+31>=posx and E[2]+31<posx+31 and E[3]+31>=posy and E[3]+31<posy+31:
-                effaces.append(E)               
+                if E[5][:32]=="./spriteEnnemi/ennemi10/ennemi10":
+                    mini_boss2(E,fleche,effaces)
+                if E[5][:32]=="./spriteEnnemi/ennemi09/ennemi09":
+                    toucher_cristal(E)
+                else:
+                    effaces.append(E)
             elif E[2]>=posx and E[2]<posx+31 and E[3]>=posy and E[3]<posy+31:
-                effaces.append(E)            
+                if E[5][:32]=="./spriteEnnemi/ennemi10/ennemi10":
+                    mini_boss2(E,fleche,effaces)
+                if E[5][:32]=="./spriteEnnemi/ennemi09/ennemi09":
+                    toucher_cristal(E)
+                else:
+                    effaces.append(E)
             elif E[2]+31>=posx and E[2]+31<posx+31 and E[3]>=posy and E[3]<posy+31:
-                effaces.append(E)
+                if E[5][:32]=="./spriteEnnemi/ennemi10/ennemi10":
+                    mini_boss2(E,fleche,effaces)
+                if E[5][:32]=="./spriteEnnemi/ennemi09/ennemi09":
+                    toucher_cristal(E)
+                else:
+                    effaces.append(E)
            
     if(len(effaces)>0):
         mon_perso[10]=[0,0,0,0,[],"Bas"]
@@ -1053,17 +1176,36 @@ def toucher(entite):
             
         for E in Ennemi:
             if E[2]>=posx and E[2]<posx+31 and E[3]+31>=posy and E[3]+31<posy+31:
-                effaces.append(E)
+                if E[5][:32]=="./spriteEnnemi/ennemi10/ennemi10":
+                    mini_boss(E,effaces)
+                if E[5][:32]=="./spriteEnnemi/ennemi09/ennemi09":
+                    toucher_cristal(E)
+                else:
+                    effaces.append(E)
                 
             elif E[2]+31>=posx and E[2]+31<posx+31 and E[3]+31>=posy and E[3]+31<posy+31:
-                effaces.append(E)
+                if E[5][:32]=="./spriteEnnemi/ennemi10/ennemi10":
+                    mini_boss(E,effaces)
+                if E[5][:32]=="./spriteEnnemi/ennemi09/ennemi09":
+                    toucher_cristal(E)
+                else:
+                    effaces.append(E)
                 
             elif E[2]>=posx and E[2]<posx+31 and E[3]>=posy and E[3]<posy+31:
-                effaces.append(E)
+                if E[5][:32]=="./spriteEnnemi/ennemi10/ennemi10":
+                    mini_boss(E,effaces)
+                if E[5][:32]=="./spriteEnnemi/ennemi09/ennemi09":
+                    toucher_cristal(E)
+                else:
+                    effaces.append(E)
                 
             elif E[2]+31>=posx and E[2]+31<posx+31 and E[3]>=posy and E[3]<posy+31:
-                effaces.append(E)
-        
+                if E[5][:32]=="./spriteEnnemi/ennemi10/ennemi10":
+                    mini_boss(E,effaces)
+                if E[5][:32]=="./spriteEnnemi/ennemi09/ennemi09":
+                    toucher_cristal(E)
+                else:
+                    effaces.append(E)
                 
     if entite[6]=="Droite" or entite[6]=="Gauche":
         if entite[6]=="Gauche":
@@ -1077,17 +1219,37 @@ def toucher(entite):
             
         for E in Ennemi:
             if E[2]>=posx and E[2]<posx+31 and E[3]+31>=posy and E[3]+31<posy+31:
-                effaces.append(E)
+                if E[5][:32]=="./spriteEnnemi/ennemi10/ennemi10":
+                    mini_boss(E,effaces)
+                if E[5][:32]=="./spriteEnnemi/ennemi09/ennemi09":
+                    toucher_cristal(E)
+                else:
+                    effaces.append(E)
                 
             elif E[2]+31>=posx and E[2]+31<posx+31 and E[3]+31>=posy and E[3]+31<posy+31:
-                effaces.append(E)
-                
+                if E[5][:32]=="./spriteEnnemi/ennemi10/ennemi10":
+                    mini_boss(E,effaces)
+                if E[5][:32]=="./spriteEnnemi/ennemi09/ennemi09":
+                    toucher_cristal(E)
+                else:
+                    effaces.append(E)
+                    
             elif E[2]>=posx and E[2]<posx+31 and E[3]>=posy and E[3]<posy+31:
-                effaces.append(E)
-                
+                if E[5][:32]=="./spriteEnnemi/ennemi10/ennemi10":
+                    mini_boss(E,effaces)
+                if E[5][:32]=="./spriteEnnemi/ennemi09/ennemi09":
+                    toucher_cristal(E)
+                else:
+                    effaces.append(E)
+                    
             elif E[2]+31>=posx and E[2]+31<posx+31 and E[3]>=posy and E[3]<posy+31:
-                effaces.append(E)
-                
+                if E[5][:32]=="./spriteEnnemi/ennemi10/ennemi10":
+                    mini_boss(E,effaces)
+                if E[5][:32]=="./spriteEnnemi/ennemi09/ennemi09":
+                    toucher_cristal(E)
+                else:
+                    effaces.append(E)
+                    
     if(len(effaces)>0):
         for E in effaces:
             sprite=""
@@ -1115,9 +1277,21 @@ def toucher(entite):
                 E[5]=sprite+"G4"
             del effaces[0]
 
-            
+def mini_boss(entite,liste):
+    if entite[6]=="Bas" and mon_perso[6]=="Bas" and mon_perso[3]<=entite[3]:
+        entite[9]-=1
+        liste.append(entite)
+    elif entite[6]=="Droite" and mon_perso[6]=="Droite" and mon_perso[2]<=entite[2]:
+        entite[9]-=1
+        liste.append(entite)
+    elif entite[6]=="Gauche" and mon_perso[6]=="Gauche" and mon_perso[2]>=entite[2]:
+        entite[9]-=1
+        liste.append(entite)
+    elif entite[6]=="Haut" and mon_perso[6]=="Haut" and mon_perso[3]>=entite[3]:
+        entite[9]-=1
+        liste.append(entite)
                     
-def mouvement_perso():        
+def mouvement_perso():
     val_x=mon_perso[2]
     val_y=mon_perso[3] 
     mon_perso[2]+=mon_perso[0]
@@ -1193,7 +1367,10 @@ def aleatoire(chiffre,mon_ennemi):
     elif(chiffre==3):
         mon_ennemi[1]-=mon_ennemi[8]
         mon_ennemi[6]="Haut"
-    mon_ennemi[7]=10
+    if mon_ennemi[5][:32]=="./spriteEnnemi/ennemi10/ennemi10":
+        mon_ennemi[7]=30
+    else:
+        mon_ennemi[7]=10
     	
 def mouvement_ennemi(mon_ennemi):
 
@@ -1258,7 +1435,7 @@ def vitesse(event):
         elif(touche=="c" and inventaire[0]>0):
             attaque("Arc")
             mon_perso[11]=0
-        if touche=="Escape":
+        if touche=="Escape" and not save_desactive:
             menu()
         if(touche=="a"):
             interagir()
@@ -1306,7 +1483,6 @@ def vitesse(event):
             
     elif message_active:
         if(touche=="a"):
-            print "1"
             if len(boss)>0:
                 for i in boss:
                     canvas.delete(i)
@@ -1429,7 +1605,13 @@ def stop(event):
 def evenement():
     global coffre1
     global vague1
-
+    global vague2
+    global save_desactive
+    global message_active
+    global messageflamme1
+    global messageflamme2
+    
+    save_desactive=False
     coffrepris=False
     existe=False
     if(nommap2=="tuto3"):
@@ -1442,6 +1624,7 @@ def evenement():
                 
     elif(nommap2=="temple6"):
         if (not vague1):
+            save_desactive=True
             for liste in listechangement:
                 if liste[4]=="07" and liste[2]==nommap:
                     coffrepris=True
@@ -1459,6 +1642,8 @@ def evenement():
                     listechangement.append([256,224,nommap,0,"07",0])
                     placer("./spriteObjet/objet02",256,224,2)
         else:
+            for E in Ennemi:
+                efface(E[4])
             Ennemi[:]=[]
             for liste in bloque:
                 if liste[0]==160 and liste[1]==320:
@@ -1471,8 +1656,191 @@ def evenement():
                     break
 
     elif nommap2=="boss1":
+        save_desactive=True
         combat_boss()
+        
+    elif nommap2=="boss" and mon_perso[3]<=320:
+        actionne_final()
+        save_desactive=True
+        
+    elif nommap2=="miniboss":
+        if (not messageflamme1):
+            boss.append(canvas.create_rectangle(100, 550, 550, 625, width=5, fill='white'))
+            boss.append(canvas.create_text(320, 590, text = "Golem : INTRUS INTRUS INTRUS ! DETRUIRE INTRUS !"))
+            message_active=True
+            messageflamme1=True
+        elif (not messageflamme2):
+            boss.append(canvas.create_rectangle(100, 550, 550, 625, width=5, fill='white'))
+            boss.append(canvas.create_text(320, 590, text = "C'est un Golem, ils sont réputés invincible. \nLeur point faible se trouve derriére leur dos. \nProfite de sa lenteur pour l'attaquer au bon moment. "))
+            message_active=True
+            messageflamme2=True
+            
+        elif (not vague2):
+            save_desactive=True
+            for liste in listechangement:
+                if liste[4]=="07" and liste[2]==nommap:
+                    coffrepris=True
+                    break
+            for liste in listeitem:
+                if liste[0]=="63":
+                    existe=True
+            if (not coffrepris):
+                if not existe:
+                    listeitem.append(["63",288,416,0,0,[]])
+                    placer("./spriteDecor/bloc63",288,416,2)  
+                if(not(len(Ennemi)>0)):                 
+                    vague2=True
+                    listeitem.append(["07",256,224,0,0,[]])
+                    listechangement.append([256,224,nommap,0,"07",0])
+                    placer("./spriteObjet/objet02",256,224,2)
+        else:
+            for E in Ennemi:
+                efface(E[4])
+            Ennemi[:]=[]
+            for liste in bloque:
+                if liste[0]==288 and liste[1]==416:
+                    bloque.remove(liste)
+                    break
+            for liste in listeitem:
+                if liste[0]=="63":
+                    efface(liste[5])
+                    break
+                
+def toucher_cristal(E):
+    E[0]=0
+    E[1]=0
+    if vulnerable and E[11]<=0:
+        E[9]-=1.5
+        E[5]="./spriteEnnemi/ennemi09/ennemi09B4"
+        E[11]=10
+def actionne_final():
+    global cptboss2
+    global message_active
+    global vulnerable
+    global cptfinal
+    global nommap2
+    global nommap
+    for j in timer:
+        canvas.delete(j)
+    timer[:]=[]
+    if cptfinal==0:
+        timer.append(canvas.create_rectangle(100, 550, 550, 625,fill='white'))
+        timer.append(canvas.create_text(320, 590, text = ("Tu es donc parvenu jusqu'ici...")))
+        message_active=True
+        cptfinal+=1
 
+    elif cptfinal==1:
+        timer.append(canvas.create_rectangle(100, 550, 550, 625,fill='white'))
+        timer.append(canvas.create_text(320, 590, text = ("T'affronter ici et maintenant ne serait qu'une perte de temps...")))
+        message_active=True
+        cptfinal+=1
+        
+    elif cptfinal==2:
+        timer.append(canvas.create_rectangle(100, 550, 550, 625,fill='white'))
+        timer.append(canvas.create_text(320, 590, text = ("Le rituel n'est pas complet, mais il est suffisant...")))
+        for liste in listeitem:
+            if liste[0]=="64":
+                efface(liste[5])
+                listeitem.append(["65",liste[1],liste[2],0,0,[]])
+                placer("./spriteObjet/objet65",liste[1],liste[2],2)
+                for E in bloque:
+                    if E[0]==liste[1] and E[1]==liste[2]:
+                        bloque.remove(E)
+                        break
+                listeitem.remove(liste)
+                break
+        message_active=True
+        cptfinal+=1
+
+    elif cptfinal==3:
+        timer.append(canvas.create_rectangle(100, 550, 550, 625,fill='white'))
+        timer.append(canvas.create_text(320, 590, text = ("Nous nous reverrons ! Si tu t'en sors vivant.")))
+        for liste in listeitem:
+            print liste[0]
+            if liste[0]=="65":
+                efface(liste[5])
+                for E in bloque:
+                    if E[0]==liste[1] and E[1]==liste[2]:
+                        bloque.remove(E)
+                        break
+                listeitem.remove(liste)
+                break
+        placer("./spriteDecor/bloc63",320,352,1)
+                
+        message_active=True
+        cptfinal+=1
+    elif cptfinal==4:
+        timer.append(canvas.create_rectangle(100, 550, 550, 625,fill='white'))
+        timer.append(canvas.create_text(320, 590, text = ("Héros ! Le cristal, tu dois le détruire ! \nLe rituel étant incomplet, le cristal aura besoin de temps \npour recharger sa magie.")))
+        message_active=True
+        cptfinal+=1
+        
+    elif cptfinal==5:
+        cristal_vie=0
+        for E in Ennemi:
+            if E[5][:32]=="./spriteEnnemi/ennemi09/ennemi09":
+                cristal_vie=E[9]
+                break
+        if cptboss2==0:
+            if not vulnerable :
+                boss.append(canvas.create_rectangle(100, 550, 550, 625, width=5, fill='white'))
+                boss.append(canvas.create_text(320, 590, text = "Le Cristal est Vulnérable ! Attaque le !"))
+                message_active=True
+                cptboss2=500
+            else:
+                cptboss2=1000
+            
+            vulnerable=not vulnerable
+
+        timer.append(canvas.create_rectangle(20, 70,200, 90,fill='white'))
+        timer.append(canvas.create_text(100, 80, text = ("Degat Cristal : " + str(cristal_vie) +"%" )))       
+        if not vulnerable:
+            timer.append(canvas.create_rectangle(450, 70,650, 90,fill='white'))
+            timer.append(canvas.create_text(550, 80, text = ("Cristal Vulnérable Dans : " + str(cptboss2/20) )))
+        else:
+            timer.append(canvas.create_rectangle(450, 70,650, 90,fill='white'))
+            timer.append(canvas.create_text(550, 80, text = ("Cristal Rechargé Dans : " + str(cptboss2/20) )))
+        
+        if cptboss2==500 or cptboss2==250 or cptboss2==750 or cptboss2==1000 and len(Ennemi)<10:
+            chiffre=randint(0,4)
+            if chiffre==0:
+                ajout_ennemi("./spriteEnnemi/ennemi07/ennemi07",384,128)
+                ajout_ennemi("./spriteEnnemi/ennemi02/ennemi02",256,128)
+                ajout_ennemi("./spriteEnnemi/ennemi02/ennemi02",256,288)
+                ajout_ennemi("./spriteEnnemi/ennemi03/ennemi03",384,288)
+            elif chiffre==1:
+                ajout_ennemi("./spriteEnnemi/ennemi02/ennemi02",256,128)
+                ajout_ennemi("./spriteEnnemi/ennemi03/ennemi03",384,128)
+                ajout_ennemi("./spriteEnnemi/ennemi02/ennemi02",256,288)
+                ajout_ennemi("./spriteEnnemi/ennemi03/ennemi03",384,288)
+            elif chiffre==2:
+                ajout_ennemi("./spriteEnnemi/ennemi02/ennemi02",256,128)
+                ajout_ennemi("./spriteEnnemi/ennemi03/ennemi03",384,128)
+                ajout_ennemi("./spriteEnnemi/ennemi08/ennemi08",384,288)
+                ajout_ennemi("./spriteEnnemi/ennemi07/ennemi07",256,288)
+            elif chiffre==3:
+                ajout_ennemi("./spriteEnnemi/ennemi08/ennemi08",384,128)
+                ajout_ennemi("./spriteEnnemi/ennemi07/ennemi07",256,128)
+                ajout_ennemi("./spriteEnnemi/ennemi02/ennemi02",256,288)
+                ajout_ennemi("./spriteEnnemi/ennemi03/ennemi03",384,288)
+            else:
+                ajout_ennemi("./spriteEnnemi/ennemi05/ennemi05",384,128)
+                ajout_ennemi("./spriteEnnemi/ennemi01/ennemi01",256,128)
+                ajout_ennemi("./spriteEnnemi/ennemi02/ennemi02",256,288)
+                ajout_ennemi("./spriteEnnemi/ennemi03/ennemi03",384,288)
+
+        cptboss2-=1
+        for E in Ennemi:
+            if cristal_vie==0:
+                canvas.delete("all")
+                nommap2="detruit1"
+                nommap="./map/detruit1"
+                Ennemi[:]=[]
+                efface_listeitem()
+                bloque[:]=[]
+                
+                affiche_terrain(nommap)
+            
 def combat_boss():
     global boss1
     global boss2
@@ -1486,8 +1854,9 @@ def combat_boss():
     for j in timer:
         canvas.delete(j)
     timer[:]=[]
-    timer.append(canvas.create_rectangle(600, 100,650, 120,fill='white'))
-    timer.append(canvas.create_text(615, 110, text = str (cptboss/10)))    
+    timer.append(canvas.create_rectangle(450, 70,650, 90,fill='white'))
+    timer.append(canvas.create_text(550, 80, text = ("Fin du Rituel dans : " + str(cptboss/20) )))
+    
     if cptboss==2000:
         boss.append(canvas.create_rectangle(100, 550, 550, 625, width=5, fill='white'))
         boss.append(canvas.create_text(320, 590, text = "Le Rituel à déjà débuté ! Tu ne pourras pas m'arrêter ! "))
@@ -1529,14 +1898,6 @@ def combat_boss():
                 listeitem.remove(liste)
                 break
     elif boss2 and len(Ennemi)==0:
-        ajout_ennemi("./spriteEnnemi/ennemi04/ennemi04",200,150)
-        ajout_ennemi("./spriteEnnemi/ennemi07/ennemi07",200,280)
-        ajout_ennemi("./spriteEnnemi/ennemi05/ennemi05",250,280)
-        ajout_ennemi("./spriteEnnemi/ennemi06/ennemi06",250,320)
-        ajout_ennemi("./spriteEnnemi/ennemi08/ennemi08",500,320)
-        ajout_ennemi("./spriteEnnemi/ennemi06/ennemi06",500,500)
-        ajout_ennemi("./spriteEnnemi/ennemi07/ennemi07",500,532)
-        boss3=True
         for liste in bloque:
             if liste[0]==320 and liste[1]==192:
                 bloque.remove(liste)
@@ -1546,15 +1907,14 @@ def combat_boss():
                 efface(liste[5])
                 listeitem.remove(liste)
                 break
-        listeitem.append(["63",320,96,0,0,[]])
-        placer("./spriteDecor/bloc63",320,96,2)
+        if mon_perso[3]<=128:
+            ajout_ennemi("./spriteEnnemi/ennemi05/ennemi05",200,150)
+            ajout_ennemi("./spriteEnnemi/ennemi07/ennemi07",200,280)
+            ajout_ennemi("./spriteEnnemi/ennemi07/ennemi07",500,532)
+            listeitem.append(["63",320,96,0,0,[]])
+            placer("./spriteDecor/bloc63",320,96,2)
+            boss3=True
     elif boss1 and len(Ennemi)==0:
-        ajout_ennemi("./spriteEnnemi/ennemi07/ennemi07",200,280)
-        ajout_ennemi("./spriteEnnemi/ennemi05/ennemi05",250,280)
-        ajout_ennemi("./spriteEnnemi/ennemi06/ennemi06",250,320)
-        ajout_ennemi("./spriteEnnemi/ennemi08/ennemi08",500,320)
-        ajout_ennemi("./spriteEnnemi/ennemi07/ennemi07",500,280)
-        boss2=True
         for liste in bloque:
             if liste[0]==320 and liste[1]==384:
                 bloque.remove(liste)
@@ -1564,10 +1924,16 @@ def combat_boss():
                 efface(liste[5])
                 listeitem.remove(liste)
                 break
-        listeitem.append(["63",320,192,0,0,[]])
-        placer("./spriteDecor/bloc63",320,192,2)
+        if mon_perso[3]<=224:
+            ajout_ennemi("./spriteEnnemi/ennemi07/ennemi07",200,280)
+            ajout_ennemi("./spriteEnnemi/ennemi06/ennemi06",250,320)
+            ajout_ennemi("./spriteEnnemi/ennemi08/ennemi08",500,320)
+            ajout_ennemi("./spriteEnnemi/ennemi07/ennemi07",500,280)
+            listeitem.append(["63",320,192,0,0,[]])
+            placer("./spriteDecor/bloc63",320,192,2)
+            boss2=True
             
-    elif not boss1 and len(Ennemi)==0:
+    elif not boss1 and len(Ennemi)==0 and mon_perso[3]<=416:
         ajout_ennemi("./spriteEnnemi/ennemi07/ennemi07",250,500)
         ajout_ennemi("./spriteEnnemi/ennemi06/ennemi06",250,540)
         ajout_ennemi("./spriteEnnemi/ennemi06/ennemi06",500,500)
@@ -1786,9 +2152,25 @@ def sauvegarder():
         mot="["+str(liste[0])+","+str(liste[1])+",]\n"
         fichier.write(mot)
     fichier.write("@\n")
+    fichier.write("["+str(coffre1)+","+str(vague1)+","+str(vague2)+","+str(messageflamme1)+","+str(messageflamme2)+",]\n")
+    fichier.write("@\n")
     fichier.close()
 def joueur_mort():
+    global boss1
+    global boss2
+    global boss3
+    global boss4
+    global cptboss
+    global cptboss2
+    global cptfinal
     if inventaire[1]<=0:
+        cptboss=2000
+        cptboss2=1000
+        boss1=False
+        boss2=False
+        boss3=False
+        boss4=False
+        cptfinal=0
         if os.path.isfile("./save/save1"):
             charger()
         else:
@@ -1803,6 +2185,14 @@ def charger():
     global interrupteur
     global FLECHE_MAX
     global VIE_MAX
+    global save_desactive
+    global coffre1
+    global vague2
+    global vague1
+    global messageflamme1
+    global messageflamme2
+    
+    save_desactive=False
 
     listechangement[:]=[]
     inventaire[:]=[]
@@ -1946,7 +2336,47 @@ def charger():
                         
                     elif est_changement:
                         mot+=c
-
+                        
+            elif cpt2==5:           
+                for c in ligne:
+                    if c=="[":
+                        est_changement=True
+                        mot=""
+                    elif c==",":
+                        if cpt==0:
+                            if mot[0]=="F":
+                                coffre1=False
+                            else:
+                                coffre1=True             
+                        elif cpt==1:
+                            if mot[0]=="F":
+                                vague1=False
+                            else:
+                                vague1=True    
+                        elif cpt==2:
+                            if mot[0]=="F":
+                                vague2=False
+                            else:
+                                vague2=True    
+                        elif cpt==3:
+                            if mot[0]=="F":
+                                messageflamme1=False
+                            else:
+                                messageflamme1=True    
+                        elif cpt==4:
+                            if mot[0]=="F":
+                                messageflamme2=False
+                            else:
+                                messageflamme2=True   
+                        mot=""
+                        est_changement=True
+                        cpt+=1
+                    elif c=="]":
+                        cpt=0
+                        i+=1
+                        est_changement=False
+                    elif est_changement:
+                        mot+=c
             
     Ennemi[:]=[]
     mon_perso[10]=[0,0,0,0,[],"Bas"]
@@ -2035,11 +2465,11 @@ canvas = Canvas(fenetre, width=640, height=640, background="black")
 mapx=1
 mapy=1
 
-nommap="./map/map0-0"
-nommap2="map0-0"
+nommap="./map/bos1"
+nommap2="boss1"
 
-inventaire=[30,10,True,True,1500,0]#[fleche,vie,Epee,Arc,Gold,clef]
-mon_perso=[0,0,320,400,[],"./spritePerso/PersoB1","Bas",0,inventaire,[0,False,""],[0,0,0,0,[],"Bas"],0] #[vitessex,vitessey,posx,posy,idsprite,sprite,orientation,d,[Inventaire],[Epee],[Fleche],compteurDegat]
+inventaire=[40,30,True,True,1500,0]#[fleche,vie,Epee,Arc,Gold,clef]
+mon_perso=[0,0,352,300,[],"./spritePerso/PersoB1","Bas",0,inventaire,[0,False,""],[0,0,0,0,[],"Bas"],0] #[vitessex,vitessey,posx,posy,idsprite,sprite,orientation,d,[Inventaire],[Epee],[Fleche],compteurDegat]
 
 Ennemi=[]
 
@@ -2062,14 +2492,21 @@ message_active=False
 coffre1=False
 attendre = False
 achat=False
+vague2=False
 vague1=False
+save_desactive=False
+messageflamme1=False
+messageflamme2=False
 
 boss1=False
 boss2=False
 boss3=False
 boss4=False
+vulnerable=False
 boss=[]
 cptboss=2000
+cptboss2=1000
+cptfinal=0
 timer=[]
 
 listeitem=[]
@@ -2079,7 +2516,7 @@ listeobjet=[]
 listecassable=[]
 listechangement=[]
 
-VIE_MAX=10
+VIE_MAX=30
 FLECHE_MAX=40
 
 affiche_terrain(nommap)
