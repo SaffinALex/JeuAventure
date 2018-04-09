@@ -5,13 +5,11 @@
 [320,544,./map/tuto6,0,07,1,]
 [384,128,./map/tuto6,1,12,1,]
 @
-[./map/map1-1,map1-1,504,264,1,1,0,20,20,]
+[./map/map0-0,map0-0,384,600,0,0,0,20,20,]
 @
-[17,20,True,True,10,0,0,]
+[18,5,True,True,35,0,0,]
 @
-[180,230,1,./spriteEnnemi/ennemi08/ennemi08H1,2,1,]
-[448,352,1,./spriteEnnemi/ennemi08/ennemi08D1,2,1,]
-[172,436,2,./spriteEnnemi/ennemi05/ennemi05B1,2,2,]
+[196,260,2,./spriteEnnemi/ennemi03/ennemi03H2,2,2,]
 @
 @
 [True,False,False,False,False,False,False,False,False,]
