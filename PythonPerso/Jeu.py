@@ -146,7 +146,7 @@ def affiche_ennemi(nom):
             i+=2
         j+=32
     fichier.close()
-    if not titre:
+    if not titre and not introactive:
         create_HUD()
     
 
@@ -624,7 +624,7 @@ def ramasse_objet():
               
 def frame():
     efface=[]
-    if(not attendre and not achat and not message_active and not fin and not titre):
+    if(not attendre and not achat and not message_active and not fin and not titre and not introactive):
         changeMap()
         joueur_toucher()
 
@@ -671,6 +671,8 @@ def frame():
         canvas.after(30,frame)
     if titre:
         ecran_titre()
+    if introactive:
+        introduction()
         
 def teleportation():
     global nommap2
@@ -1408,6 +1410,7 @@ def vitesse(event):
     global attendre
     global message_active
     global achat
+    global introactive
     touche=event.keysym
     if(not attendre and not message_active and not achat and not titre):
         if touche=="z" or touche=="Z":
@@ -1464,7 +1467,7 @@ def vitesse(event):
             attendre=False
             if lemenu[3]==0:
                 if titre:
-                    nouvelle_partie()
+                    introactive=True
                 else:
                     sauvegarder()
             elif lemenu[3]==2:
@@ -1474,47 +1477,6 @@ def vitesse(event):
                 attendre=True
             frame()
 
-    elif (titre):
-        if touche=="Escape":
-            attendre=False
-            letitre[2][1]=280
-            letitre[2][0]=485
-            lemenu[3]=0
-            efface(lemenu[2][2])
-            efface(lemenu[0])
-            efface(lemenu[1])
-            frame()
-            
-        if touche=="Up":
-            efface(lemenu[2][2])
-            lemenu[2][1]-=28
-            lemenu[3]-=1
-            if(lemenu[2][1]<280):
-                lemenu[2][1]+=28*3
-                lemenu[3]=2
-            placer_curseur()
-        if touche=="Down":
-            efface(lemenu[2][2])
-            lemenu[2][1]+=28
-            lemenu[3]+=1
-            if(lemenu[2][1]>336):
-                lemenu[2][1]-=28*3
-                lemenu[3]=0
-            placer_curseur()
-        if touche=="Return":
-            efface(lemenu[2][2])
-            efface(lemenu[0])
-            efface(lemenu[1])
-            attendre=False
-            if lemenu[3]==0:
-                sauvegarder()
-            elif lemenu[3]==2:
-                charger()
-            elif lemenu[3]==1:
-                fenetre.destroy()
-                attendre=True
-            frame()
-            
     elif message_active:
         if(touche=="space"):
             if len(boss)>0:
@@ -1523,6 +1485,7 @@ def vitesse(event):
                 boss[:]=[]
                 message_active=False
                 frame()
+    
             else:
                 message_active = False
 	        canvas.delete(rectangle)
@@ -1673,7 +1636,6 @@ def boss_phase3():
         if 320<=mon_perso[2]<=352 and 416<=mon_perso[3]<=448:
             efface(mon_perso[4])
             placer("./spriteObjet/objet66",320,352,0)
-            attendre=True
             message_active=True
             boss.append(canvas.create_rectangle(100, 550, 550, 625, width=5, fill='white'))
             boss.append(canvas.create_text(320, 590, text = "Homme Mystérieux: Bien,il est parti... \nCette Affaire est bien trop préoccupante...\nElle ne doit pas s'ébruiter."))
@@ -2767,7 +2729,8 @@ def nouvelle_partie():
     global messageflamme2
     global messageflamme3
     global messageflamme4
-    
+    global introd
+
     cptboss=2000
     cptboss2=1000
     boss1=False
@@ -2783,7 +2746,7 @@ def nouvelle_partie():
     messageflamme3=False
     messageflamme4=False   
     cptfinal=0
-    
+
     canvas.delete("all")
     inventaire[:]=[20,20,True,True,0,0,0]#[fleche,vie,Epee,Arc,Gold,clef,Grande Clef]
     mon_perso[:]=[0,0,320,392,[],"./spritePerso/PersoB1","Bas",0,inventaire,[0,False,""],[0,0,0,0,[],"Bas"],0] #[vitessex,vitessey,posx,posy,idsprite,sprite,orientation,d,[Inventaire],[Epee],[Fleche],compteurDegat]
@@ -2792,10 +2755,57 @@ def nouvelle_partie():
     titre=False
     Ennemi[:]=[]
     bloque[:]=[]
+    introd=0
     affiche_terrain(nommap)
     verifie_interrupteur()
 
+def introduction():
+    global introd
+    global titre
+    global attendre
+    global message_active
+    global introactive
+    message_active=True
+    titre=False
+    attendre=False
+    canvas.delete("all")
+    boss.append(canvas.create_rectangle(100, 550, 550, 625, width=5, fill='white'))
     
+    if introd==0:
+        boss.append(canvas.create_text(320, 590, text = "Les légendes racontent qu'autrefois il existait un Royaume trés avancé. "))
+        introd+=1
+    elif introd==1:
+        affiche_terrain("./map/intro1")
+        boss.append(canvas.create_rectangle(100, 550, 550, 625, width=5, fill='white'))
+        boss.append(canvas.create_text(320, 590, text = "Mais un jour ce Royaume disparu de la carte.\nLaissant derriére lui 6 Critaux au pouvoir incommensurable. "))
+        introd+=1
+    elif introd==2:
+        affiche_terrain("./map/intro3")
+        boss.append(canvas.create_rectangle(100, 550, 550, 625, width=5, fill='white'))
+        boss.append(canvas.create_text(320, 590, text = "En prévention, ils furent cachés dans 6 lieux différents. "))
+        introd+=1
+    elif introd==3:
+        affiche_terrain("./map/intro2")
+        boss.append(canvas.create_rectangle(100, 550, 550, 625, width=5, fill='white'))
+        boss.append(canvas.create_text(320, 590, text = "Et des gardiens furent désigner pour veilleur sur les critaux."))
+        introd+=1
+    elif introd==4:
+        affiche_terrain("./map/Cinematique")
+        boss.append(canvas.create_rectangle(100, 550, 550, 625, width=5, fill='white'))
+        boss.append(canvas.create_text(320, 590, text = "Mais Aujourd'hui les cristaux sont en danger !"))
+        introd+=1
+    elif introd==5:
+        mouvement_perso()
+        boss.append(canvas.create_rectangle(100, 550, 550, 625, width=5, fill='white'))
+        boss.append(canvas.create_text(320, 590, text = "Et c'est toi qui a été choisit pour éviter \nqu'ils ne tombent entre de mauvaise main."))
+        introd+=1
+    elif introd==6:
+        introactive=False
+        nouvelle_partie()
+        boss.append(canvas.create_rectangle(100, 550, 550, 625, width=5, fill='white'))
+        boss.append(canvas.create_text(320, 590, text = "Va et accomplis ta mission !"))
+
+        
 fenetre = Tk()
 canvas = Canvas(fenetre, width=640, height=640, background="black")
 
@@ -2824,6 +2834,8 @@ sequence2=["G","H","G","G","G","H","G","B","H"]
 sequence_joueur=[]
 dialogue_bois=""
 
+introd=0
+introactive=False
 message_active=False
 coffre1=False
 attendre = False
